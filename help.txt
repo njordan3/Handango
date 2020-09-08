@@ -1,0 +1,14 @@
+Examples:
+https://programmer.help/blogs/node.js-c-plug-in-practice-guide.html
+
+Examples:
+https://github.com/schahriar/n-api-article/tree/master/Getting_Started
+
+Examples:
+https://hackernoon.com/n-api-and-getting-started-with-writing-c-addons-for-node-js-cf061b3eae75
+
+Documentation:
+https://nodejs.org/api/n-api.html#n_api_napi_env
+
+Examples:
+https://github.com/nodejs/node-addon-examples
