@@ -15,8 +15,8 @@ var port = 443;
 try {
     //get OpenSSL credentials
     options = {
-        key: fs.readFileSync(__dirname + "/ssl/privkey.pem"),
-        cert: fs.readFileSync(__dirname + "/ssl/cert.pem")
+        key: fs.readFileSync(__dirname + "/tls/privkey.pem"),
+        cert: fs.readFileSync(__dirname + "/tls/cert.pem")
     }
 } catch (e) {
     //change to HTTP connection
