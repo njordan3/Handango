@@ -1,42 +1,76 @@
+//https://medium.com/@technologies4.trending/password-encryption-using-mysql-database-in-node-js-30f736ea1de8
+//https://medium.com/@alexcambose/webcam-live-streaming-with-websockets-and-base64-64b1b4992db8
+//Websocket/socketio with NodeJS/Express
+//https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
+
 const greeting = require('../build/Release/greeting');
 
 console.log(greeting.greetHello("Nick"));
 
 //server dependencies
 const express = require('express');
-const https = require('https');
-const httpsPort = 443;
+const bodyParser = require('body-parser');
+const helmet = require('helmet');
+//const https = require('https');
+const { v4: uuidv4 } = require('uuid'); //random string generator
+const session = require('express-session');
+//https://www.npmjs.com/package/express-mysql-session
+const filestore = require('session-file-store')(session);
 
-//get OpenSSL credentials
-const fs = require('fs');   // file system
-const options = {
-    key: fs.readFileSync(__dirname + "/ssl/privkey.pem"),
-    cert: fs.readFileSync(__dirname + "/ssl/cert.pem")
+//used to create file path strings
+const path = require('path');
+// file system
+const fs = require('fs');
+
+var options = {};
+var protocol = require('https');
+var port = 443;
+try {
+    //get OpenSSL credentials
+    options = {
+        key: fs.readFileSync(__dirname + "/tls/privkey.pem"),
+        cert: fs.readFileSync(__dirname + "/tls/cert.pem")
+    }
+} catch (e) {
+    protocol = require('http');
+    port = 3000;
 }
 
 //initialize express app
-app = express();
+const app = express();
+//serve public directory to client
+//https://stackoverflow.com/questions/11569181/serve-static-files-on-a-dynamic-route-using-express
+app.use(express.static(path.join(__dirname, '../public')));
+//use helmet as middleware
+app.use(helmet());
+//body parser middleware for html form handling
+app.use(bodyParser.urlencoded({extended: true}));
+
+//use session middleware with unique session id using UUIDV4
+app.use(session({
+    genid: () => {
+        return uuidv4();
+    },
+    store: new filestore(),
+    secret: 'super secret',
+    resave: false,
+    saveUninitialized: true
+}))
+
 app.enable('trust proxy');
-//handler to inspect req.secure flag so we 
-//can handle requests from https and http
-app.use(function (req, res, next) {
-    if (req.secure) {
-        //request was https, so do no special handling
-        next();
-    } else {
-        //request was http, so redirect to https
-        res.redirect('https://' + req.headers.host + req.url);
-    }
-});
+
 //response on homepage
-var path = require('path');
 app.get('/', function(req, res) {
-    res.sendFile(path.join(__dirname, '../public', 'index.html'));
+    console.log("Someone is at the homepage");
+});
+//login post from client
+app.post('/login', function(req, res) {
+    res.send(`You sent the following: ${req.body.email}.`);
+    console.log(req.body.password);
 });
 
 //launch server
-var httpsServer = https.createServer(options, app);
-httpsServer.listen(httpsPort, () => {
-    console.log(`HTTPS server listening on port: ${httpsPort}`);
-    console.log('Proceed to https://duohando.com');
+var server = protocol.createServer(options, app);
+server.listen(port, () => {
+    port === 443 ? console.log("HTTPS Server on https://duohando.com") : console.log(`HTTP server on localhost:${port}`);
 });

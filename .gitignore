@@ -1,0 +1,8 @@
+.vscode/
+build/
+c++/
+node_modules/
+tls/
+sessions/
+*.txt
+*.gyp
