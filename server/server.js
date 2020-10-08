@@ -39,11 +39,6 @@ app.enable('trust proxy');
 app.get('/', function(req, res) {
     console.log("Someone is at the homepage");
 });
-//login post from client
-app.post('/login', function(req, res) {
-    res.send(`You sent the following: ${req.body.email}.`);
-    console.log(req.body.password);
-});
 
 //launch server
 var server = protocol.createServer(options, app);
