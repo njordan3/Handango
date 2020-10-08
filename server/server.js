@@ -1,42 +1,52 @@
-const greeting = require('../build/Release/greeting');
-
-console.log(greeting.greetHello("Nick"));
-
 //server dependencies
 const express = require('express');
-const https = require('https');
-const httpsPort = 443;
+const bodyParser = require('body-parser');
+const helmet = require('helmet');
 
-//get OpenSSL credentials
-const fs = require('fs');   // file system
-const options = {
-    key: fs.readFileSync(__dirname + "/ssl/privkey.pem"),
-    cert: fs.readFileSync(__dirname + "/ssl/cert.pem")
+//used to create file path strings
+const path = require('path');
+//file system
+const fs = require('fs');
+
+//default to HTTPS connection
+var options = {};
+var protocol = require('https');
+var port = 443;
+try {
+    //get OpenSSL credentials
+    options = {
+        key: fs.readFileSync(__dirname + "/ssl/privkey.pem"),
+        cert: fs.readFileSync(__dirname + "/ssl/cert.pem")
+    }
+} catch (e) {
+    //change to HTTP connection
+    protocol = require('http');
+    port = 3000;
 }
 
 //initialize express app
-app = express();
+const app = express();
+//serve public directory to client
+app.use(express.static(path.join(__dirname, '../public')));
+//use helmet as middleware
+app.use(helmet());
+//body parser middleware for html form handling
+app.use(bodyParser.urlencoded({extended: true}));
+
 app.enable('trust proxy');
-//handler to inspect req.secure flag so we 
-//can handle requests from https and http
-app.use(function (req, res, next) {
-    if (req.secure) {
-        //request was https, so do no special handling
-        next();
-    } else {
-        //request was http, so redirect to https
-        res.redirect('https://' + req.headers.host + req.url);
-    }
-});
+
 //response on homepage
-var path = require('path');
 app.get('/', function(req, res) {
-    res.sendFile(path.join(__dirname, '../public', 'index.html'));
+    console.log("Someone is at the homepage");
+});
+//login post from client
+app.post('/login', function(req, res) {
+    res.send(`You sent the following: ${req.body.email}.`);
+    console.log(req.body.password);
 });
 
 //launch server
-var httpsServer = https.createServer(options, app);
-httpsServer.listen(httpsPort, () => {
-    console.log(`HTTPS server listening on port: ${httpsPort}`);
-    console.log('Proceed to https://duohando.com');
+var server = protocol.createServer(options, app);
+server.listen(port, () => {
+    port === 443 ? console.log("HTTPS Server on https://duohando.com") : console.log(`HTTP server on localhost:${port}`);
 });
