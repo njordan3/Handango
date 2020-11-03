@@ -38,8 +38,8 @@ module.exports = function() {
     //passport google login setup ===================
     //===============================================
     passport.use('google', new GoogleStrategy({
-        clientID: "600277126585-94hhjv378m79343pdjnn2mmnn3diea5p.apps.googleusercontent.com",
-        clientSecret: "zhRu9BV0Seyi2cj8RYwRM5Kc",
+        clientID: process.env.GOOGLE_ID,
+        clientSecret: process.env.GOOGLE_SECRET,
         callbackURL: "https://duohando.com/google/callback"
       },
       function(accessToken, refreshToken, profile, done) {
@@ -55,8 +55,8 @@ module.exports = function() {
     //passport facebook login setup =================
     //===============================================
     passport.use('facebook', new FacebookStrategy({
-        clientID: "370584830733552",
-        clientSecret: "6be9eb375ba6ff4ccbabf4a512249fd5",
+        clientID: process.env.FACEBOOK_ID,
+        clientSecret: process.env.FACEBOOK_SECRET,
         callbackURL: "https://duohando.com/facebook/callback"
       },
       function(accessToken, refreshToken, profile, done) {
