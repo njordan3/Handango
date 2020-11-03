@@ -1,1 +1,0 @@
-char* helloUser(char* name);

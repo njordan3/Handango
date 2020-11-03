@@ -3,34 +3,29 @@
 //Websocket/socketio with NodeJS/Express
 //https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
 
-const greeting = require('../build/Release/greeting');
-
-console.log(greeting.greetHello("Nick"));
-
 //server dependencies
 const express = require('express');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
-//const https = require('https');
-const { v4: uuidv4 } = require('uuid'); //random string generator
-const session = require('express-session');
-//https://www.npmjs.com/package/express-mysql-session
-const filestore = require('session-file-store')(session);
+const WebSocket = require('ws');
+const favicon = require('serve-favicon');
+//user authentication and database configuration
+const passport = require('passport');
+require('./passport-setup')(passport);
 
-//used to create file path strings
 const path = require('path');
-// file system
 const fs = require('fs');
 
 var options = {};
 var protocol = require('https');
+const { default: contentSecurityPolicy } = require('helmet/dist/middlewares/content-security-policy');
 var port = 443;
 try {
     //get OpenSSL credentials
     options = {
         key: fs.readFileSync(__dirname + "/tls/privkey.pem"),
         cert: fs.readFileSync(__dirname + "/tls/cert.pem")
-    }
+    };
 } catch (e) {
     protocol = require('http');
     port = 3000;
@@ -38,39 +33,36 @@ try {
 
 //initialize express app
 const app = express();
-//serve public directory to client
-//https://stackoverflow.com/questions/11569181/serve-static-files-on-a-dynamic-route-using-express
-app.use(express.static(path.join(__dirname, '../public')));
-//use helmet as middleware
-app.use(helmet());
+
 //body parser middleware for html form handling
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json())
+//use helmet as middleware
+app.use(helmet());
 
-//use session middleware with unique session id using UUIDV4
-app.use(session({
-    genid: () => {
-        return uuidv4();
-    },
-    store: new filestore(),
-    secret: 'super secret',
-    resave: false,
-    saveUninitialized: true
-}))
+//initializes passport and passport sessions
+app.use(passport.initialize());
+app.use(passport.session());
+
+//serves favicon
+app.use(favicon(path.join(__dirname, '../favicon/favicon-32x32.png')));
+
+//load routes with our app and configured passport
+require('./routes')(express, app, passport);
 
 app.enable('trust proxy');
 
-//response on homepage
-app.get('/', function(req, res) {
-    console.log("Someone is at the homepage");
-});
-//login post from client
-app.post('/login', function(req, res) {
-    res.send(`You sent the following: ${req.body.email}.`);
-    console.log(req.body.password);
+//launch web server
+const server = protocol.createServer(options, app);
+
+//launch websocket server by sharing our web server protocol and only accept connections coming from 'path'
+const ws_server = new WebSocket.Server({server: server, path: ""});
+ws_server.on('connection', function connection(socket) {
+    socket.on('test', function incoming(msg) {
+        console.log(msg);
+    });
 });
 
-//launch server
-var server = protocol.createServer(options, app);
 server.listen(port, () => {
     port === 443 ? console.log("HTTPS Server on https://duohando.com") : console.log(`HTTP server on localhost:${port}`);
 });

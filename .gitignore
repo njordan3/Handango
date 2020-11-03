@@ -1,8 +1,13 @@
+#ignore all these folders
 .vscode/
 build/
 c++/
 node_modules/
 tls/
-sessions/
+favicon/
+#ignore .txt files
 *.txt
+#ignore .gyp files
 *.gyp
+#ignore .env files
+*.env
