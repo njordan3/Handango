@@ -1,4 +1,17 @@
+const bcrypt = require('bcrypt');
+
 var connection;
+
+module.exports = {
+    initDB: initDB,
+    connectToDB: connectToDB,
+    findUser: findUser,
+    addUser: addUser,
+    validEmail: validEmail,
+    validPassword: validPassword,
+    comparePassword: comparePassword,
+    hashPassword: hashPassword
+}
 
 function initDB() {
     var mysql = require('mysql2');
@@ -12,49 +25,90 @@ function initDB() {
 
     connection.connect(function(err) {
         if (err) {
-            console.error('error: ' + err.message);
+            console.log(err.sqlMessage);
         } else {
             console.log('Connected to the MySQL server.');
         }
     });
 }
 
-function connectToDB(callback) {
-    connection.connect(function(err) {
-        callback(err);
+function connectToDB() {
+    return new Promise((resolve, reject) => {
+        connection.connect(function(err) {
+           if (err) reject(err.sqlMessage);
+           resolve();
+        });
     });
 }
 
-function findUser(email, callback) {
-    connection.connect(function(err) {
-        if (err) {
-            callback(err, null);    //dont query is db isnt up
-        } else {
-            connection.query('CALL findUser(?)', [email], function(err, result) {
-                callback(err, JSON.parse(JSON.stringify(result[0][0])));
-            });
-        }
+function findUser(email) {
+    return new Promise((resolve, reject) => {
+        connection.connect(function(err) {
+            if (err) return reject(err)
+            else {
+                connection.query('CALL findUser(?)', [email], function(err, result) {
+                    if (err) return reject(err.sqlMessage);
+                    if (result[0].length === 0) return reject(new Error(`Account for ${email} doesn't exist`));
+                    let row = JSON.parse(JSON.stringify(result[0][0]));
+                    return resolve(row);
+                });
+            }
+        });
+    
     });
-
 }
 
 function addUser(params, callback) {
-    connection.connect(function(err) {
-        if (err) {
-            callback(err, null);    //dont query is db isnt up
-        } else if (params.length !== 7) {
-            callback(`addUser called with wrong amount of params: ${params.length}`, null);
-        } else {
-            connection.query('CALL addUser(?,?,?,?,?,?,?)', params, function(err, result) {
-                callback(err, result);
-            });
-        }
+    return new Promise((resolve, reject) => {
+        connection.connect(function(err) {
+            if (err) return reject(err);
+            else if (params.length !== 7) return reject(new Error(`Wrong amount of parameters when adding user: ${params.length}`));
+            else {
+                connection.query('CALL addUser(?,?,?,?,?,?,?)', params, function(err, result) {
+                    if (err) return reject(err.sqlMessage);
+                    return resolve();
+                });
+            }
+        });
     });
 }
 
-module.exports = {
-    initDB: initDB,
-    connectToDB: connectToDB,
-    findUser: findUser,
-    addUser: addUser,
+var emailREGEX = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+var passwordREGEX = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[-+_!@#$%^&*.,?]).{8,}/;
+
+function validEmail(email) {
+    return new Promise((resolve, reject) => {
+        if (!emailREGEX.test(email)) {
+            return reject(new Error("Improperly formatted email"));
+        }
+        return resolve();
+    });
+}
+
+function validPassword(password) {
+    new Promise((resolve, reject) => {
+        if (!passwordREGEX.test(password)) {
+            return reject(new Error("Improperly formatted password"));
+        }
+        return resolve();
+    });
+}
+
+function comparePassword(password, hash) {
+    return new Promise((resolve, reject) => {
+        bcrypt.compare(password, hash, function(err, result) {
+            if (err) return reject(err);
+            else if (!result) return reject(new Error("Wrong password"));
+            return resolve();
+        });
+    });   
+}
+
+function hashPassword(password) {
+    return new Promise((resolve, reject) => {
+        bcrypt.hash(password, parseInt(process.env.USER_SALT), function(err, hash) {
+            if (err) return reject(err);
+            return resolve(hash);
+        });
+    });
 }
