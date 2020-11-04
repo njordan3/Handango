@@ -51,7 +51,7 @@ module.exports = function() {
                 .catch(function(err) {
                     console.log(err);
                     return done(null, false, {message: err});
-                }); 
+                });
         }
     ));
     //===============================================
