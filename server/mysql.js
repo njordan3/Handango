@@ -58,7 +58,7 @@ function findUser(email) {
     });
 }
 
-function addUser(params, callback) {
+function addUser(params) {
     return new Promise((resolve, reject) => {
         connection.connect(function(err) {
             if (err) return reject(err);
@@ -66,17 +66,18 @@ function addUser(params, callback) {
             else {
                 connection.query('CALL addUser(?,?,?,?,?,?,?)', params, function(err, result) {
                     if (err) return reject(err.sqlMessage);
-                    return resolve();
+                    if (result[0].length === 0) return reject(new Error(`Account for ${email} doesn't exist`));
+                    let row = JSON.parse(JSON.stringify(result[0][0]));
+                    return resolve(row);
                 });
             }
         });
     });
 }
 
-var emailREGEX = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-var passwordREGEX = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[-+_!@#$%^&*.,?]).{8,}/;
 
 function validEmail(email) {
+    let emailREGEX = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
     return new Promise((resolve, reject) => {
         if (!emailREGEX.test(email)) {
             return reject(new Error("Improperly formatted email"));
@@ -86,6 +87,7 @@ function validEmail(email) {
 }
 
 function validPassword(password) {
+    let passwordREGEX = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[-+_!@#$%^&*.,?]).{8,}/;
     new Promise((resolve, reject) => {
         if (!passwordREGEX.test(password)) {
             return reject(new Error("Improperly formatted password"));

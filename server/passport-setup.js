@@ -3,7 +3,9 @@ if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config()
 } else { return console.error('You shouldnt use .env files in production'); }
 
+const { resolveInclude } = require('ejs');
 const passport = require('passport');
+const { connectToDB } = require('./mysql');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const LocalStrategy = require('passport-local').Strategy;
@@ -30,13 +32,27 @@ module.exports = function() {
         callbackURL: "https://duohando.com/google/callback"
       },
       function(accessToken, refreshToken, profile, done) {
-        /*
-        use the profile info (mainly profile id) to check if the user is registerd in ur db
-        If yes select the user and pass him to the done callback
-        If not create the user and then select him and pass to callback
-        */
-        return done(null, profile);
-      }
+            user,connectToDB()
+                .then(function() {
+                    profile = profile._json;
+                    return user.findUser(profile.email)
+                        .catch(function() { //user doesnt exist, create profile
+                            let fullName = profile.name.split(' ');
+                            let prof = [
+                                fullName[0], fullName[fullName.length-1],
+                                profile.email, null,
+                                null,
+                                'Google', profile.sub
+                            ];
+                            return user.addUser(prof);
+                        });
+                })
+                .then(function(row) { return done(null, {username: row.email}); })
+                .catch(function(err) {
+                    console.log(err);
+                    return done(null, false, {message: err});
+                }); 
+        }
     ));
     //===============================================
     //passport facebook login setup =================
@@ -44,15 +60,30 @@ module.exports = function() {
     passport.use('facebook', new FacebookStrategy({
         clientID: process.env.FACEBOOK_ID,
         clientSecret: process.env.FACEBOOK_SECRET,
-        callbackURL: "https://duohando.com/facebook/callback"
+        callbackURL: "https://duohando.com/facebook/callback",
+        profileFields: ['id', 'displayName', 'email']
       },
       function(accessToken, refreshToken, profile, done) {
-            /*
-            use the profile info (mainly profile id) to check if the user is registerd in ur db
-            If yes select the user and pass him to the done callback
-            If not create the user and then select him and pass to callback
-            */
-            return done(null, profile);
+            user,connectToDB()
+                .then(function() { 
+                    profile = profile._json;
+                    return user.findUser(profile.email)
+                        .catch(function() { //user doesnt exist, create profile
+                            let fullName = profile.name.split(' ');
+                            let prof = [
+                                fullName[0], fullName[fullName.length-1],
+                                profile.email, null,
+                                null,
+                                'Facebook', profile.id
+                            ];
+                            return user.addUser(prof);
+                        });
+                })
+                .then(function(row) { return done(null, {username: row.email}); })
+                .catch(function(err) {
+                    console.log(err);
+                    return done(null, false, {message: err});
+                });
         }
     ));
     //===============================================
@@ -64,6 +95,7 @@ module.exports = function() {
             passReqToCallback: true
         },
         function(req, email, password, done) {
+            console.log(`${email} login attempt`);
             user.connectToDB()
                 .then(function() { return user.validEmail(email); })
                 .then(function() { return user.validPassword(password); })
