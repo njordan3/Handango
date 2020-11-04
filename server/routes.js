@@ -2,14 +2,15 @@ const path = require('path');
 const fs = require('fs');
 
 module.exports = function(express, app, passport) {
-    //dynamically serve static files when the user is at specific URLS
-    app.use('/', express.static(path.join(__dirname, '../public/home')));
-    app.use('/login', express.static(path.join(__dirname, '../public/login')));
-    app.use('/register', express.static(path.join(__dirname, '../public/register')));
-    app.use('/dashboard', express.static(path.join(__dirname, '../public/dashboard')));
+    //serve static files for public directory
+    app.use('/', express.static(path.join(__dirname, '../public')));
+    // view engine setup
+    app.engine('html', require('ejs').renderFile);
+    app.set('view engine', 'html');
+    app.set('views', path.join(__dirname,'../views'));
 
     app.get('/dashboard', isLoggedIn, function(req, res) {
-        //only logged in users can see their dashboard
+        res.render('dashboard');
     });
 
     app.post('/gotologin', function(req, res) {
@@ -19,17 +20,17 @@ module.exports = function(express, app, passport) {
         res.redirect('/register');
     });
 
-    app.post('/login', passport.authenticate('local-login', { failureRedirect: '/login' }),
-        function(req, res) {
-            res.redirect('/dashboard');
-        }
-    );
+    app.post('/login', passport.authenticate('local-login', { 
+        successRedirect: '/dashboard',
+        failureRedirect: '/login',
+        failureFlash: true
+    }));
     
-    app.post('/register', passport.authenticate('local-register', { failureRedirect: '/' }),
-        function(req, res) {
-            res.redirect('/login');
-        }
-    );
+    app.post('/register', passport.authenticate('local-register', {
+        successRedirect: '/login',
+        failureRedirect: '/register',
+        failureFlash: true
+    }));
 
     app.post('/logout', function(req, res) {
         req.logout();
@@ -38,22 +39,18 @@ module.exports = function(express, app, passport) {
 
     // Google login routing
     app.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-    app.get('/google/callback', passport.authenticate('google', { failureRedirect: '/' }),
-        function(req, res) {
-            // Successful authentication
-            //If user doesn't exist, add them
-            res.redirect('/dashboard');
-        }
-    );
+    app.get('/google/callback', passport.authenticate('google', { 
+        successRedirect: '/dashboard',
+        failureRedirect: '/',
+        failureFlash: true
+    }));
     // Facebook login routing
     app.get('/facebook', passport.authenticate('facebook', { scope: 'email' }));
-    app.get('/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/' }),
-        function(req, res) {
-            // Successful authentication
-            //If user doesn't exist, add them
-            res.redirect('/dashboard');
-        }
-    );
+    app.get('/facebook/callback', passport.authenticate('facebook', { 
+        successRedirect: '/dashboard',
+        failureRedirect: '/',
+        failureFlash: true
+    }));
 };
 
 // route middleware to check if the user is authorized
@@ -63,6 +60,7 @@ function isLoggedIn(req, res, next) {
 	if (req.isAuthenticated())
 		return next();
 
+    console.log("not authenticated");
 	// if they aren't redirect them to the home page
 	res.redirect('/');
 }

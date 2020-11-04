@@ -9,6 +9,8 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const WebSocket = require('ws');
 const favicon = require('serve-favicon');
+const session = require('express-session')
+const flash = require('connect-flash');
 //user authentication and database configuration
 const passport = require('passport');
 require('./passport-setup')(passport);
@@ -34,11 +36,22 @@ try {
 //initialize express app
 const app = express();
 
+//use sessions (put this before passport.session())
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: true,
+    cookie: {secure: true}
+}));
+
 //body parser middleware for html form handling
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json())
 //use helmet as middleware
 app.use(helmet());
+
+//enable passport to flash messages to user
+app.use(flash());
 
 //initializes passport and passport sessions
 app.use(passport.initialize());
