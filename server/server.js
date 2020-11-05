@@ -5,22 +5,16 @@
 
 //server dependencies
 const express = require('express');
-const bodyParser = require('body-parser');
-const helmet = require('helmet');
 const WebSocket = require('ws');
-const favicon = require('serve-favicon');
-const session = require('express-session')
-const flash = require('connect-flash');
+
 //user authentication and database configuration
 const passport = require('passport');
 require('./passport-setup')(passport);
 
-const path = require('path');
 const fs = require('fs');
 
 var options = {};
 var protocol = require('https');
-const { default: contentSecurityPolicy } = require('helmet/dist/middlewares/content-security-policy');
 var port = 443;
 try {
     //get OpenSSL credentials
@@ -33,37 +27,12 @@ try {
     port = 3000;
 }
 
-//initialize express app
+//initialize express app with middleware
 const app = express();
-
-//use sessions (put this before passport.session())
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: true,
-    cookie: {secure: true}
-}));
-
-//body parser middleware for html form handling
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json())
-//use helmet as middleware
-app.use(helmet());
-
-//enable passport to flash messages to user
-app.use(flash());
-
-//initializes passport and passport sessions
-app.use(passport.initialize());
-app.use(passport.session());
-
-//serves favicon
-app.use(favicon(path.join(__dirname, '../favicon/favicon-32x32.png')));
+require('./middleware')(express, app, passport);
 
 //load routes with our app and configured passport
 require('./routes')(express, app, passport);
-
-app.enable('trust proxy');
 
 //launch web server
 const server = protocol.createServer(options, app);

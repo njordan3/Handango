@@ -5,7 +5,6 @@ if (process.env.NODE_ENV !== 'production') {
 
 const { resolveInclude } = require('ejs');
 const passport = require('passport');
-const { connectToDB } = require('./mysql');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const LocalStrategy = require('passport-local').Strategy;
@@ -18,10 +17,12 @@ module.exports = function() {
     //passport session setup ========================
     //===============================================
     passport.serializeUser(function(user, done) {
-        done(null, user.username);
-    });
-    passport.deserializeUser(function(user, done) {
         done(null, user);
+    });
+    passport.deserializeUser(function(usr, done) {
+        user.findUser(usr.username, usr.id)
+            .then(function(row) { done(null, row.email); })
+            .catch(function(err) { done(err); })
     });
     //===============================================
     //passport google login setup ===================
@@ -32,10 +33,10 @@ module.exports = function() {
         callbackURL: "https://duohando.com/google/callback"
       },
       function(accessToken, refreshToken, profile, done) {
-            user,connectToDB()
+            user.connectToDB()
                 .then(function() {
                     profile = profile._json;
-                    return user.findUser(profile.email)
+                    return user.findUser(profile.email, profile.sub)
                         .catch(function() { //user doesnt exist, create profile
                             let fullName = profile.name.split(' ');
                             let prof = [
@@ -47,7 +48,7 @@ module.exports = function() {
                             return user.addUser(prof);
                         });
                 })
-                .then(function(row) { return done(null, {username: row.email}); })
+                .then(function(row) { return done(null, {username: row.email, id: row.external_id}); })
                 .catch(function(err) {
                     console.log(err);
                     return done(null, false, {message: err});
@@ -64,10 +65,10 @@ module.exports = function() {
         profileFields: ['id', 'displayName', 'email']
       },
       function(accessToken, refreshToken, profile, done) {
-            user,connectToDB()
+            user.connectToDB()
                 .then(function() { 
                     profile = profile._json;
-                    return user.findUser(profile.email)
+                    return user.findUser(profile.email, profile.id)
                         .catch(function() { //user doesnt exist, create profile
                             let fullName = profile.name.split(' ');
                             let prof = [
@@ -79,7 +80,7 @@ module.exports = function() {
                             return user.addUser(prof);
                         });
                 })
-                .then(function(row) { return done(null, {username: row.email}); })
+                .then(function(row) { return done(null, {username: row.email, id: row.external_id}); })
                 .catch(function(err) {
                     console.log(err);
                     return done(null, false, {message: err});
@@ -100,8 +101,11 @@ module.exports = function() {
                 .then(function() { return user.validEmail(email); })
                 .then(function() { return user.validPassword(password); })
                 .then(function() { return user.findUser(email); })
-                .then(function(row) { return user.comparePassword(password, row.password_hash); })
-                .then(function() { return done(null, {username: email}); })
+                .then(function(row) {
+                    if (row.external_id) return Promise.reject(new Error("External account attempted email/password login"));
+                    return user.comparePassword(password, row.password_hash);
+                })
+                .then(function() { return done(null, {username: email, id: null}); })
                 .catch(function(err) {
                     console.log(err);
                     return done(null, false, {message: err});
@@ -130,7 +134,7 @@ module.exports = function() {
                     ];
                     return user.addUser(profile);
                 })
-                .then(function() { return done(null, {username: email}); })
+                .then(function() { return done(null, {username: email, id: null}); })
                 .catch(function(err) {
                     console.log(err);
                     return done(null, false, {message: err});

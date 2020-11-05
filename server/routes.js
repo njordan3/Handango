@@ -1,9 +1,11 @@
 const path = require('path');
 const fs = require('fs');
+const flash = require('connect-flash');
 
 module.exports = function(express, app, passport) {
-    //serve static files for public directory
-    app.use('/', express.static(path.join(__dirname, '../public')));
+    //enable passport to flash messages to user
+    app.use(flash());
+
     // view engine setup
     app.engine('html', require('ejs').renderFile);
     app.set('view engine', 'html');

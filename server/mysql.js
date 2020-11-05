@@ -41,12 +41,12 @@ function connectToDB() {
     });
 }
 
-function findUser(email) {
+function findUser(email, external_id = null) {
     return new Promise((resolve, reject) => {
         connection.connect(function(err) {
             if (err) return reject(err)
             else {
-                connection.query('CALL findUser(?)', [email], function(err, result) {
+                connection.query('CALL findUser(?,?)', [email, external_id], function(err, result) {
                     if (err) return reject(err.sqlMessage);
                     if (result[0].length === 0) return reject(new Error(`Account for ${email} doesn't exist`));
                     let row = JSON.parse(JSON.stringify(result[0][0]));
