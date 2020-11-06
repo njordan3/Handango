@@ -6,7 +6,7 @@ module.exports = {
     initDB: initDB,
     connectToDB: connectToDB,
     findUser: findUser,
-    addUser: addUser,
+    Register: Register,
     validEmail: validEmail,
     validPassword: validPassword,
     comparePassword: comparePassword,
@@ -46,7 +46,7 @@ function findUser(email, external_id = null) {
         connection.connect(function(err) {
             if (err) return reject(err)
             else {
-                connection.query('CALL findUser(?,?)', [email, external_id], function(err, result) {
+                connection.query('CALL findUserProc(?,?)', [email, external_id], function(err, result) {
                     if (err) return reject(err.sqlMessage);
                     if (result[0].length === 0) return reject(new Error(`Account for ${email} doesn't exist`));
                     let row = JSON.parse(JSON.stringify(result[0][0]));
@@ -54,19 +54,17 @@ function findUser(email, external_id = null) {
                 });
             }
         });
-    
     });
 }
 
-function addUser(params) {
+function Register(params) {
     return new Promise((resolve, reject) => {
         connection.connect(function(err) {
             if (err) return reject(err);
             else if (params.length !== 7) return reject(new Error(`Wrong amount of parameters when adding user: ${params.length}`));
             else {
-                connection.query('CALL addUser(?,?,?,?,?,?,?)', params, function(err, result) {
+                connection.query('CALL Register(?,?,?,?,?,?,?)', params, function(err, result) {
                     if (err) return reject(err.sqlMessage);
-                    if (result[0].length === 0) return reject(new Error(`Account for ${email} doesn't exist`));
                     let row = JSON.parse(JSON.stringify(result[0][0]));
                     return resolve(row);
                 });
@@ -74,7 +72,6 @@ function addUser(params) {
         });
     });
 }
-
 
 function validEmail(email) {
     let emailREGEX = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
@@ -88,7 +85,7 @@ function validEmail(email) {
 
 function validPassword(password) {
     let passwordREGEX = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[-+_!@#$%^&*.,?]).{8,}/;
-    new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         if (!passwordREGEX.test(password)) {
             return reject(new Error("Improperly formatted password"));
         }

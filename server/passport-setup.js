@@ -36,17 +36,14 @@ module.exports = function() {
             user.connectToDB()
                 .then(function() {
                     profile = profile._json;
-                    return user.findUser(profile.email, profile.sub)
-                        .catch(function() { //user doesnt exist, create profile
-                            let fullName = profile.name.split(' ');
-                            let prof = [
-                                fullName[0], fullName[fullName.length-1],
-                                profile.email, null,
-                                null,
-                                'Google', profile.sub
-                            ];
-                            return user.addUser(prof);
-                        });
+                    let fullName = profile.name.split(' ');
+                    let prof = [
+                        fullName[0], fullName[fullName.length-1],
+                        profile.email, null,
+                        null,
+                        'Google', profile.sub
+                    ];
+                    return user.Register(prof);
                 })
                 .then(function(row) { return done(null, {username: row.email, id: row.external_id}); })
                 .catch(function(err) {
@@ -68,17 +65,14 @@ module.exports = function() {
             user.connectToDB()
                 .then(function() { 
                     profile = profile._json;
-                    return user.findUser(profile.email, profile.id)
-                        .catch(function() { //user doesnt exist, create profile
-                            let fullName = profile.name.split(' ');
-                            let prof = [
-                                fullName[0], fullName[fullName.length-1],
-                                profile.email, null,
-                                null,
-                                'Facebook', profile.id
-                            ];
-                            return user.addUser(prof);
-                        });
+                    let fullName = profile.name.split(' ');
+                    let prof = [
+                        fullName[0], fullName[fullName.length-1],
+                        profile.email, null,
+                        null,
+                        'Facebook', profile.id
+                    ];
+                    return user.Register(prof);
                 })
                 .then(function(row) { return done(null, {username: row.email, id: row.external_id}); })
                 .catch(function(err) {
@@ -132,9 +126,9 @@ module.exports = function() {
                         hash,
                         null, null
                     ];
-                    return user.addUser(profile);
+                    return user.Register(profile);
                 })
-                .then(function() { return done(null, {username: email, id: null}); })
+                .then(function(row) { return done(null, {username: row.email, id: row.external_id}); })
                 .catch(function(err) {
                     console.log(err);
                     return done(null, false, {message: err});

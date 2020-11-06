@@ -62,7 +62,7 @@ function isLoggedIn(req, res, next) {
 	if (req.isAuthenticated())
 		return next();
 
-    console.log("not authenticated");
+    console.log("Not authenticated");
 	// if they aren't redirect them to the home page
 	res.redirect('/');
 }
