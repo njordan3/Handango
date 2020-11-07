@@ -20,7 +20,7 @@ module.exports = function(passport) {
     passport.deserializeUser(function(usr, done) {
         user.findUser(usr.username, usr.id)
             .then(function(row) { done(null, row.email); })
-            .catch(function(err) { done(err); })
+            .catch(function(err) { done(null, false, {message: err}); })
     });
     //===============================================
     //passport google login setup ===================
@@ -88,14 +88,13 @@ module.exports = function(passport) {
             passReqToCallback: true
         },
         function(req, email, password, done) {
-            console.log(`${email} login attempt`);
             user.connectToDB()
                 .then(function() { return user.validEmail(email); })
                 .then(function() { return user.validPassword(password); })
                 .then(function() { return user.findUser(email); })
                 .then(function(row) {
                     if (row.external_id) return Promise.reject(new Error("External account attempted email/password login"));
-                    return user.comparePassword(password, row.password_hash);
+                    return user.comparePassword(email, row.login_attempts, password, row.password_hash);
                 })
                 .then(function() { return done(null, {username: email, id: null}); })
                 .catch(function(err) {

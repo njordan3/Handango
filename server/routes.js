@@ -24,6 +24,7 @@ module.exports = function(app, passport) {
             res.redirect('/login');
         })
         .catch(function(err) {
+            console.log("here");
             console.log(err);
             res.redirect('/dashboard');
         });

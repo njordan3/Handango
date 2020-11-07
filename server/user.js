@@ -51,8 +51,7 @@ function changeEmail(email, email_new) {
             if (err) return reject(err);
             else {
                 connection.query('CALL changeEmail(?,?)', [email, email_new], function(err, result) {
-                    if (err) return reject(err);
-                    if (result[0].length === 1) return reject(new Error(`External account for ${email} cannot change email`));
+                    if (err) return reject(err.sqlMessage);
                     return resolve();
                 });
             }
@@ -66,8 +65,7 @@ function changePhoneNumber(email, phone_num_new) {
             if (err) return reject(err);
             else {
                 connection.query('CALL changePhoneNumber(?,?)', [email, phone_num_new], function(err, result) {
-                    if (err) return reject(err);
-                    if (result[0].length === 1) return reject(new Error(`Account for ${email} couldn't change email`));
+                    if (err) return reject(err.sqlMessage);
                     return resolve();
                 });
             }
@@ -81,8 +79,7 @@ function changePassword(email, password_new) {
             if (err) return reject(err);
             else {
                 connection.query('CALL changePassword(?,?)', [email, password_new], function(err, result) {
-                    if (err) return reject(err);
-                    if (result[0].length === 1) return reject(new Error(`Account doesn't exists or external account for ${email} cannot change password`));
+                    if (err) return reject(err.sqlMessage);
                     return resolve();
                 });
             }
@@ -97,7 +94,6 @@ function findUser(email, external_id = null) {
             else {
                 connection.query('CALL findUserProc(?,?)', [email, external_id], function(err, result) {
                     if (err) return reject(err.sqlMessage);
-                    if (result[0].length === 0) return reject(new Error(`Account for ${email} doesn't exist`));
                     let row = JSON.parse(JSON.stringify(result[0][0]));
                     return resolve(row);
                 });
@@ -114,7 +110,6 @@ function Register(params) {
             else {
                 connection.query('CALL Register(?,?,?,?,?,?,?)', params, function(err, result) {
                     if (err) return reject(err.sqlMessage);
-                    if (result[0].length === 0) return reject(new Error(`Account for ${params[2]} already exists`));
                     let row = JSON.parse(JSON.stringify(result[0][0]));
                     return resolve(row);
                 });
@@ -153,13 +148,27 @@ function validPhoneNumber(phone_num) {
     });
 }
 
-function comparePassword(password, hash) {
+function comparePassword(email, attempts, password, hash) {
     return new Promise((resolve, reject) => {
-        bcrypt.compare(password, hash, function(err, result) {
+        connection.connect(function(err) {
             if (err) return reject(err);
-            else if (!result) return reject(new Error("Wrong password"));
-            return resolve();
-        });
+            else {
+                bcrypt.compare(password, hash, function(err, result) {
+                    if (err) return reject(err);
+                    else if (!result) {
+                        connection.query('CALL setLoginAttempt(?,?)', [email, attempts+1], function(err, result) {
+                            if (err) return reject(err.sqlMessage);
+                        });
+                        return reject(new Error("Wrong password"));
+                    } else {
+                        connection.query('CALL setLoginAttempt(?,?)', [email, 0], function(err, result) {
+                            if (err) return reject(err.sqlMessage);
+                        });
+                        return resolve();
+                    }
+                });
+            }
+        })
     });   
 }
 
