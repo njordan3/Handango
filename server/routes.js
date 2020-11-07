@@ -1,8 +1,9 @@
 const path = require('path');
 const fs = require('fs');
 const flash = require('connect-flash');
+const user = require('./user');
 
-module.exports = function(express, app, passport) {
+module.exports = function(app, passport) {
     //enable passport to flash messages to user
     app.use(flash());
 
@@ -13,6 +14,46 @@ module.exports = function(express, app, passport) {
 
     app.get('/dashboard', isLoggedIn, function(req, res) {
         res.render('dashboard');
+    });
+
+    app.post('/changeEmail', isLoggedIn, function(req, res) {
+        user.validEmail(req.body.email_new)
+        .then(function() { return user.changeEmail(req.user, req.body.email_new) })
+        .then(function() {
+            req.logout();
+            res.redirect('/login');
+        })
+        .catch(function(err) {
+            console.log(err);
+            res.redirect('/dashboard');
+        });
+    });
+
+    app.post('/changePhoneNumber', isLoggedIn, function(req, res) {
+        user.validPhoneNumber(req.body.phone_num_new)
+        .then(function() { return user.changePhoneNumber(req.user, req.body.phone_num_new) })
+        .then(function() {
+            req.logout();
+            res.redirect('/login');
+        })
+        .catch(function(err) {
+            console.log(err);
+            res.redirect('/dashboard');
+        });
+    });
+
+    app.post('/changePassword', isLoggedIn, function(req, res) {
+        user.validPassword(req.body.password_new)
+        .then(function() { return user.hashPassword(req.body.password_new) })
+        .then(function(hash) { return user.changePassword(req.user, hash) })
+        .then(function() {
+            req.logout();
+            res.redirect('/login');
+        })
+        .catch(function(err) {
+            console.log(err);
+            res.redirect('/dashboard');
+        });
     });
 
     app.post('/gotologin', function(req, res) {
@@ -54,15 +95,12 @@ module.exports = function(express, app, passport) {
         failureFlash: true
     }));
 };
-
-// route middleware to check if the user is authorized
 function isLoggedIn(req, res, next) {
-
-	// if user is authenticated in the session, carry on
-	if (req.isAuthenticated())
-		return next();
+    // if user is authenticated in the session, carry on
+    if (req.isAuthenticated())
+        return next();
 
     console.log("Not authenticated");
-	// if they aren't redirect them to the home page
-	res.redirect('/');
+    // if they aren't redirect them to the home page
+    res.redirect('/');
 }

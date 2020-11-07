@@ -3,16 +3,14 @@ if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config()
 } else { return console.error('You shouldnt use .env files in production'); }
 
-const { resolveInclude } = require('ejs');
-const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const LocalStrategy = require('passport-local').Strategy;
 
-const user = require('./mysql');
+const user = require('./user');
 user.initDB();
 
-module.exports = function() {
+module.exports = function(passport) {
     //===============================================
     //passport session setup ========================
     //===============================================

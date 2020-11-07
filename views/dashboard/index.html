@@ -1,16 +1,41 @@
 <html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Duohando Dashboard</title>
+        <link rel="shortcut icon" type="image/x-icon" href="https://duohando.com/favicon.ico">
+    </head>
     <body>
-        <head>
-            <meta charset="utf-8"/>
-            <title>Duohando Dashboard</title>
-            <link rel="shortcut icon" type="image/x-icon" href="https://duohando.com/favicon.ico">
-        </head>
-        <body>
-            <form action="/logout", method="POST">
-                <div>
-                    <button>Logout</button>
-                </div>
-            </form>
-        </body>
+        <form action="/logout", method="POST">
+            <div>
+                <button>Logout</button>
+            </div>
+        </form>
+        <form action="/changeEmail" method="POST">
+            <div>
+                <label for="email_new">New Email</label>
+                <input name="email_new" placeholder="email@example.com" type="email"/>
+            </div>
+            <div>
+                <button>Change Email</button>
+            </div>
+        </form>
+        <form action="/changePhoneNumber" method="POST">
+            <div>
+                <label for="phone_num_new">New Phone Number</label>
+                <input name="phone_num_new" placeholder="###-###-####" type="tel" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"/>
+            </div>
+            <div>
+                <button>Change Phone Number</button>
+            </div>
+        </form>
+        <form action="/changePassword" method="POST">
+            <div>
+                <label for="password_new">New Password</label>
+                <input name="password_new" type="password"/>
+            </div>
+            <div>
+                <button>Change Password</button>
+            </div>
+        </form>
     </body>
 </html>

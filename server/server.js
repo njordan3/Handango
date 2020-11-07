@@ -6,7 +6,6 @@
 //server dependencies
 const express = require('express');
 const WebSocket = require('ws');
-
 //user authentication and database configuration
 const passport = require('passport');
 require('./passport-setup')(passport);
@@ -32,7 +31,7 @@ const app = express();
 require('./middleware')(express, app, passport);
 
 //load routes with our app and configured passport
-require('./routes')(express, app, passport);
+require('./routes')(app, passport);
 
 //launch web server
 const server = protocol.createServer(options, app);

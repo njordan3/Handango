@@ -8,9 +8,13 @@ module.exports = {
     findUser: findUser,
     Register: Register,
     validEmail: validEmail,
+    validPhoneNumber: validPhoneNumber,
     validPassword: validPassword,
     comparePassword: comparePassword,
-    hashPassword: hashPassword
+    hashPassword: hashPassword,
+    changeEmail: changeEmail,
+    changePassword: changePassword,
+    changePhoneNumber: changePhoneNumber
 }
 
 function initDB() {
@@ -41,10 +45,55 @@ function connectToDB() {
     });
 }
 
+function changeEmail(email, email_new) {
+    return new Promise((resolve, reject) => {
+        connection.connect(function(err) {
+            if (err) return reject(err);
+            else {
+                connection.query('CALL changeEmail(?,?)', [email, email_new], function(err, result) {
+                    if (err) return reject(err);
+                    if (result[0].length === 1) return reject(new Error(`External account for ${email} cannot change email`));
+                    return resolve();
+                });
+            }
+        });
+    })
+}
+
+function changePhoneNumber(email, phone_num_new) {
+    return new Promise((resolve, reject) => {
+        connection.connect(function(err) {
+            if (err) return reject(err);
+            else {
+                connection.query('CALL changePhoneNumber(?,?)', [email, phone_num_new], function(err, result) {
+                    if (err) return reject(err);
+                    if (result[0].length === 1) return reject(new Error(`Account for ${email} couldn't change email`));
+                    return resolve();
+                });
+            }
+        });
+    })
+}
+
+function changePassword(email, password_new) {
+    return new Promise((resolve, reject) => {
+        connection.connect(function(err) {
+            if (err) return reject(err);
+            else {
+                connection.query('CALL changePassword(?,?)', [email, password_new], function(err, result) {
+                    if (err) return reject(err);
+                    if (result[0].length === 1) return reject(new Error(`Account doesn't exists or external account for ${email} cannot change password`));
+                    return resolve();
+                });
+            }
+        });
+    })
+}
+
 function findUser(email, external_id = null) {
     return new Promise((resolve, reject) => {
         connection.connect(function(err) {
-            if (err) return reject(err)
+            if (err) return reject(err);
             else {
                 connection.query('CALL findUserProc(?,?)', [email, external_id], function(err, result) {
                     if (err) return reject(err.sqlMessage);
@@ -65,6 +114,7 @@ function Register(params) {
             else {
                 connection.query('CALL Register(?,?,?,?,?,?,?)', params, function(err, result) {
                     if (err) return reject(err.sqlMessage);
+                    if (result[0].length === 0) return reject(new Error(`Account for ${params[2]} already exists`));
                     let row = JSON.parse(JSON.stringify(result[0][0]));
                     return resolve(row);
                 });
@@ -88,6 +138,16 @@ function validPassword(password) {
     return new Promise((resolve, reject) => {
         if (!passwordREGEX.test(password)) {
             return reject(new Error("Improperly formatted password"));
+        }
+        return resolve();
+    });
+}
+
+function validPhoneNumber(phone_num) {
+    let phoneNumberREGEX = /[0-9]{3}-[0-9]{3}-[0-9]{4}/;
+    return new Promise((resolve, reject) => {
+        if (!phoneNumberREGEX.test(phone_num)) {
+            return reject(new Error("Improperly formatted phone number"));
         }
         return resolve();
     });
