@@ -1,4 +1,3 @@
-//https://medium.com/@technologies4.trending/password-encryption-using-mysql-database-in-node-js-30f736ea1de8
 //https://medium.com/@alexcambose/webcam-live-streaming-with-websockets-and-base64-64b1b4992db8
 //Websocket/socketio with NodeJS/Express
 //https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia

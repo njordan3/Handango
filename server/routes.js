@@ -24,7 +24,6 @@ module.exports = function(app, passport) {
             res.redirect('/login');
         })
         .catch(function(err) {
-            console.log("here");
             console.log(err);
             res.redirect('/dashboard');
         });
@@ -69,10 +68,14 @@ module.exports = function(app, passport) {
         failureRedirect: '/login',
         failureFlash: true
     }));
-    
     app.post('/register', passport.authenticate('local-register', {
         successRedirect: '/login',
         failureRedirect: '/register',
+        failureFlash: true
+    }));
+    app.post('/changeToEmail', passport.authenticate('changeToEmail', {
+        successRedirect: '/login',
+        failureRedirect: '/dashboard',
         failureFlash: true
     }));
 
@@ -81,11 +84,18 @@ module.exports = function(app, passport) {
         res.redirect('/');
     });
 
+
     // Google login routing
     app.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
     app.get('/google/callback', passport.authenticate('google', { 
         successRedirect: '/dashboard',
         failureRedirect: '/',
+        failureFlash: true
+    }));
+    app.get('/changeToGoogle', passport.authenticate('changeToGoogle', {scope: ['profile', 'email']}));
+    app.get('/changeToGoogle/callback', passport.authenticate('changeToGoogle', { 
+        successRedirect: '/login',
+        failureRedirect: '/dashboard',
         failureFlash: true
     }));
     // Facebook login routing
@@ -95,7 +105,14 @@ module.exports = function(app, passport) {
         failureRedirect: '/',
         failureFlash: true
     }));
+    app.get('/changeToFacebook', passport.authenticate('changeToFacebook', { scope: 'email' }));
+    app.get('/changeToFacebook/callback', passport.authenticate('changeToFacebook', { 
+        successRedirect: '/login',
+        failureRedirect: '/dashboard',
+        failureFlash: true
+    }));
 };
+
 function isLoggedIn(req, res, next) {
     // if user is authenticated in the session, carry on
     if (req.isAuthenticated())

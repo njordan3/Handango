@@ -14,7 +14,8 @@ module.exports = {
     hashPassword: hashPassword,
     changeEmail: changeEmail,
     changePassword: changePassword,
-    changePhoneNumber: changePhoneNumber
+    changePhoneNumber: changePhoneNumber,
+    changeLoginType: changeLoginType
 }
 
 function initDB() {
@@ -87,6 +88,26 @@ function changePassword(email, password_new) {
     })
 }
 
+function changeLoginType(params) {
+    return new Promise((resolve, reject) => {
+        connection.connect(function(err) {
+            if (err) return reject(err);
+            else if (params.length !== 8) return reject(new Error(`Wrong amount of parameters when changing login type: ${params.length}`));
+            else {
+                connection.query('CALL changeLoginType(?,?,?,?,?,?,?,?)', params, function(err, result) {
+                    if (err) return reject(err.sqlMessage);
+                    try {
+                        let row = JSON.parse(JSON.stringify(result[0][0]));
+                        return resolve(row);
+                    } catch (error) {
+                        return reject(error);
+                    }
+                });
+            }
+        });
+    })
+}
+
 function findUser(email, external_id = null) {
     return new Promise((resolve, reject) => {
         connection.connect(function(err) {
@@ -94,6 +115,7 @@ function findUser(email, external_id = null) {
             else {
                 connection.query('CALL findUserProc(?,?)', [email, external_id], function(err, result) {
                     if (err) return reject(err.sqlMessage);
+                    if (result[0].length === 0) return reject(new Error(`Account ${email} attempted invalid login type`));
                     let row = JSON.parse(JSON.stringify(result[0][0]));
                     return resolve(row);
                 });
@@ -110,6 +132,7 @@ function Register(params) {
             else {
                 connection.query('CALL Register(?,?,?,?,?,?,?)', params, function(err, result) {
                     if (err) return reject(err.sqlMessage);
+                    if (result[0].length === 0) return reject(new Error(`Account ${params[2]} attempted invalid login type`));
                     let row = JSON.parse(JSON.stringify(result[0][0]));
                     return resolve(row);
                 });

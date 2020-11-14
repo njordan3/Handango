@@ -50,6 +50,33 @@ module.exports = function(passport) {
                 });
         }
     ));
+    passport.use('changeToGoogle', new GoogleStrategy({
+        clientID: process.env.GOOGLE_ID,
+        clientSecret: process.env.GOOGLE_SECRET,
+        callbackURL: "https://duohando.com/changeToGoogle/callback",
+        passReqToCallback: true
+      },
+      function(req, accessToken, refreshToken, profile, done) {
+            user.connectToDB()
+                .then(function() {
+                    profile = profile._json;
+                    let fullName = profile.name.split(' ');
+                    let params = [
+                        fullName[0], fullName[fullName.length-1],
+                        req.user, profile.email,
+                        null,
+                        'Google', 
+                        null, profile.sub
+                    ];
+                    return user.changeLoginType(params);
+                })
+                .then(function(row) { return done(null, {username: row.email, id: row.external_id}); })
+                .catch(function(err) {
+                    console.log(err);
+                    return done(null, false, {message: err});
+                });
+        }
+    ));
     //===============================================
     //passport facebook login setup =================
     //===============================================
@@ -71,6 +98,34 @@ module.exports = function(passport) {
                         'Facebook', profile.id
                     ];
                     return user.Register(prof);
+                })
+                .then(function(row) { return done(null, {username: row.email, id: row.external_id}); })
+                .catch(function(err) {
+                    console.log(err);
+                    return done(null, false, {message: err});
+                });
+        }
+    ));
+    passport.use('changeToFacebook', new FacebookStrategy({
+        clientID: process.env.FACEBOOK_ID,
+        clientSecret: process.env.FACEBOOK_SECRET,
+        callbackURL: "https://duohando.com/changeToFacebook/callback",
+        profileFields: ['id', 'displayName', 'email'],
+        passReqToCallback: true
+      },
+      function(req, accessToken, refreshToken, profile, done) {
+            user.connectToDB()
+                .then(function() { 
+                    profile = profile._json;
+                    let fullName = profile.name.split(' ');
+                    let params = [
+                        fullName[0], fullName[fullName.length-1],
+                        req.user, profile.email,
+                        null,
+                        'Facebook', 
+                        null, profile.id
+                    ];
+                    return user.changeLoginType(params);
                 })
                 .then(function(row) { return done(null, {username: row.email, id: row.external_id}); })
                 .catch(function(err) {
@@ -132,4 +187,31 @@ module.exports = function(passport) {
                 });
         }
     ));
+    passport.use('changeToEmail', new LocalStrategy({
+        usernameField: 'email',
+        passwordField: 'password',
+        passReqToCallback: true,
+    },
+    function(req, email, password, done) {
+        user.connectToDB()
+            .then(function() { return user.validEmail(email); })
+            .then(function() { return user.validPassword(password); })
+            .then(function() { return user.hashPassword(password); })
+            .then(function(hash) {
+                let params = [
+                    null, null,
+                    req.user, email,
+                    hash,
+                    null,
+                    req._passport.session.user.id, null
+                ];
+                return user.changeLoginType(params);
+            })
+            .then(function(row) { return done(null, {username: row.email, id: row.external_id}); })
+            .catch(function(err) {
+                console.log(err);
+                return done(null, false, {message: err});
+            });
+    }
+));
 };
