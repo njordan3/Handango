@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const speakeasy = require('speakeasy');
 
 var connection;
 
@@ -8,13 +9,13 @@ module.exports = {
     findUser: findUser,
     Register: Register,
     validEmail: validEmail,
-    validPhoneNumber: validPhoneNumber,
     validPassword: validPassword,
     comparePassword: comparePassword,
     hashPassword: hashPassword,
+    activate2FA: activate2FA,
+    verify2FA: verify2FA,
     changeEmail: changeEmail,
     changePassword: changePassword,
-    changePhoneNumber: changePhoneNumber,
     changeLoginType: changeLoginType
 }
 
@@ -30,7 +31,7 @@ function initDB() {
 
     connection.connect(function(err) {
         if (err) {
-            console.log(err.sqlMessage);
+            console.log('MySQL server is offline');
         } else {
             console.log('Connected to the MySQL server.');
         }
@@ -46,12 +47,13 @@ function connectToDB() {
     });
 }
 
-function changeEmail(email, email_new) {
+function activate2FA(email, id) {
     return new Promise((resolve, reject) => {
         connection.connect(function(err) {
             if (err) return reject(err);
             else {
-                connection.query('CALL changeEmail(?,?)', [email, email_new], function(err, result) {
+                var secret = speakeasy.generateSecret({length: 20});
+                connection.query('CALL add2FA(?,?,?)', [email, id, secret.base32], function(err, result) {
                     if (err) return reject(err.sqlMessage);
                     return resolve();
                 });
@@ -60,12 +62,25 @@ function changeEmail(email, email_new) {
     })
 }
 
-function changePhoneNumber(email, phone_num_new) {
+function verify2FA(secret, token) {
+    var t = speakeasy.totp({
+        secret: secret,
+        encoding: 'base32'
+    });
+    console.log(t);
+    return speakeasy.totp.verify({
+            secret: secret,
+            encoding: 'base32',
+            token: token
+    });
+}
+
+function changeEmail(email, email_new) {
     return new Promise((resolve, reject) => {
         connection.connect(function(err) {
             if (err) return reject(err);
             else {
-                connection.query('CALL changePhoneNumber(?,?)', [email, phone_num_new], function(err, result) {
+                connection.query('CALL changeEmail(?,?)', [email, email_new], function(err, result) {
                     if (err) return reject(err.sqlMessage);
                     return resolve();
                 });
@@ -161,17 +176,7 @@ function validPassword(password) {
     });
 }
 
-function validPhoneNumber(phone_num) {
-    let phoneNumberREGEX = /[0-9]{3}-[0-9]{3}-[0-9]{4}/;
-    return new Promise((resolve, reject) => {
-        if (!phoneNumberREGEX.test(phone_num)) {
-            return reject(new Error("Improperly formatted phone number"));
-        }
-        return resolve();
-    });
-}
-
-function comparePassword(email, attempts, password, hash) {
+function comparePassword(email, attempts, password, hash, secret) {
     return new Promise((resolve, reject) => {
         connection.connect(function(err) {
             if (err) return reject(err);
@@ -187,7 +192,7 @@ function comparePassword(email, attempts, password, hash) {
                         connection.query('CALL setLoginAttempt(?,?)', [email, 0], function(err, result) {
                             if (err) return reject(err.sqlMessage);
                         });
-                        return resolve();
+                        return resolve(secret);
                     }
                 });
             }

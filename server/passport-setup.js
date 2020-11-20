@@ -10,6 +10,9 @@ const LocalStrategy = require('passport-local').Strategy;
 const user = require('./user');
 user.initDB();
 
+const email = require('./email');
+email.startMailer();
+
 module.exports = function(passport) {
     //===============================================
     //passport session setup ========================
@@ -43,7 +46,9 @@ module.exports = function(passport) {
                     ];
                     return user.Register(prof);
                 })
-                .then(function(row) { return done(null, {username: row.email, id: row.external_id}); })
+                .then(function(row) {
+                    return done(null, {username: row.email, id: row.external_id, secret: row.secret});
+                })
                 .catch(function(err) {
                     console.log(err);
                     return done(null, false, {message: err});
@@ -99,7 +104,9 @@ module.exports = function(passport) {
                     ];
                     return user.Register(prof);
                 })
-                .then(function(row) { return done(null, {username: row.email, id: row.external_id}); })
+                .then(function(row) {
+                    return done(null, {username: row.email, id: row.external_id, secret: row.secret});
+                })
                 .catch(function(err) {
                     console.log(err);
                     return done(null, false, {message: err});
@@ -149,9 +156,11 @@ module.exports = function(passport) {
                 .then(function() { return user.findUser(email); })
                 .then(function(row) {
                     if (row.external_id) return Promise.reject(new Error("External account attempted email/password login"));
-                    return user.comparePassword(email, row.login_attempts, password, row.password_hash);
+                    return user.comparePassword(email, row.login_attempts, password, row.password_hash, row.secret);
                 })
-                .then(function() { return done(null, {username: email, id: null}); })
+                .then(function(secret) {
+                    return done(null, {username: email, id: null, secret: secret});
+                })
                 .catch(function(err) {
                     console.log(err);
                     return done(null, false, {message: err});
@@ -174,7 +183,7 @@ module.exports = function(passport) {
                 .then(function(hash) {
                     let profile = [
                         req.body.firstname, req.body.lastname,
-                        email, req.body.phone_num,
+                        email, null,
                         hash,
                         null, null
                     ];

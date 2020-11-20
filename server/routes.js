@@ -12,11 +12,28 @@ module.exports = function(app, passport) {
     app.set('view engine', 'html');
     app.set('views', path.join(__dirname,'../views'));
 
-    app.get('/dashboard', isLoggedIn, function(req, res) {
+    app.get('/dashboard', isLoggedIn, is2FAuthenticated, function(req, res) {
         res.render('dashboard');
     });
 
-    app.post('/changeEmail', isLoggedIn, function(req, res) {
+    app.get('/goto2FA', isLoggedIn, function(req, res) {
+        if (req._passport.session.user.secret) {
+            res.redirect('/2FA');
+        } else {
+            res.redirect('/dashboard');
+        }
+    });
+
+    app.post('/2FA', isLoggedIn, function(req, res) {
+        if (user.verify2FA(req._passport.session.user.secret, req.body.token)) {
+            req._passport.session.user.secret = null;   //set to null so it is 2Fauthenticated
+            res.redirect('/dashboard');
+        } else {
+            res.redirect('/2FA');
+        }
+    });
+
+    app.post('/changeEmail', isLoggedIn, is2FAuthenticated, function(req, res) {
         user.validEmail(req.body.email_new)
         .then(function() { return user.changeEmail(req.user, req.body.email_new) })
         .then(function() {
@@ -29,9 +46,8 @@ module.exports = function(app, passport) {
         });
     });
 
-    app.post('/changePhoneNumber', isLoggedIn, function(req, res) {
-        user.validPhoneNumber(req.body.phone_num_new)
-        .then(function() { return user.changePhoneNumber(req.user, req.body.phone_num_new) })
+    app.post('/activate2FA', isLoggedIn, function(req, res) {
+        user.activate2FA(req.user, req._passport.session.user.id)
         .then(function() {
             req.logout();
             res.redirect('/login');
@@ -42,7 +58,7 @@ module.exports = function(app, passport) {
         });
     });
 
-    app.post('/changePassword', isLoggedIn, function(req, res) {
+    app.post('/changePassword', isLoggedIn, is2FAuthenticated, function(req, res) {
         user.validPassword(req.body.password_new)
         .then(function() { return user.hashPassword(req.body.password_new) })
         .then(function(hash) { return user.changePassword(req.user, hash) })
@@ -64,7 +80,7 @@ module.exports = function(app, passport) {
     });
 
     app.post('/login', passport.authenticate('local-login', { 
-        successRedirect: '/dashboard',
+        successRedirect: '/goto2FA',
         failureRedirect: '/login',
         failureFlash: true
     }));
@@ -73,13 +89,13 @@ module.exports = function(app, passport) {
         failureRedirect: '/register',
         failureFlash: true
     }));
-    app.post('/changeToEmail', passport.authenticate('changeToEmail', {
-        successRedirect: '/login',
+    app.post('/changeToEmail', isLoggedIn, is2FAuthenticated, passport.authenticate('changeToEmail', {
+        successRedirect: '/logout',
         failureRedirect: '/dashboard',
         failureFlash: true
     }));
 
-    app.post('/logout', function(req, res) {
+    app.get('/logout', function(req, res) {
         req.logout();
         res.redirect('/');
     });
@@ -88,37 +104,44 @@ module.exports = function(app, passport) {
     // Google login routing
     app.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
     app.get('/google/callback', passport.authenticate('google', { 
-        successRedirect: '/dashboard',
+        successRedirect: '/goto2FA',
         failureRedirect: '/',
         failureFlash: true
     }));
-    app.get('/changeToGoogle', passport.authenticate('changeToGoogle', {scope: ['profile', 'email']}));
+    app.get('/changeToGoogle', isLoggedIn, is2FAuthenticated, passport.authenticate('changeToGoogle', {scope: ['profile', 'email']}));
     app.get('/changeToGoogle/callback', passport.authenticate('changeToGoogle', { 
-        successRedirect: '/login',
+        successRedirect: '/logout',
         failureRedirect: '/dashboard',
         failureFlash: true
     }));
     // Facebook login routing
     app.get('/facebook', passport.authenticate('facebook', { scope: 'email' }));
     app.get('/facebook/callback', passport.authenticate('facebook', { 
-        successRedirect: '/dashboard',
+        successRedirect: '/goto2FA',
         failureRedirect: '/',
         failureFlash: true
     }));
-    app.get('/changeToFacebook', passport.authenticate('changeToFacebook', { scope: 'email' }));
+    app.get('/changeToFacebook', isLoggedIn, is2FAuthenticated, passport.authenticate('changeToFacebook', { scope: 'email' }));
     app.get('/changeToFacebook/callback', passport.authenticate('changeToFacebook', { 
-        successRedirect: '/login',
+        successRedirect: '/logout',
         failureRedirect: '/dashboard',
         failureFlash: true
     }));
 };
 
 function isLoggedIn(req, res, next) {
-    // if user is authenticated in the session, carry on
     if (req.isAuthenticated())
         return next();
 
+    console.log("Not logged in");
+    res.redirect('/');
+}
+
+function is2FAuthenticated(req, res, next) {
+    if (req._passport.session.user.secret == null) {
+        return next();
+    }
+    //if the secret isn't null, then they have 2FA activated and havent entered their OTP to fully login
     console.log("Not authenticated");
-    // if they aren't redirect them to the home page
     res.redirect('/');
 }

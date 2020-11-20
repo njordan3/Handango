@@ -11,12 +11,12 @@ require('./passport-setup')(passport);
 
 const fs = require('fs');
 
-var options = {};
+var tls = {};
 var protocol = require('https');
 var port = 443;
 try {
     //get OpenSSL credentials
-    options = {
+    tls = {
         key: fs.readFileSync(__dirname + "/tls/privkey.pem"),
         cert: fs.readFileSync(__dirname + "/tls/cert.pem")
     };
@@ -33,7 +33,7 @@ require('./middleware')(express, app, passport);
 require('./routes')(app, passport);
 
 //launch web server
-const server = protocol.createServer(options, app);
+const server = protocol.createServer(tls, app);
 
 //launch websocket server by sharing our web server protocol and only accept connections coming from 'path'
 const ws_server = new WebSocket.Server({server: server, path: ""});

@@ -5,18 +5,14 @@
         <link rel="shortcut icon" type="image/x-icon" href="https://duohando.com/favicon.ico">
     </head>
     <body>
-        <form action="/logout", method="POST">
+        <form action="/logout", method="GET">
             <div>
                 <button>Logout</button>
             </div>
         </form>
-        <form action="/changeEmail" method="POST">
+        <form action="/activate2FA" method="POST">
             <div>
-                <label for="email_new">New Email</label>
-                <input name="email_new" placeholder="email@example.com" type="email"/>
-            </div>
-            <div>
-                <button>Change Email</button>
+                <button>Activate 2FA with Google Authenticator</button>
             </div>
         </form>
         <form action="/changePhoneNumber" method="POST">
