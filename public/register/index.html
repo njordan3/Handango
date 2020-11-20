@@ -1,0 +1,43 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Duohando Login</title>
+        <link rel="shortcut icon" type="image/x-icon" href="https://duohando.com/favicon.ico">
+    </head>
+    <body>
+        <!--Email/password login-->
+        <form action="/register", method="POST">
+            <div>
+                <label for="firstname">First Name</label>
+                <input name="firstname" type="text"/>
+            </div>
+            <div>
+                <label for="lastname">Last Name</label>
+                <input name="lastname" type="text"/>
+            </div>
+            <div>
+                <label for="email">Email</label>
+                <input name="email" type="email"/>
+            </div>
+            <div>
+                <label for="password">Password</label>
+                <!--At least 8 characters with at least 1: number, letter, and symbol-->
+                <input name="password" type="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[-+_!@#$%^&*.,?]).{8,}"/>
+            </div>
+            <div>
+                <button>Submit</button>
+            </div>
+        </form>
+        <form action="/google", method="GET">
+            <div>
+                <button>Register With Google</button>
+            </div>
+        </form>
+        <form action="/facebook", method="GET">
+            <div>
+                <button>Register With Facebook</button>
+            </div>
+        </form>
+    </body>
+    <script src="/login/index.js"></script>
+</html>

@@ -1,14 +1,16 @@
+//https://medium.com/@alexcambose/webcam-live-streaming-with-websockets-and-base64-64b1b4992db8
+//Websocket/socketio with NodeJS/Express
+//https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
+
 //server dependencies
 const express = require('express');
-const bodyParser = require('body-parser');
-const helmet = require('helmet');
+const WebSocket = require('ws');
+//user authentication and database configuration
+const passport = require('passport');
+require('./passport-setup')(passport);
 
-//used to create file path strings
-const path = require('path');
-//file system
 const fs = require('fs');
 
-//default to HTTPS connection
 var options = {};
 var protocol = require('https');
 var port = 443;
@@ -17,31 +19,30 @@ try {
     options = {
         key: fs.readFileSync(__dirname + "/tls/privkey.pem"),
         cert: fs.readFileSync(__dirname + "/tls/cert.pem")
-    }
+    };
 } catch (e) {
-    //change to HTTP connection
     protocol = require('http');
     port = 3000;
 }
 
-//initialize express app
+//initialize express app with middleware
 const app = express();
-//serve public directory to client
-app.use(express.static(path.join(__dirname, '../public')));
-//use helmet as middleware
-app.use(helmet());
-//body parser middleware for html form handling
-app.use(bodyParser.urlencoded({extended: true}));
+require('./middleware')(express, app, passport);
 
-app.enable('trust proxy');
+//load routes with our app and configured passport
+require('./routes')(app, passport);
 
-//response on homepage
-app.get('/', function(req, res) {
-    console.log("Someone is at the homepage");
+//launch web server
+const server = protocol.createServer(options, app);
+
+//launch websocket server by sharing our web server protocol and only accept connections coming from 'path'
+const ws_server = new WebSocket.Server({server: server, path: ""});
+ws_server.on('connection', function connection(socket) {
+    socket.on('test', function incoming(msg) {
+        console.log(msg);
+    });
 });
 
-//launch server
-var server = protocol.createServer(options, app);
 server.listen(port, () => {
     port === 443 ? console.log("HTTPS Server on https://duohando.com") : console.log(`HTTP server on localhost:${port}`);
 });
