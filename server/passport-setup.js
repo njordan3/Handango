@@ -22,7 +22,7 @@ module.exports = function(passport) {
     });
     passport.deserializeUser(function(usr, done) {
         user.findUser(usr.username, usr.id)
-            .then(function(row) { done(null, row.email); })
+            .then(function(row) { done(null, {username: row.email, id: row.external_id}); })
             .catch(function(err) { done(null, false, {message: err}); })
     });
     //===============================================
@@ -47,7 +47,7 @@ module.exports = function(passport) {
                     return user.Register(prof);
                 })
                 .then(function(row) {
-                    return done(null, {username: row.email, id: row.external_id, secret: row.secret});
+                    return done(null, {username: row.email, id: row.external_id});
                 })
                 .catch(function(err) {
                     console.log(err);
@@ -68,7 +68,7 @@ module.exports = function(passport) {
                     let fullName = profile.name.split(' ');
                     let params = [
                         fullName[0], fullName[fullName.length-1],
-                        req.user, profile.email,
+                        req.session.passport.user.username, profile.email,
                         null,
                         'Google', 
                         null, profile.sub
@@ -104,9 +104,7 @@ module.exports = function(passport) {
                     ];
                     return user.Register(prof);
                 })
-                .then(function(row) {
-                    return done(null, {username: row.email, id: row.external_id, secret: row.secret});
-                })
+                .then(function(row) { return done(null, {username: row.email, id: row.external_id}); })
                 .catch(function(err) {
                     console.log(err);
                     return done(null, false, {message: err});
@@ -127,7 +125,7 @@ module.exports = function(passport) {
                     let fullName = profile.name.split(' ');
                     let params = [
                         fullName[0], fullName[fullName.length-1],
-                        req.user, profile.email,
+                        req.session.passport.user.username, profile.email,
                         null,
                         'Facebook', 
                         null, profile.id
@@ -209,7 +207,7 @@ module.exports = function(passport) {
             .then(function(hash) {
                 let params = [
                     null, null,
-                    req.user, email,
+                    req.session.passport.user.username, email,
                     hash,
                     null,
                     req._passport.session.user.id, null

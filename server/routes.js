@@ -16,67 +16,77 @@ module.exports = function(app, passport) {
         res.render('dashboard');
     });
 
+    app.get('/logout', function(req, res) {
+        logout(req);
+        res.redirect('/');
+    });
+
+    app.post('/gotologin', function(req, res) {
+        if (req.session.passport) {
+            res.redirect('/dashboard');
+        } else {
+            res.redirect('/login');
+        }
+    });
+    app.post('/gotoregister', function(req, res) {
+        res.redirect('/register');
+    });
     app.get('/goto2FA', isLoggedIn, function(req, res) {
-        if (req._passport.session.user.secret) {
+        if (req.session.passport.user.secret != null) {
             res.redirect('/2FA');
         } else {
+            req.session.passport.user.authenticated = true;
+            req.session.save();
             res.redirect('/dashboard');
         }
     });
 
     app.post('/2FA', isLoggedIn, function(req, res) {
-        if (user.verify2FA(req._passport.session.user.secret, req.body.token)) {
-            req._passport.session.user.secret = null;   //set to null so it is 2Fauthenticated
+        if (user.verify2FA(req.session.passport.user.secret, req.body.token)) {
+            req.session.passport.user.secret = null;
+            req.session.passport.user.authenticated = true;
+            req.session.save();
             res.redirect('/dashboard');
         } else {
             res.redirect('/2FA');
         }
     });
+    app.post('/activate2FA', isLoggedIn, function(req, res) {
+        user.activate2FA(req.session.passport.user.username, req.user.id)
+        .then(function() {
+            req.logout();
+            res.redirect('/logout');
+        })
+        .catch(function(err) {
+            console.log(err);
+            res.redirect('/dashboard');
+        });
+    });
 
     app.post('/changeEmail', isLoggedIn, is2FAuthenticated, function(req, res) {
         user.validEmail(req.body.email_new)
-        .then(function() { return user.changeEmail(req.user, req.body.email_new) })
+        .then(function() { return user.changeEmail(req.session.passport.user.username, req.body.email_new) })
         .then(function() {
             req.logout();
-            res.redirect('/login');
+            res.redirect('/logout');
         })
         .catch(function(err) {
             console.log(err);
             res.redirect('/dashboard');
         });
     });
-
-    app.post('/activate2FA', isLoggedIn, function(req, res) {
-        user.activate2FA(req.user, req._passport.session.user.id)
-        .then(function() {
-            req.logout();
-            res.redirect('/login');
-        })
-        .catch(function(err) {
-            console.log(err);
-            res.redirect('/dashboard');
-        });
-    });
-
     app.post('/changePassword', isLoggedIn, is2FAuthenticated, function(req, res) {
         user.validPassword(req.body.password_new)
         .then(function() { return user.hashPassword(req.body.password_new) })
-        .then(function(hash) { return user.changePassword(req.user, hash) })
+        .then(function(hash) { return user.changePassword(req.session.passport.user.username, hash) })
         .then(function() {
             req.logout();
-            res.redirect('/login');
+            res.redirect('/logout');
         })
         .catch(function(err) {
             console.log(err);
             res.redirect('/dashboard');
         });
-    });
-
-    app.post('/gotologin', function(req, res) {
-        res.redirect('/login');
-    });
-    app.post('/gotoregister', function(req, res) {
-        res.redirect('/register');
     });
 
     app.post('/login', passport.authenticate('local-login', { 
@@ -89,17 +99,12 @@ module.exports = function(app, passport) {
         failureRedirect: '/register',
         failureFlash: true
     }));
+
     app.post('/changeToEmail', isLoggedIn, is2FAuthenticated, passport.authenticate('changeToEmail', {
         successRedirect: '/logout',
         failureRedirect: '/dashboard',
         failureFlash: true
     }));
-
-    app.get('/logout', function(req, res) {
-        req.logout();
-        res.redirect('/');
-    });
-
 
     // Google login routing
     app.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
@@ -129,6 +134,7 @@ module.exports = function(app, passport) {
     }));
 };
 
+//Authorization middleware functions
 function isLoggedIn(req, res, next) {
     if (req.isAuthenticated())
         return next();
@@ -136,12 +142,16 @@ function isLoggedIn(req, res, next) {
     console.log("Not logged in");
     res.redirect('/');
 }
-
 function is2FAuthenticated(req, res, next) {
-    if (req._passport.session.user.secret == null) {
+    if (req.session.passport.user.secret == null && req.session.passport.user.authenticated) {
         return next();
     }
-    //if the secret isn't null, then they have 2FA activated and havent entered their OTP to fully login
     console.log("Not authenticated");
     res.redirect('/');
+}
+
+function logout(req) {
+    req.logout();
+    req.session.passport = undefined;
+    req.session.save();
 }
