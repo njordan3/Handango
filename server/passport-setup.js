@@ -3,12 +3,14 @@ if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config()
 } else { return console.error('You shouldnt use .env files in production'); }
 
+const twoFactor = require('./2FA');
+
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const LocalStrategy = require('passport-local').Strategy;
 
-const user = require('./user');
-user.initDB();
+const db = require('./db');
+db.initDB();
 
 const email = require('./email');
 email.startMailer();
@@ -21,8 +23,14 @@ module.exports = function(passport) {
         done(null, user);
     });
     passport.deserializeUser(function(usr, done) {
-        user.findUser(usr.username, usr.id)
-            .then(function(row) { done(null, {username: row.email, id: row.external_id}); })
+        db.findUser(usr.username, usr.id, false)
+            .then(function(row) {
+                if (row.sqlMessage) {
+                    return Promise.reject(`User ${usr.username} not found in Deserialize`);
+                } else {
+                    done(null, {username: row.email, id: row.external_id});
+                }
+            })
             .catch(function(err) { done(null, false, {message: err}); })
     });
     //===============================================
@@ -34,21 +42,25 @@ module.exports = function(passport) {
         callbackURL: "https://duohando.com/google/callback"
       },
       function(accessToken, refreshToken, profile, done) {
-            user.connectToDB()
-                .then(function() {
-                    profile = profile._json;
-                    let fullName = profile.name.split(' ');
-                    let prof = [
-                        fullName[0], fullName[fullName.length-1],
-                        profile.email, null,
-                        null,
-                        'Google', profile.sub
-                    ];
-                    return user.Register(prof);
-                })
+            db.connectToDB()
+                .then(function() { return db.findUser(profile._json.email, profile._json.sub) })
                 .then(function(row) {
-                    return done(null, {username: row.email, id: row.external_id});
+                    if (row.sqlMessage) {
+                        profile = profile._json;
+                        let fullName = profile.name.split(' ');
+                        let prof = [
+                            fullName[0], fullName[fullName.length-1],
+                            profile.email, null,
+                            null,
+                            'Google', profile.sub
+                        ];
+                        return db.Register(prof);
+                    } else {
+                        return Promise.resolve(row);
+                    }
                 })
+                .then(function(row) { return db.Login(row); })
+                .then(function(row) { return done(null, {username: row.email, id: row.external_id, secret: row.secret}); })
                 .catch(function(err) {
                     console.log(err);
                     return done(null, false, {message: err});
@@ -62,7 +74,7 @@ module.exports = function(passport) {
         passReqToCallback: true
       },
       function(req, accessToken, refreshToken, profile, done) {
-            user.connectToDB()
+            db.connectToDB()
                 .then(function() {
                     profile = profile._json;
                     let fullName = profile.name.split(' ');
@@ -73,9 +85,30 @@ module.exports = function(passport) {
                         'Google', 
                         null, profile.sub
                     ];
-                    return user.changeLoginType(params);
+                    return db.changeLoginType(params);
                 })
-                .then(function(row) { return done(null, {username: row.email, id: row.external_id}); })
+                .then(function(row) {
+                    //calling done() resets the passport user to whatever object we pass it,
+                    //we need to make sure the user is still authorized to get onto their dashboard
+                    if (req.session.passport.user.two_factored) {
+                        //emulating set2FAInfo
+                        row = {
+                            username: row.email, id: row.external_id, secret: row.secret,
+                            ejs: {
+                                toggle2FAForm: true,
+                                action: "/toggle2FAForm",
+                                failRedirect: '/dashboard',
+                                successRedirect: '/logout'
+                            },
+                            logged_in: true,
+                            two_factored: true
+                        }
+                        return Promise.resolve(row);
+                    } else {
+                        return Promise.resolve({username: row.email, id: row.external_id});
+                    }
+                })
+                .then(function(row) { return done(null, row); })
                 .catch(function(err) {
                     console.log(err);
                     return done(null, false, {message: err});
@@ -92,19 +125,25 @@ module.exports = function(passport) {
         profileFields: ['id', 'displayName', 'email']
       },
       function(accessToken, refreshToken, profile, done) {
-            user.connectToDB()
-                .then(function() { 
-                    profile = profile._json;
-                    let fullName = profile.name.split(' ');
-                    let prof = [
-                        fullName[0], fullName[fullName.length-1],
-                        profile.email, null,
-                        null,
-                        'Facebook', profile.id
-                    ];
-                    return user.Register(prof);
+            db.connectToDB()
+                .then(function() { return db.findUser(profile._json.email, profile._json.id) })
+                .then(function(row) {
+                    if (row.sqlMessage) {
+                        profile = profile._json;
+                        let fullName = profile.name.split(' ');
+                        let prof = [
+                            fullName[0], fullName[fullName.length-1],
+                            profile.email, null,
+                            null,
+                            'Facebook', profile.id
+                        ];
+                        return db.Register(prof);
+                    } else {
+                        return Promise.resolve(row);
+                    }
                 })
-                .then(function(row) { return done(null, {username: row.email, id: row.external_id}); })
+                .then(function(row) { return db.Login(row); })
+                .then(function(row) { return done(null, {username: row.email, id: row.external_id, secret: row.secret}); })
                 .catch(function(err) {
                     console.log(err);
                     return done(null, false, {message: err});
@@ -119,7 +158,7 @@ module.exports = function(passport) {
         passReqToCallback: true
       },
       function(req, accessToken, refreshToken, profile, done) {
-            user.connectToDB()
+            db.connectToDB()
                 .then(function() { 
                     profile = profile._json;
                     let fullName = profile.name.split(' ');
@@ -130,9 +169,30 @@ module.exports = function(passport) {
                         'Facebook', 
                         null, profile.id
                     ];
-                    return user.changeLoginType(params);
+                    return db.changeLoginType(params);
                 })
-                .then(function(row) { return done(null, {username: row.email, id: row.external_id}); })
+                .then(function(row) {
+                    //calling done() resets the passport user to whatever object we pass it,
+                    //we need to make sure the user is still authorized to get onto their dashboard
+                    if (req.session.passport.user.two_factored) {
+                        //emulating set2FAInfo
+                        row = {
+                            username: row.email, id: row.external_id, secret: row.secret,
+                            ejs: {
+                                toggle2FAForm: true,
+                                action: "/toggle2FAForm",
+                                failRedirect: '/dashboard',
+                                successRedirect: '/logout'
+                            },
+                            logged_in: true,
+                            two_factored: true
+                        }
+                        return Promise.resolve(row);
+                    } else {
+                        return Promise.resolve({username: row.email, id: row.external_id});
+                    }
+                })
+                .then(function(row) { return done(null, row); })
                 .catch(function(err) {
                     console.log(err);
                     return done(null, false, {message: err});
@@ -148,19 +208,23 @@ module.exports = function(passport) {
             passReqToCallback: true
         },
         function(req, email, password, done) {
-            user.connectToDB()
-                .then(function() { return user.validEmail(email); })
-                .then(function() { return user.validPassword(password); })
-                .then(function() { return user.findUser(email); })
+            db.connectToDB()
+                .then(function() { return db.validEmail(email); })
+                .then(function() { return db.validPassword(password); })
+                .then(function() { return db.findUser(email, null, false); })
                 .then(function(row) {
-                    if (row.external_id) return Promise.reject(new Error("External account attempted email/password login"));
-                    return user.comparePassword(email, row.login_attempts, password, row.password_hash, row.secret);
+                    if (row.sqlMessage) {
+                        return Promise.reject(row.sqlMessage);
+                    }
+                    if (row.external_id) return Promise.reject(`External account ${email} attempted email/password login`);
+                    return db.comparePassword(email, password, row);
                 })
-                .then(function(secret) {
-                    return done(null, {username: email, id: null, secret: secret});
-                })
+                .then(function(row) { return db.Login(row); })
+                .then(function(row) { return done(null, {username: email, id: null, secret: row.secret}); })
                 .catch(function(err) {
-                    console.log(err);
+                    if (err) {
+                        console.log(err);
+                    }
                     return done(null, false, {message: err});
                 });
         }
@@ -174,10 +238,18 @@ module.exports = function(passport) {
             passReqToCallback: true
         },
         function(req, email, password, done) {
-            user.connectToDB()
-                .then(function() { return user.validEmail(email); })
-                .then(function() { return user.validPassword(password); })
-                .then(function() { return user.hashPassword(password); })
+            db.connectToDB()
+                .then(function() { return db.findUser(email, null); })
+                .then(function(row) {
+                    if (row.sqlMessage) {
+                        return Promise.resolve();
+                    } else {
+                        return Promise.reject(`Can't register existing account ${email}`);
+                    }
+                })
+                .then(function() { return db.validEmail(email); })
+                .then(function() { return db.validPassword(password); })
+                .then(function() { return db.hashPassword(password); })
                 .then(function(hash) {
                     let profile = [
                         req.body.firstname, req.body.lastname,
@@ -185,9 +257,9 @@ module.exports = function(passport) {
                         hash,
                         null, null
                     ];
-                    return user.Register(profile);
+                    return db.Register(profile);
                 })
-                .then(function(row) { return done(null, {username: row.email, id: row.external_id}); })
+                .then(function(row) { return done(null, {username: row.email, id: row.external_id, secret: row.secret}); })
                 .catch(function(err) {
                     console.log(err);
                     return done(null, false, {message: err});
@@ -200,21 +272,49 @@ module.exports = function(passport) {
         passReqToCallback: true,
     },
     function(req, email, password, done) {
-        user.connectToDB()
-            .then(function() { return user.validEmail(email); })
-            .then(function() { return user.validPassword(password); })
-            .then(function() { return user.hashPassword(password); })
+        new Promise((resolve, reject) => {
+                if (req.session.passport.user.id == null) {
+                    return reject(`${req.session.passport.user.username} tried to change to an email account as an email account`);
+                } else {
+                    return resolve();
+                }
+            })
+            .then(function() { return db.connectToDB(); })
+            .then(function() { return db.validEmail(email); })
+            .then(function() { return db.validPassword(password); })
+            .then(function() { return db.hashPassword(password); })
             .then(function(hash) {
                 let params = [
                     null, null,
                     req.session.passport.user.username, email,
                     hash,
                     null,
-                    req._passport.session.user.id, null
+                    req.session.passport.user.id, null
                 ];
-                return user.changeLoginType(params);
+                return db.changeLoginType(params);
             })
-            .then(function(row) { return done(null, {username: row.email, id: row.external_id}); })
+            .then(function(row) {
+                //calling done() resets the passport user to whatever object we pass it,
+                //we need to make sure the user is still authorized to get onto their dashboard
+                if (req.session.passport.user.two_factored) {
+                    //emulating set2FAInfo
+                    row = {
+                        username: row.email, id: row.external_id, secret: row.secret,
+                        ejs: {
+                            toggle2FAForm: true,
+                            action: "/toggle2FAForm",
+                            failRedirect: '/dashboard',
+                            successRedirect: '/logout'
+                        },
+                        logged_in: true,
+                        two_factored: true
+                    }
+                    return Promise.resolve(row);
+                } else {
+                    return Promise.resolve({username: row.email, id: row.external_id});
+                }
+            })
+            .then(function(row) { return done(null, row); })
             .catch(function(err) {
                 console.log(err);
                 return done(null, false, {message: err});

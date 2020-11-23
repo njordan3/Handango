@@ -27,10 +27,14 @@ try {
 
 //initialize express app with middleware
 const app = express();
-require('./middleware')(express, app, passport);
+let {initMiddleware} = require('./middleware');
+initMiddleware(express, app, passport);
 
 //load routes with our app and configured passport
-require('./routes')(app, passport);
+let {initDashboardRoutes} = require('./dashboard');
+initDashboardRoutes(app, passport);
+let {initLoginRoutes} = require('./login');
+initLoginRoutes(app, passport);
 
 //launch web server
 const server = protocol.createServer(tls, app);
