@@ -7,16 +7,40 @@
             <link rel="shortcut icon" type="image/x-icon" href="https://duohando.com/favicon.ico">
         </head>
         <body>
-            <form action="/gotologin", method="POST">
-                <div>
-                    <button>Login</button>
-                </div>
-            </form>
-            <form action="/gotoregister", method="POST">
-                <div>
-                    <button>Register</button>
-                </div>
-            </form>
+            <video autoplay playsinline muted id = "webcamView" width = "224" height="224"></video>
+            <h2>Webcam</h2>
+<!--           <script src = "../server/webcam.js"></script>-->
+        <script>
+
+        async function setupWebcam() {
+            return new Promise( ( resolve, reject ) => {
+                const webcamElem = document.getElementById( "webcamView" );
+                const navigatorAny = navigator;
+                navigator.getUserMedia = navigator.getUserMedia ||
+                navigatorAny.webkitGetUserMedia || navigatorAny.mozGetUserMedia ||
+                navigatorAny.msGetUserMedia;
+                if( navigator.getUserMedia ) {
+                    navigator.getUserMedia( { video: true },
+                        stream => {
+                            webcamElem.srcObject = stream;
+                            webcamElem.addEventListener( "loadeddata", resolve, false );
+                        },
+                    error => reject());
+                }
+                else {
+                    reject();
+                }
+            });
+        }
+
+
+
+        let webcam = null;
+
+        (async () => {
+            await setupWebcam();
+        })();
+            </script>
         </body>
     </body>
 </html>
