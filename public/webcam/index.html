@@ -11,7 +11,18 @@
             <h2>Webcam</h2>
 <!--           <script src = "../server/webcam.js"></script>-->
         <script>
-
+            // Boolean to check whether the camera the API is supported
+            function getUserMediaSupported() {
+                return !!(navigator.mediaDevices &&
+                         navigator.mediaDevices.getUserMedia);
+            }
+            // Checking whether the browser supported getUserMedia()
+            if (getUserMediaSupported()) {
+                console.log("getUserMedia is supported by your browser");
+            } else {
+                console.warn("getUserMedia is not supported by your browser")
+            }
+            // Asynchronous function the set up the web cam for the web page
         async function setupWebcam() {
             return new Promise( ( resolve, reject ) => {
                 const webcamElem = document.getElementById( "webcamView" );
@@ -28,6 +39,7 @@
                     error => reject());
                 }
                 else {
+                    console.warn("Failed to set up the webcam, make sure it is operating correctly.")
                     reject();
                 }
             });
