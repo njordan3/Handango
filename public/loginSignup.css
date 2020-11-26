@@ -1,0 +1,36 @@
+html {
+    scroll-behavior: smooth;
+}
+.bg-dark {
+    background-color: #04204e !important;
+}
+.navbar-brand {
+    font-weight: bold;
+    font-family: monospace;
+    font-size: 28px;
+}
+.navbar-dark .navbar-nav .nav-link {
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+.navbar-dark .navbar-nav .nav-item {
+    margin: 0 15px;
+}
+.navbar-dark .navbar-collapse {
+    flex-direction: row-reverse;
+}
+.btn-primary {
+    width: 300px;
+    margin: 2px 0;
+}
+.form-container .exampleTitle  {
+    font-size: 25px;
+    text-align: center;
+    display: block;
+    margin: 10px 0px;
+
+}
+.form-container input {
+    width: 300px;
+}
