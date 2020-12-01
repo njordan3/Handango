@@ -9,7 +9,11 @@ const flash = require('connect-flash');
 module.exports = {
     initMiddleware: initMiddleware,
     isLoggedIn: isLoggedIn,
-    isAuthenticated: isAuthenticated
+    just2FAd: just2FAd,
+    isEmailPassUser: isEmailPassUser,
+    isExternalUser: isExternalUser,
+    isNotFacebookUser: isNotFacebookUser,
+    isNotGoogleUser: isNotGoogleUser
 }
 
 function initMiddleware(express, app, passport) {
@@ -61,10 +65,56 @@ function isLoggedIn(req, res, next) {
     console.log("Not logged in");
     res.redirect('/');
 }
-function isAuthenticated(req, res, next) {
-    if (req.session.passport.user.logged_in) {
+
+function just2FAd(req, res, next) {
+    if (req.session.passport.user.just2FAd) {
+        req.session.passport.user.just2FAd = false;
         return next();
     }
-    console.log("Not authenticated");
-    res.redirect('/');
+    if (req.session.passport.user.secret === null) {
+        return next();
+    }
+    console.log("Was not just 2FAd");
+    res.redirect('/2FA');
+}
+
+function isExternalUser(req, res, next) {
+    console.log(req.session.passport.user.type, req.session.passport.user.id);
+    if ((req.session.passport.user.type === "Facebook" || req.session.passport.user.type === "Google") && req.session.passport.user.id !== null) {
+        return next();
+    }
+
+    console.log("Was not an external user");
+    req.session.passport.user.just2FAd = true;
+    res.redirect('/dashboard');
+}
+
+function isNotGoogleUser(req, res, next) {
+    if (req.session.passport.user.type !== "Google") {
+        return next();
+    }
+
+    console.log("Was a Google user");
+    req.session.passport.user.just2FAd = true;
+    res.redirect('/dashboard');
+}
+
+function isNotFacebookUser(req, res, next) {
+    if (req.session.passport.user.type !== "Facebook") {
+        return next();
+    }
+
+    console.log("Was a Facebook user");
+    req.session.passport.user.just2FAd = true;
+    res.redirect('/dashboard');
+}
+
+function isEmailPassUser(req, res, next) {
+    if (req.session.passport.user.type === null && req.session.passport.user.id === null) {
+        return next();
+    }
+
+    console.log("Was not a Email/Password user");
+    req.session.passport.user.just2FAd = true;
+    res.redirect('/dashboard');
 }

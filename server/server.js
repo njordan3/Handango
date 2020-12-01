@@ -35,6 +35,8 @@ let {initDashboardRoutes} = require('./dashboard');
 initDashboardRoutes(app, passport);
 let {initLoginRoutes} = require('./login');
 initLoginRoutes(app, passport);
+let {initSecurityRoutes} = require('./security');
+initSecurityRoutes(app, passport);
 
 //launch web server
 const server = protocol.createServer(tls, app);

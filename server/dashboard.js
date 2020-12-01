@@ -1,7 +1,10 @@
 const db = require('./db');
-const twoFactor = require('./2FA');
+const twoFactor = require('./security');
+const randomString = require('crypto-random-string');
+const mailer = require('./email');
 
-let {isLoggedIn, isAuthenticated} = require('./middleware');
+let {isLoggedIn, just2FAd, isEmailPassUser, isNotFacebookUser, isExternalUser, isNotGoogleUser} = require('./middleware');
+let { hashPassword, validEmail, validPassword } = require('./security');
 
 module.exports = {
     initDashboardRoutes: initDashboardRoutes,
@@ -13,98 +16,119 @@ function initDashboardRoutes(app, passport) {
         logout(req, res);
     });
 
-    app.get('/dashboard', isLoggedIn, isAuthenticated, function(req, res) {
+    app.get('/dashboard', isLoggedIn, just2FAd, function(req, res) {
         res.render('dashboard', req.session.passport.user.ejs);
     });
-    
-    app.post('/toggle2FAForm', isLoggedIn, function(req, res) {
-        twoFactor.check2FA(req, res)
-            .then(function() {
-                if (req.session.passport.user.ejs.toggle2FAForm) {
-                    let redirect = req.session.passport.user.ejs.successRedirect;
-                    twoFactor.unset2FAInfo(req);
-                    res.redirect(redirect);
-                } else {
-                    res.redirect('/dashboard');
-                }
-            })
-            .catch(function(err) {
-                console.log(err);
-                if (req.session.passport.user.ejs) {
-                    res.redirect(req.session.passport.user.ejs.failRedirect);
-                } else {
-                    res.redirect('/login');
-                }
-            });
+
+    app.get('/forms', isLoggedIn, just2FAd, function(req, res) {
+        //work-arounds to these forms are possible so enforce user types to specific forms
+        switch (req.query.type) {
+            case 'changeEmail':
+                if (req.session.passport.user.type === null) { res.render('forms', {type: req.query.type}); }
+                else { twoFactor.forceJust2FAd(req, res, '/dashboard'); }
+                break;
+            case 'changePassword':
+                if (req.session.passport.user.type === null) { res.render('forms', {type: req.query.type}); }
+                else { twoFactor.forceJust2FAd(req, res, '/dashboard'); }
+                break;
+            case 'changeToEmail':
+                if (req.session.passport.user.type !== null) { res.render('forms', {type: req.query.type}); }
+                else { twoFactor.forceJust2FAd(req, res, '/dashboard'); }
+                break;
+            case 'changeToGoogle':
+                if (req.session.passport.user.type === null || req.session.passport.user.type === "Facebook") { res.render('forms', {type: req.query.type}); }
+                else { twoFactor.forceJust2FAd(req, res, '/dashboard'); }
+                break;
+            case 'changeToFacebook':
+                if (req.session.passport.user.type === null || req.session.passport.user.type === "Google") { res.render('forms', {type: req.query.type}); }
+                else { twoFactor.forceJust2FAd(req, res, '/dashboard'); }
+                break;
+            default:
+                twoFactor.forceJust2FAd(req, res, '/dashboard');
+                break;
+        }
     });
 
-    app.get('/showActivate2FAForm', isLoggedIn, function(req, res) {
-        twoFactor.activate2FA(req)
-            .then(function() {
-                res.redirect('/dashboard');
-            })
-            .catch(function(err) {
-                console.log(err);
-                res.redirect('/dashboard');
-            });
+    app.get('/changeEmail-2FA', isLoggedIn, isEmailPassUser, function(req, res) {
+        twoFactor.set2FAInfo(req, res, '/forms?type=changeEmail');
     });
-
-    app.post('/activate2FA', isLoggedIn, function(req, res) {
-        twoFactor.check2FA(req, res)
-            .then(function() {
-                let params = [
-                    req.session.passport.user.username,
-                    req.session.passport.user.id,
-                    req.session.passport.user.ejs.token
-                ];
-                return db.add2FA(params); })
-            .then(function() {
-                req.session.passport.user.ejs = undefined;
-                req.session.save();
-                res.redirect('/dashboard');
-            })
-            .catch(function(err) {
-                console.log(err);
-                res.redirect('/dashboard');
-            });
-    });
-
-    app.post('/changeEmail', isLoggedIn, isAuthenticated, function(req, res) {
-        db.validEmail(req.body.email_new)
+    app.post('/changeEmail', isLoggedIn, isEmailPassUser, function(req, res) {
+        validEmail(req.body.email_new)
             .then(function() { return db.changeEmail(req.session.passport.user.username, req.body.email_new) })
-            .then(function() { return twoFactor.set2FAInfo(req, res, "/toggle2FAForm", '/dashboard', '/logout'); })
+            .then(function(row) { 
+                mailer.sendNotificationEmail(req.session.passport.user.username, row, "email-change");
+                return mailer.sendRegisterEmail(row);
+            })
+            .then(function() { res.redirect('/logout'); })
             .catch(function(err) {
                 console.log(err);
-                res.redirect('/dashboard');
+                twoFactor.forceJust2FAd(req, res, '/dashboard');
             });
     });
-    app.post('/changePassword', isLoggedIn, isAuthenticated, function(req, res) {
-        db.validPassword(req.body.password_new)
-            .then(function() { return db.hashPassword(req.body.password_new) })
+
+    app.get('/changePassword-2FA', isLoggedIn, isEmailPassUser, function(req, res) {
+        twoFactor.set2FAInfo(req, res, '/forms?type=changePassword');
+    });
+    app.post('/changePassword', isLoggedIn, isEmailPassUser, function(req, res) {
+        validPassword(req.body.password_new)
+            .then(function() { return hashPassword(req.body.password_new) })
             .then(function(hash) { return db.changePassword(req.session.passport.user.username, hash) })
-            .then(function() { return twoFactor.set2FAInfo(req, res, "/toggle2FAForm", '/dashboard', '/logout'); })
+            .then(function(row) { return mailer.sendNotificationEmail(row.email, row, 'password-change'); })
+            .then(function() { res.redirect('/logout'); })
             .catch(function(err) {
                 console.log(err);
-                res.redirect('/dashboard');
+                twoFactor.forceJust2FAd(req, res, '/dashboard');
             });
     });
 
-    app.post('/changeToEmail', isLoggedIn, isAuthenticated, passport.authenticate('changeToEmail', {
-        successRedirect: '/dashboard',
-        failureRedirect: '/dashboard',
-        failureFlash: true
-    }));
+    app.get('/changeToEmail-2FA', isLoggedIn, isExternalUser, function(req, res) {
+        if (req.session.passport.user.id !== null) twoFactor.set2FAInfo(req, res, '/forms?type=changeToEmail');
+        else res.redirect('/dashboard');
+    });
+    app.post('/changeToEmail', isLoggedIn, isExternalUser, function(req, res) {
+        var email = req.body.email, password = req.body.password;
+        db.connectToDB()
+            .then(function() { return validEmail(email); })
+            .then(function() { return validPassword(password); })
+            .then(function() { return hashPassword(password); })
+            .then(function(hash) {
+                let params = [
+                    null, null,
+                    req.session.passport.user.username, email,
+                    req.body.username,
+                    randomString({length: 128, type: 'url-safe'}),
+                    hash,
+                    null,
+                    req.session.passport.user.id, null
+                ];
+                return db.changeLoginType(params);
+            })
+            .then(function(row) { return mailer.sendRegisterEmail(row); })
+            .then(function() { res.redirect('/logout'); })
+            .catch(function(err) {
+                console.log(err);
+                twoFactor.forceJust2FAd(req, res, '/dashboard');
+            });
+    });
 
-    app.get('/changeToGoogle', isLoggedIn, isAuthenticated, passport.authenticate('changeToGoogle', {scope: ['profile', 'email']}));
+    app.get('/changeToGoogle-2FA', isLoggedIn, isNotGoogleUser, function(req, res) {
+        if (req.session.passport.user.type !== 'Google') twoFactor.set2FAInfo(req, res, '/forms?type=changeToGoogle');
+        else twoFactor.forceJust2FAd(req, res, '/dashboard');
+    });
+    app.get('/changeToGoogle', isLoggedIn, isNotGoogleUser, passport.authenticate('changeToGoogle', {scope: ['profile', 'email']}));
     app.get('/changeToGoogle/callback', passport.authenticate('changeToGoogle', { 
-        successRedirect: '/dashboard',
+        successRedirect: '/logout',
         failureRedirect: '/dashboard',
         failureFlash: true
     }));
 
-    app.get('/changeToFacebook', isLoggedIn, isAuthenticated, passport.authenticate('changeToFacebook', { scope: 'email' }));
+    app.get('/changeToFacebook-2FA', isLoggedIn, isNotFacebookUser, function(req, res) {
+        if (req.session.passport.user.type !== 'Facebook') twoFactor.set2FAInfo(req, res, '/forms?type=changeToFacebook');
+        else twoFactor.forceJust2FAd(req, res, '/dashboard');
+    });
+    app.get('/changeToFacebook', isLoggedIn, isNotFacebookUser, passport.authenticate('changeToFacebook', { scope: 'email' }));
     app.get('/changeToFacebook/callback', passport.authenticate('changeToFacebook', { 
-        successRedirect: '/dashboard',
+        successRedirect: '/logout',
         failureRedirect: '/dashboard',
         failureFlash: true
     }));

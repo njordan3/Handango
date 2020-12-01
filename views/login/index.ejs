@@ -20,6 +20,8 @@
                 <button>Submit</button>
             </div>
         </form>
+        <a href="https://duohando.com/forgot-password">Forgot My Password</a>
+        <a href="https://duohando.com/forgot-email">Forgot My Email</a>
         <form action="/google", method="GET">
             <div>
                 <button>Login With Google</button>
@@ -30,19 +32,6 @@
                 <button>Login With Facebook</button>
             </div>
         </form>
-        <% if (locals.toggle2FAForm !== undefined && locals.action !== undefined) { %>
-            <br>
-            <p>Check for your one time password in Google Authenticator</p>
-            <form action=<%= action %> method="POST">
-                <div>
-                    <label for="token">Code</label>
-                    <input name="token" type="text"/>
-                </div>
-                <div>
-                    <button>Submit Code</button>
-                </div>
-            </form>
-        <% } %>
     </body>
     <script src="/login/index.js"></script>
 </html>
