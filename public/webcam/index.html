@@ -44,7 +44,15 @@
                 }
             });
         }
-
+        /* Asynchronous function to capture the Webcam image from the user.
+           This will be used to be sent to database to be analyzed
+        */
+        async function webcamImage() {
+            const image = (await webcam.capture()).toFloat();
+            //Normalize the image
+            const normalized = image.div(127).sub(1);
+            return normalized;
+        }
 
 
         let webcam = null;
