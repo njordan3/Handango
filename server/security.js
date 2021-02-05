@@ -1,6 +1,7 @@
 const speakeasy = require('speakeasy');
 const QRCode = require('qrcode');
 const db = require('./db');
+const bcrypt = require('bcrypt');
 
 let {isLoggedIn} = require('./middleware');
 
@@ -172,9 +173,7 @@ function check2FA(req, res) {
             encoding: 'base32'
         });
         console.log(t, req.body.token);
-
-        //console.log(req.session.passport.user.secret || req.session.passport.user.ejs.token);
-
+        
         let result = speakeasy.totp.verify({
             secret: req.session.passport.user.secret || req.session.passport.user.ejs.token,
             encoding: 'base32',

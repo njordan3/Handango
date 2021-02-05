@@ -59,7 +59,15 @@ module.exports = function(passport) {
                     else { return Promise.resolve(row); }
                 })
                 .then(function(row) { return db.Login(row); })
-                .then(function(row) { return done(null, {username: row.email, type: row.external_type, id: row.external_id, secret: row.twofactor_secret, ejs: {successRedirect: '/dashboard'}}); })
+                .then(function(row) { 
+                    //organize lessons into array of JSONs
+                    let dir = row.lesson_dir.split(",");
+                    let desc = row.lesson_desc.split(",");
+                    let lessons = [];
+                    for (let i = 0; i < dir.length; i++) { lessons[i] = { dir: dir[i], desc: desc[i] }; }
+
+                    return done(null, {username: row.email, type: row.external_type, id: row.external_id, secret: row.twofactor_secret, ejs: {successRedirect: '/dashboard'}});
+                })
                 .catch(function(err) {
                     console.log(err);
                     return done(null, false, {message: err});
@@ -128,7 +136,15 @@ module.exports = function(passport) {
                     else { return Promise.resolve(row); }
                 })
                 .then(function(row) { return db.Login(row); })
-                .then(function(row) { return done(null, {username: row.email, type: row.external_type, id: row.external_id, secret: row.twofactor_secret, ejs: {successRedirect: '/dashboard'}}); })
+                .then(function(row) {
+                    //organize lessons into array of JSONs
+                    let dir = row.lesson_dir.split(",");
+                    let desc = row.lesson_desc.split(",");
+                    let lessons = [];
+                    for (let i = 0; i < dir.length; i++) { lessons[i] = { dir: dir[i], desc: desc[i] }; }
+
+                    return done(null, {username: row.email, type: row.external_type, id: row.external_id, secret: row.twofactor_secret, ejs: {successRedirect: '/dashboard'}});
+                })
                 .catch(function(err) {
                     console.log(err);
                     return done(null, false, {message: err});
@@ -190,7 +206,13 @@ module.exports = function(passport) {
                 })
                 .then(function(row) { return db.Login(row); })
                 .then(function(row) {
-                    return done(null, {username: email, type: null, id: null, secret: row.twofactor_secret, ejs: {successRedirect: '/dashboard'}});
+                    //organize lessons into array of JSONs
+                    let dir = row.lesson_dir.split(",");
+                    let desc = row.lesson_desc.split(",");
+                    let lessons = [];
+                    for (let i = 0; i < dir.length; i++) { lessons[i] = { dir: dir[i], desc: desc[i] }; }
+
+                    return done(null, {username: email, type: null, id: null, secret: row.twofactor_secret, lessons: lessons, ejs: {successRedirect: '/dashboard'}});
                 })
                 .catch(function(err) {
                     console.log(err);
