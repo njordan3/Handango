@@ -89,6 +89,10 @@
   margin: 0;
 }
 
+#current-slide {
+  display: none;
+}
+
 #dd-ASL-bank {
   min-width: 279; /*max letter width (P) = 219*/
   min-height: 272;  /*max letter height (Z) = 252*/

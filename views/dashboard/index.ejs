@@ -80,6 +80,14 @@
                 <button>Change to Email Account</button>
             </div>
         </form>
+        <% for(let i = 0; i < lessons.length; i++) { %>
+            <form action="/lesson<%= i+1 %>" method="GET">
+                <div>
+                    <button id="lesson<%= i+1 %>">Lesson <%= i+1 %></button>
+                    <label for="lesson<%= i+1 %>">Goal: <%= lessons[i].desc %></label>
+                </div>
+            </form>
+        <% } %>
     </body>
     <script src="/dashboard/index.js"></script>
 </html>
