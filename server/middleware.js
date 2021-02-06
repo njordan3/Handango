@@ -39,15 +39,17 @@ function initMiddleware(express, app, passport) {
         app.use(helmet());
 
         //use sessions (put this before passport.session())
-        app.use(session({
+        let ses = session({
             secret: process.env.SESSION_SECRET,
+            key: process.env.SESSION_KEY,
             resave: true,
             saveUninitialized: true,
             cookie: {
                 httpOnly: true,
                 secure: true
             }
-        }));
+        });
+        app.use(ses);
 
         //initializes passport and passport sessions
         app.use(passport.initialize());
@@ -55,6 +57,7 @@ function initMiddleware(express, app, passport) {
 
         //serves favicon
         app.use(favicon(path.join(__dirname, '../favicon/favicon-32x32.png')));
+        return ses;
 }
 
 //Authorization middleware functions

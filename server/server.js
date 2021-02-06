@@ -4,7 +4,6 @@
 
 //server dependencies
 const express = require('express');
-const WebSocket = require('ws');
 //user authentication and database configuration
 const passport = require('passport');
 require('./passport-setup')(passport);
@@ -28,7 +27,7 @@ try {
 //initialize express app with middleware
 const app = express();
 let {initMiddleware} = require('./middleware');
-initMiddleware(express, app, passport);
+let session = initMiddleware(express, app, passport);
 
 //load routes with our app and configured passport
 let {initDashboardRoutes} = require('./dashboard');
@@ -39,15 +38,12 @@ let {initSecurityRoutes} = require('./security');
 initSecurityRoutes(app, passport);
 
 //launch web server
-const server = protocol.createServer(tls, app);
+var server = protocol.createServer(tls, app);
 
-//launch websocket server by sharing our web server protocol and only accept connections coming from 'path'
-const ws_server = new WebSocket.Server({server: server, path: ""});
-ws_server.on('connection', function connection(socket) {
-    socket.on('test', function incoming(msg) {
-        console.log(msg);
-    });
-});
+//set up socket.io with lessons
+var io = require('socket.io')(server);
+let {initLessonRoutes} = require('./lessons');
+initLessonRoutes(app, session, io);
 
 server.listen(port, () => {
     port === 443 ? console.log("HTTPS Server on https://duohando.com") : console.log(`HTTP server on localhost:${port}`);

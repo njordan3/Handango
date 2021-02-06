@@ -18,7 +18,11 @@ module.exports = {
     verifyDisableSecret: verifyDisableSecret,
     verifyPasswordSecret: verifyPasswordSecret,
     addPasswordSecret: addPasswordSecret,
-    getEmailFromUsername: getEmailFromUsername
+    getEmailFromUsername: getEmailFromUsername,
+    setLectureProgress: setLectureProgress,
+    setPracticeProgress: setPracticeProgress,
+    setPracticeComplete: setPracticeComplete,
+    setQuizComplete: setQuizComplete
 }
 
 function initDB() {
@@ -280,4 +284,64 @@ function comparePassword(email, password, row) {
             }
         })
     });   
+}
+
+function setLectureProgress(email, id, progress, lesson) {
+    return new Promise((resolve, reject) => {
+        connection.connect(function(err) {
+            if (err) { return reject(err); }
+            else {
+                connection.query('CALL setLectureProgress(?,?,?,?)', [email, id, progress, lesson], function(err, result) {
+                    if (err) { return reject(err.sqlMessage); }
+                    if (result[0].length !== 0) { return resolve(result[0][0]); }
+                    else { return reject(`There was a problem setting lecture progress for ${username} lesson ${lesson}`); }
+                });
+            }
+        });
+    });
+}
+
+function setPracticeProgress(email, id, progress, lesson) {
+    return new Promise((resolve, reject) => {
+        connection.connect(function(err) {
+            if (err) { return reject(err); }
+            else {
+                connection.query('CALL setPracticeProgress(?,?,?,?)', [email, id, progress, lesson], function(err, result) {
+                    if (err) { return reject(err.sqlMessage); }
+                    if (result[0].length !== 0) { return resolve(result[0][0]); }
+                    else { return reject(`There was a problem setting practice progress for ${username} lesson ${lesson}`); }
+                });
+            }
+        });
+    });
+}
+
+function setPracticeComplete(email, id, lesson) {
+    return new Promise((resolve, reject) => {
+        connection.connect(function(err) {
+            if (err) { return reject(err); }
+            else {
+                connection.query('CALL setPracticeComplete(?,?,?)', [email, id, lesson], function(err, result) {
+                    if (err) { return reject(err.sqlMessage); }
+                    if (result[0].length !== 0) { return resolve(result[0][0]); }
+                    else { return reject(`There was a problem setting practice complete for ${username} lesson ${lesson}`); }
+                });
+            }
+        });
+    });
+}
+
+function setQuizComplete(email, id, lesson) {
+    return new Promise((resolve, reject) => {
+        connection.connect(function(err) {
+            if (err) { return reject(err); }
+            else {
+                connection.query('CALL setQuizComplete(?,?,?)', [email, id, lesson], function(err, result) {
+                    if (err) { return reject(err.sqlMessage); }
+                    if (result[0].length !== 0) { return resolve(result[0][0]); }
+                    else { return reject(`There was a problem setting quiz complete for ${username} lesson ${lesson}`); }
+                });
+            }
+        });
+    });
 }

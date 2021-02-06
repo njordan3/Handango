@@ -3,7 +3,7 @@ const twoFactor = require('./security');
 const randomString = require('crypto-random-string');
 const mailer = require('./email');
 
-let { isLoggedIn, just2FAd, isEmailPassUser, isNotFacebookUser, isExternalUser, isNotGoogleUser } = require('./middleware');
+let { isLoggedIn, just2FAd, isEmailPassUser, isNotFacebookUser, isExternalUser, isNotGoogleUser} = require('./middleware');
 let { hashPassword, validEmail, validPassword } = require('./security');
 
 module.exports = {
@@ -17,11 +17,9 @@ function initDashboardRoutes(app, passport) {
     });
 
     app.get('/dashboard', isLoggedIn, just2FAd, function(req, res) {
-        res.render('dashboard', req.session.passport.user.ejs);
-    });
-
-    app.get('/dashboard/test', isLoggedIn, just2FAd, function(req, res) {
-        res.render('lessons/lesson1/practice', req.session.passport.user.ejs);
+        let temp = req.session.passport.user.ejs;
+        temp.lessons = req.session.passport.user.lessons;
+        res.render('dashboard', temp);
     });
 
     app.get('/forms', isLoggedIn, just2FAd, function(req, res) {
