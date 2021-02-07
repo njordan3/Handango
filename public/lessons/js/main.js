@@ -3,9 +3,7 @@ import * as FingerSpelling from './fingerspelling.js';
 import * as FingerSpellingInterp from './fingerspelling-interp.js';
 import * as MultipleChoice from './mutliple-choice.js';
 
-let lesson_num = window.location.pathname.split('/')[1].charAt(6);
-let part = window.location.pathname.split('/')[2];
-
+//////////////////////////////[SOCKET.IO]//////////////////////////////
 var socket = io();
 socket.on('complete-confirmation', function(redirect) {
     window.location.href = redirect;
@@ -29,10 +27,121 @@ function sendComplete() {
         console.log("Lecture completion isn't saved");
     }
 }
+//////////////////////////////[LESSON-PART SETUP]//////////////////////////////
 
+let lesson_num = window.location.pathname.split('/')[1].charAt(6);
+let part = window.location.pathname.split('/')[2];
+
+if (part === 'practice') {
+    let practice_DD = ["J", "B", "Z"];
+    let practice_FS = ["food", "drink", "napkin"];
+    let pracice_FSI = ["food", "drink", "napkin"];
+    let practice_MC = [
+        {
+            question: "Question 1?",
+            choices:    [
+                "Choice 1",
+                "Choice 2",
+                "Choice 3",
+                "Choice 4",
+            ],
+            correct: 1
+        },
+        {
+            question: "Question 2?",
+            choices:    [
+                "Choice 1",
+                "Choice 2",
+                "Choice 3",
+                "Choice 4",
+            ],
+            correct: 3
+        },
+        {
+            question: "Question 3?",
+            choices:    [
+                "Choice 1",
+                "Choice 2",
+                "Choice 3",
+                "Choice 4",
+            ],
+            correct: 0
+        }
+    ];
+
+    DragDrop.setUp(practice_DD);
+    FingerSpelling.setUp(practice_FS);
+    FingerSpellingInterp.setUp(pracice_FSI);
+    MultipleChoice.setUp(practice_MC);
+} else if (part === 'quiz') {
+    function getMinutes(distance) { return Math.floor((distance % 3600000) / (60000)); }
+    function getSeconds(distance) { return Math.floor((distance % 60000) / 1000); }
+    var countDownDate = new Date();
+    countDownDate.setMinutes(countDownDate.getMinutes() + 10);  //add 10 minutes
+    var now = new Date().getTime();
+    var distance = countDownDate - now;
+    //set up initial timer display
+    document.getElementById("timer").innerHTML = `${getMinutes(distance)}m ${getSeconds(distance)}s`;
+
+    //update time every 1 second
+    var timer = setInterval(function() {
+        // Find the distance between now and the count down date
+        now = new Date().getTime();
+        distance = countDownDate - now;
+
+        document.getElementById("timer").innerHTML = `${getMinutes(distance)}m ${getSeconds(distance)}s`;
+
+        if (distance < 0) {
+            clearInterval(timer);
+            document.getElementById("timer").innerHTML = "TIME'S UP";
+        }
+    }, 1000);
+
+    DragDrop.setUp(["J", "B", "Z"]);
+    FingerSpelling.setUp(["food", "drink", "napkin"]);
+    FingerSpellingInterp.setUp(["food", "drink", "napkin"]);
+    var questions = [
+      {
+          question: "Question 1?",
+          choices:    [
+              "Choice 1",
+              "Choice 2",
+              "Choice 3",
+              "Choice 4",
+          ],
+          correct: 1
+      },
+      {
+          question: "Question 2?",
+          choices:    [
+              "Choice 1",
+              "Choice 2",
+              "Choice 3",
+              "Choice 4",
+          ],
+          correct: 3
+      },
+      {
+          question: "Question 3?",
+          choices:    [
+              "Choice 1",
+              "Choice 2",
+              "Choice 3",
+              "Choice 4",
+          ],
+          correct: 0
+      }
+    ];
+    MultipleChoice.setUp(questions);
+}
+
+////////////////////////////[SLIDE LOGIC]////////////////////////////
 const slides = document.getElementsByClassName("mySlides");
 
-var slideIndex = parseInt(document.getElementById('current-slide').innerHTML !== undefined ? document.getElementById('current-slide').innerHTML : 1);
+var slideIndex = 1;
+if (part !== 'quiz') {
+    slideIndex = parseInt(document.getElementById('current-slide').innerHTML !== undefined ? document.getElementById('current-slide').innerHTML : 1);
+}
 showSlides(slideIndex);
 
 // Next/previous controls
@@ -47,7 +156,6 @@ function currentSlide(n) {
 }
 
 function showSlides(n) {
-  console.log(n);
   if (n > slides.length) {slideIndex = 1}
   if (n < 1) {slideIndex = slides.length}
   for (let i = 0; i < slides.length; i++) {
@@ -89,41 +197,3 @@ next_part.onclick = function() {
     }
 }
 
-if (part === 'practice' || part === 'quiz') {
-    DragDrop.setUp(["J", "B", "Z"]);
-    FingerSpelling.setUp(["food", "drink", "napkin"]);
-    FingerSpellingInterp.setUp(["food", "drink", "napkin"]);
-    var questions = [
-      {
-          question: "Question 1?",
-          choices:    [
-              "Choice 1",
-              "Choice 2",
-              "Choice 3",
-              "Choice 4",
-          ],
-          correct: 1
-      },
-      {
-          question: "Question 2?",
-          choices:    [
-              "Choice 1",
-              "Choice 2",
-              "Choice 3",
-              "Choice 4",
-          ],
-          correct: 3
-      },
-      {
-          question: "Question 3?",
-          choices:    [
-              "Choice 1",
-              "Choice 2",
-              "Choice 3",
-              "Choice 4",
-          ],
-          correct: 0
-      }
-    ];
-    MultipleChoice.setUp(questions);
-}
