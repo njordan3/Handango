@@ -89,8 +89,16 @@
   margin: 0;
 }
 
-#current-slide {
-  display: none;
+#webcam-container{
+  width: 320;
+  height: 240;
+  margin: 50px auto;
+  border: 1px solid black;
+}
+
+#webcam {
+  width: 320;
+  height: 240;
 }
 
 #dd-ASL-bank {
@@ -115,6 +123,12 @@
 
 #fsi-ASL-bank {
   display: inline;
+}
+
+#wc-ASL-bank {
+  margin-top: 100px;
+  text-align: center;
+  font-size: 100px;
 }
 
 #dd-ASL-answer-bank {
@@ -145,6 +159,8 @@
 .fs-ASL-bank-answer {
   width: 100;
   height: 100;
+  min-width: 100px;
+  min-height: 100px;
   border: 1px solid black;
   margin: 10px;
 }

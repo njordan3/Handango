@@ -2,6 +2,7 @@ import * as DragDrop from './drag-drop.js';
 import * as FingerSpelling from './fingerspelling.js';
 import * as FingerSpellingInterp from './fingerspelling-interp.js';
 import * as MultipleChoice from './mutliple-choice.js';
+import * as Webcam from './web-cam.js';
 
 //////////////////////////////[SOCKET.IO]//////////////////////////////
 var socket = io();
@@ -27,6 +28,10 @@ function sendComplete() {
         console.log("Lecture completion isn't saved");
     }
 }
+
+export {
+    socket as socket
+}
 //////////////////////////////[LESSON-PART SETUP]//////////////////////////////
 
 let lesson_num = window.location.pathname.split('/')[1].charAt(6);
@@ -35,7 +40,8 @@ let part = window.location.pathname.split('/')[2];
 if (part === 'practice') {
     let practice_DD = ["J", "B", "Z"];
     let practice_FS = ["food", "drink", "napkin"];
-    let pracice_FSI = ["food", "drink", "napkin"];
+    let practice_FSI = ["food", "drink", "napkin"];
+    let practice_WC = "A";
     let practice_MC = [
         {
             question: "Question 1?",
@@ -71,8 +77,9 @@ if (part === 'practice') {
 
     DragDrop.setUp(practice_DD);
     FingerSpelling.setUp(practice_FS);
-    FingerSpellingInterp.setUp(pracice_FSI);
+    FingerSpellingInterp.setUp(practice_FSI);
     MultipleChoice.setUp(practice_MC);
+    Webcam.setUp(practice_WC);
 } else if (part === 'quiz') {
     function getMinutes(distance) { return Math.floor((distance % 3600000) / (60000)); }
     function getSeconds(distance) { return Math.floor((distance % 60000) / 1000); }
@@ -133,6 +140,7 @@ if (part === 'practice') {
       }
     ];
     MultipleChoice.setUp(questions);
+    Webcam.setUp("A");
 }
 
 ////////////////////////////[SLIDE LOGIC]////////////////////////////
@@ -167,13 +175,14 @@ function showSlides(n) {
 //setup prev and next slide buttons
 const prev_slide = document.getElementById("prev-slide");
 const next_slide = document.getElementById("next-slide");
-prev_slide.onclick = function() { plusSlides(-1); }
-next_slide.onclick = function() { plusSlides(1); }
+prev_slide.onclick = function() { Webcam.stop(); plusSlides(-1); }
+next_slide.onclick = function() { Webcam.stop(); plusSlides(1); }
 
 //set up prev and next part buttons
 const prev_part = document.getElementById("prev-part");
 const next_part = document.getElementById("next-part");
 prev_part.onclick = function() {
+    Webcam.stop();
     if (part === 'lecture') {
         window.location.href = "https://duohando.com/dashboard";
     } else if (part === 'practice') {
@@ -183,6 +192,7 @@ prev_part.onclick = function() {
     }
 }
 next_part.onclick = function() {
+    Webcam.stop();
     if (part === 'lecture') {
         window.location.href = `https://duohando.com/lesson${lesson_num}/practice`;
     } else if (part === 'practice') {

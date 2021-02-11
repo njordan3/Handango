@@ -82,6 +82,11 @@ function initLessonRoutes(app, session, io) {
                         console.log(err);
                     });
             });
+            socket.on('asl-frame', function(data) {
+                //maybe use bitmap or other file formats instead of jpeg?
+                //maybe compress the data before sending and test the model confidence with and without compression?
+                console.log(data);
+            });
         } else {
             console.log("Socket connection is not logged in");
         }
