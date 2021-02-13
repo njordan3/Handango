@@ -89,19 +89,29 @@
   margin: 0;
 }
 
-#webcam-container{
+.webcam-container{
   width: 320;
   height: 240;
   margin: 50px auto;
   border: 1px solid black;
 }
 
-#webcam {
+.webcam {
   width: 320;
   height: 240;
 }
 
-#dd-ASL-bank {
+.dd-ASL-bank {
+  min-width: 500; /*max letter width (P) = 219*/
+  min-height: 200;  /*max letter height (Z) = 252*/
+  margin: 50px;
+  display: inline-block;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid black;
+}
+
+.fs-ASL-bank {
   min-width: 279; /*max letter width (P) = 219*/
   min-height: 272;  /*max letter height (Z) = 252*/
   margin: 50px;
@@ -111,36 +121,25 @@
   border: 1px solid black;
 }
 
-#fs-ASL-bank {
-  min-width: 279; /*max letter width (P) = 219*/
-  min-height: 272;  /*max letter height (Z) = 252*/
-  margin: 50px;
-  display: inline-block;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid black;
-}
-
-#fsi-ASL-bank {
+.fsi-ASL-bank {
   display: inline;
 }
-
-#wc-ASL-bank {
+.wc-ASL-bank {
   margin-top: 100px;
   text-align: center;
   font-size: 100px;
 }
 
-#dd-ASL-answer-bank {
+.dd-ASL-answer-bank {
   display: inline-flex;
 }
 
-#fs-ASL-answer-bank {
+.fs-ASL-answer-bank {
   display: flex;
   flex-wrap: wrap;
 }
 
-#fsi-ASL-answer-bank {
+.fsi-ASL-answer-bank {
   margin-top: 50px;
 }
 
@@ -190,6 +189,8 @@
 
 .fsi-ASL-image {
   padding: 10px;
+  width: auto;
+  height: 100px;
 }
 
 /* Fading animation */
