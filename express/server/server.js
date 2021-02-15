@@ -37,11 +37,12 @@ app.enable('trust proxy');
 
 //response on homepage
 app.get('/', function(req, res) {
+    res.json({message: "hi"})
     console.log("Someone is at the homepage");
 });
 
 //launch server
 var server = protocol.createServer(options, app);
 server.listen(port, () => {
-    port === 443 ? console.log("HTTPS Server on https://duohando.com") : console.log(`HTTP server on localhost:${port}`);
+    port === 443 ? console.log("HTTPS Server on https://duohando.com") : console.log(`HTTP server on http://localhost:${port}`);
 });
