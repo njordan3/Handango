@@ -1,0 +1,18 @@
+
+#showCase {
+    min-height: 900px !important;
+    background: url('/assets/Images/showCase.jpg') !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+    width: auto !important;
+
+}
+#showCase h1 {
+    font-size: 30px !important;
+    font-family: monospace !important;
+}
+.container-showcase {
+    padding-left: 80px !important;
+    padding-top: 700px !important;
+}
