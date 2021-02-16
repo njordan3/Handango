@@ -13,11 +13,19 @@ export class AuthService {
 
   constructor(private http : HttpClient, private toastr : ToastrService) {
     this.loggedIn = new Subject();
-    this.getLogin();
+    //this.getLogin();
+  }
+
+  doFacebook() {
+    window.location.href = environment.domainUrl+'/facebook';
+  }
+
+  doGoogle() {
+    window.location.href = environment.domainUrl+'/google';
   }
 
   doLogin(email: string, password: string) {
-    this.http.post(environment.url + '/login', {
+    this.http.post(environment.localUrl + '/login', {
       email: email,
       password: password
     }, {
@@ -38,13 +46,13 @@ export class AuthService {
   }
 
   getLogin() {
-    this.http.get(environment.url + '/login', {
+    this.http.get(environment.localUrl + '/login', {
       withCredentials: true // <=========== important!
     }).subscribe((resp: any) => {
-      console.log(resp);
       if (resp.error) {
-
+        console.log(resp.error);
       } else {
+        (resp.loggedIn) ? console.log("Already logged in") : console.log("Not logged in");
         this.loggedIn.next(resp.loggedIn);
       }
     }, (errorResp) => {
@@ -53,7 +61,7 @@ export class AuthService {
   }
 
   logout() {
-    this.http.post(environment.url + '/logout', {}, {
+    this.http.post(environment.localUrl + '/logout', {}, {
       withCredentials: true
     }).subscribe(() => {
       this.loggedIn.next(false);

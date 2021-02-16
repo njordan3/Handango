@@ -26,4 +26,14 @@ export class LoginSignupComponent {
     this.authService.logout();
   }
 
+  doFacebook() {
+    console.log("Facebook");
+    this.authService.doFacebook();
+  }
+
+  doGoogle() {
+    console.log("Google");
+    this.authService.doGoogle();
+  }
+
 }

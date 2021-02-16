@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const cors = require('cors');
+var session = require('express-session')
 
 //used to create file path strings
 const path = require('path');
@@ -28,6 +29,14 @@ try {
 //initialize express app
 const app = express();
 app.enable('trust proxy');
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: true
+    }
+}));
 //use helmet as middleware
 app.use(helmet());
 //body parser middleware for html form handling
@@ -42,12 +51,22 @@ app.use(cors({origin: [
 
 app.post('/login', function(req, res) {
     console.log(`login attempt from ${req.body.email}`);
-    res.json({username: req.body.email});
+    req.session.username = req.body.email;
+    req.session.save(function(err) {
+        if (err) { res.json({error: "There was an error logging in..."}); }
+        else { res.json({username: req.session.username, loggedIn: true}); }
+    });
+   
 });
 
 app.get('/login', function(req, res) {
     //check if the user is already logged in
-    res.json({message: "hi"});
+    if (req.session.username) {
+        res.json({message: `Hi ${req.session.username}`, loggedIn: true});
+    } else {
+        res.json({loggedIn: false});
+    }
+    
 });
 
 //launch server

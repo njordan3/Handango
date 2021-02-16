@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  url: 'http://localhost:3000'
+  localUrl: 'http://localhost:3000',
+  domainUrl: 'https://duohando.com'
 };
 
 /*
