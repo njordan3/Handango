@@ -2,6 +2,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
+const cors = require('cors');
 
 //used to create file path strings
 const path = require('path');
@@ -26,19 +27,27 @@ try {
 
 //initialize express app
 const app = express();
-//serve public directory to client
-app.use(express.static(path.join(__dirname, '../public')));
+app.enable('trust proxy');
 //use helmet as middleware
 app.use(helmet());
 //body parser middleware for html form handling
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+//serve public directory to client
+app.use(express.static(path.join(__dirname, '../public')));
+//enable cors
+app.use(cors({origin: [
+    "http://localhost:4200"
+    ], credentials: true}));
 
-app.enable('trust proxy');
+app.post('/login', function(req, res) {
+    console.log(`login attempt from ${req.body.email}`);
+    res.json({username: req.body.email});
+});
 
-//response on homepage
-app.get('/', function(req, res) {
-    res.json({message: "hi"})
-    console.log("Someone is at the homepage");
+app.get('/login', function(req, res) {
+    //check if the user is already logged in
+    res.json({message: "hi"});
 });
 
 //launch server

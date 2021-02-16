@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../environments/environment';
 import {Subject} from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ export class AuthService {
 
   loggedIn : Subject<boolean>;
 
-  constructor(private http : HttpClient) {
+  constructor(private http : HttpClient, private toastr : ToastrService) {
     this.loggedIn = new Subject();
     this.getLogin();
   }
@@ -22,10 +23,16 @@ export class AuthService {
     }, {
       withCredentials: true
     }).subscribe((resp: any) => {
-      this.loggedIn.next(true);
       console.log(resp);
+      if (resp.error) {
+        this.toastr.error(resp.error);
+      } else {
+        this.toastr.success(`Welcome ${resp.username}!`);
+        this.loggedIn.next(true);
+      }
     }, (errorResp) => {
       this.loggedIn.next(false);
+      this.toastr.error("Something went wrong trying to login...");
       console.log(errorResp);
     });
   }
@@ -34,8 +41,12 @@ export class AuthService {
     this.http.get(environment.url + '/login', {
       withCredentials: true // <=========== important!
     }).subscribe((resp: any) => {
-      this.loggedIn.next(resp.loggedIn);
       console.log(resp);
+      if (resp.error) {
+
+      } else {
+        this.loggedIn.next(resp.loggedIn);
+      }
     }, (errorResp) => {
       console.log(errorResp);
     })

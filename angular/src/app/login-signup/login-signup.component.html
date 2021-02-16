@@ -7,14 +7,14 @@
         <h4 class="title text-center mt-4">
           Login into account
         </h4>
-        <form class="form-box px-3">
+        <form #loginForm="ngForm" (ngSubmit)="doLogin(loginForm)" class="form-box px-3">
           <div class="form-input">
             <span><i class="fa fa-envelope"></i></span>
-            <input type="email" name="" placeholder="Email Address" tabindex="10" required>
+            <input type="email" name="email" id="email" placeholder="Email Address" tabindex="10" required ngModel>
           </div>
           <div class="form-input">
             <span><i class="fa fa-key"></i></span>
-            <input type="password" name="" placeholder="Password" required>
+            <input type="password" name="password" id="password" placeholder="Password" required ngModel>
           </div>
 
           <div class="mb-3">

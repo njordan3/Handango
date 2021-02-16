@@ -1,15 +1,14 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../auth.service';
+import { NgForm } from '@angular/forms';
 
 @Component({
-  selector: 'app-login-signup',
+  selector: 'login-signup',
   templateUrl: './login-signup.component.html',
   styleUrls: ['./login-signup.component.css']
 })
 export class LoginSignupComponent {
 
-  email : string = "";
-  password : string = "";
   loggedIn : boolean = false;
 
   constructor(private authService: AuthService) {
@@ -18,8 +17,9 @@ export class LoginSignupComponent {
     });
   }
 
-  doLogin() {
-    this.authService.doLogin(this.email, this.password);
+  //https://stackoverflow.com/questions/41195708/how-to-get-form-data-in-angular-2
+  doLogin(form : NgForm) {
+    this.authService.doLogin(form.value.email, form.value.password);
   }
 
   doLogout() {
