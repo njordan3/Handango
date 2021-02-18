@@ -9,13 +9,7 @@ import { NgForm } from '@angular/forms';
 })
 export class LoginSignupComponent {
 
-  loggedIn : boolean = false;
-
-  constructor(private authService: AuthService) {
-    this.authService.loggedIn.subscribe(loggedIn => {
-      this.loggedIn = loggedIn;
-    });
-  }
+  constructor(private authService: AuthService) {}
 
   //https://stackoverflow.com/questions/41195708/how-to-get-form-data-in-angular-2
   doLogin(form : NgForm) {

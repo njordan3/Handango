@@ -24,6 +24,26 @@ export class AuthService {
     window.location.href = environment.domainUrl+'/google';
   }
 
+  doRegister(username: string, name: string, email: string, password: string) {
+    this.http.post(environment.localUrl + '/register', {
+      username: username,
+      name: name,
+      email: email,
+      password: password
+    }, {
+      withCredentials: true
+    }).subscribe((resp: any) => {
+      console.log(resp);
+      if (resp.error) {
+        this.toastr.error(resp.error);
+      } else {
+        this.toastr.success(`Your new account has been created!`);
+      }
+    }, (errorResp) => {
+      this.toastr.error("Something went wrong trying to register...");
+    });
+  }
+
   doLogin(email: string, password: string) {
     this.http.post(environment.localUrl + '/login', {
       email: email,
@@ -41,7 +61,6 @@ export class AuthService {
     }, (errorResp) => {
       this.loggedIn.next(false);
       this.toastr.error("Something went wrong trying to login...");
-      console.log(errorResp);
     });
   }
 
@@ -65,6 +84,21 @@ export class AuthService {
       withCredentials: true
     }).subscribe(() => {
       this.loggedIn.next(false);
+    });
+  }
+
+  doForgotPassword(email: string) {
+    this.http.post(environment.localUrl + '/forgot-password', {
+      email: email
+    }).subscribe((resp: any) => {
+      console.log(resp);
+      if (resp.error) {
+        this.toastr.error(resp.error);
+      } else {
+        this.toastr.success(`An email with instructions has been sent to ${email}`);
+      }
+    }, (errorResp) => {
+      this.toastr.error("Something went wrong changing your password...");
     });
   }
 }

@@ -69,6 +69,16 @@ app.get('/login', function(req, res) {
     
 });
 
+app.post('/forgot-password', function(req, res) {
+    console.log(req.body.email);
+    res.json({});
+})
+
+app.post('/register', function(req, res) {
+    console.log(req.body);
+    res.json({});
+})
+
 //launch server
 var server = protocol.createServer(options, app);
 server.listen(port, () => {
