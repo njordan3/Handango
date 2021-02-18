@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 import { LoginSignupComponent } from './login-signup/login-signup.component';
 import { RegisterComponent } from './register/register.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 import { HttpClientModule } from '@angular/common/http';
 import { AuthService } from './auth.service';
@@ -20,6 +21,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
     HomeComponent,
     LoginSignupComponent,
     RegisterComponent,
+    ResetPasswordComponent
   ],
   imports: [
     BrowserModule,
