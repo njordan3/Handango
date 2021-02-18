@@ -7,45 +7,95 @@
             <h4 class="card-title mt-3 text-center">Create Account</h4>
             <p class="text-center">Get started with your free account</p>
             <p>
-                <a href="" class="btn btn-block btn-google"> <i class="fab fa-google"></i>   Login via Google</a>
-                <a href="" class="btn btn-block btn-facebook"> <i class="fab fa-facebook-f"></i>   Login via facebook</a>
+                <button type="button" (click)="doGoogle()"  class="btn btn-block btn-google"> <i class="fab fa-google"></i>   Login via Google</button>
+                <button type="button" (click)="doFacebook()"  class="btn btn-block btn-facebook"> <i class="fab fa-facebook-f"></i>   Login via facebook</button>
             </p>
             <p class="divider-text">
                 <span class="bg-light">OR</span>
             </p>
-            <form #registerForm="ngForm" (ngSubmit)="doRegister(registerForm)">
+            <form #registerForm="ngForm" novalidate (ngSubmit)="doRegister(registerForm.value, registerForm.valid)">
                 <div class="form-group input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text"> <i class="fa fa-user"></i> </span>
                      </div>
-                    <input name="username" class="form-control" placeholder="Username" type="text" ngModel>
+                    <input name="username" class="form-control" placeholder="Username" type="text" 
+                    minlength="5" maxlength="50"
+                    required [ngModel]="user.username" #username="ngModel">
+                </div>
+                <!--Validation error messages-->
+                <div class="form-group input-group" [hidden]="username.valid || (username.pristine && !registerForm.submitted)">
+                    <small class="text-danger">
+                        Username is required (minimum 5 characters).
+                    </small>
                 </div> <!-- form-group// -->
+
                 <div class="form-group input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text"> <i class="fa fa-user"></i> </span>
                     </div>
-                    <input name="name" class="form-control" placeholder="Full name" type="text" ngModel>
+                    <input name="name" class="form-control" placeholder="First and last name" type="text"
+                    pattern="^[a-zA-Z']+(\s[a-zA-Z]+)?$"
+                    required [ngModel]="user.name" #name="ngModel">
+                </div>
+                <!--Validation error messages-->
+                <div class="form-group input-group" [hidden]="name.valid || (name.pristine && !registerForm.submitted)">
+                    <small class="text-danger">
+                        First and last names are required and must contain a space between them.
+                    </small>
                 </div> <!-- form-group// -->
+
                 <div class="form-group input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text"> <i class="fa fa-envelope"></i> </span>
                     </div>
-                    <input name="email" class="form-control" placeholder="Email address" type="email" ngModel>
+                    <input name="email" class="form-control" placeholder="Email address" type="email" 
+                        pattern="(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*)@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])"
+                        required [ngModel]="user.email" #email="ngModel">
+                </div>
+                <!--Validation error messages-->
+                <div class="form-group input-group" [hidden]="email.valid || (email.pristine && !registerForm.submitted)">
+                    <small class="text-danger">
+                        Email is required and format should be <i>john@doe.com</i>.
+                    </small>
                 </div> <!-- form-group// -->
+
                 <div class="form-group input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
                     </div>
-                    <input name="password" class="form-control" placeholder="Create password" type="password" ngModel>
+                    <input name="password" class="form-control" placeholder="Create password" type="password"
+                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[-+_!@#$%^&*.,?]).{8,}"
+                    [ngModel]="user.password" required validateEqual="repeatPassword" reverse="true" #password="ngModel">
+                </div>
+                <!--Validation error messages-->
+                <div class="form-group input-group" [hidden]="password.valid || (password.pristine && !registerForm.submitted)">
+                    <small class="text-danger">
+                        Password is required and format take the form of:
+                        <ul>
+                            <li>At least 8 characters</li>
+                            <li>At least 1 uppercase or lowercase</li>
+                            <li>At least 1 symbol (-+_!@#$%^&*.,?)</li>
+                          </ul>
+                    </small>
                 </div> <!-- form-group// -->
+
                 <div class="form-group input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
                     </div>
-                    <input name="repeat-password" class="form-control" placeholder="Repeat password" type="password" ngModel>
-                </div> <!-- form-group// -->                                      
+                    <input name="repeatPassword" class="form-control" placeholder="Repeat password" type="password"
+                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[-+_!@#$%^&*.,?]).{8,}"
+                    [ngModel]="user.repeatPassword" required validateEqual="password" reverse="false" #repeatPassword="ngModel">
+                </div>
+                <!--Validation error messages-->
+                <div class="form-group input-group" [hidden]="repeatPassword.valid || (repeatPassword.pristine && !registerForm.submitted)" class="text-danger">
+                    <small>
+                        Passwords need to match and maintain the same format
+                    </small>
+                </div> <!-- form-group// -->
+
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-block"> Create Account  </button>
+                    <button type="submit" [disabled]="!registerForm.valid" class="btn btn-primary btn-block"> Create Account  </button>
                 </div> <!-- form-group// -->      
                 <p class="text-center">Have an account? <a routerLink="/loginSignup">Log In</a> </p>                                                                 
             </form>

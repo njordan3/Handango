@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth.service';
-import { NgForm } from '@angular/forms';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-register',
@@ -9,13 +9,45 @@ import { NgForm } from '@angular/forms';
 })
 export class RegisterComponent implements OnInit {
 
-  constructor(private authService: AuthService) { }
+  user: User = {
+    username: '',
+    name: '',
+    email: '',
+    password: '',
+    repeatPassword: ''
+  };
+
+  constructor(private authService: AuthService, private toastr: ToastrService) { }
 
   ngOnInit(): void { }
 
-  doRegister(form: NgForm) {
-    //check that the inputs are correct
-    this.authService.doRegister(form.value.username, form.value.name, form.value.email, form.value.password);
+  doRegister(model: User, isValid: boolean|null) {
+    //form data gets validated automatically by predefined directives in the included templateUrl
+    //and password and repeated password validation code can be seen in 'equal-validator.directive.ts'
+    if (isValid) {
+      let name = model.name.split(" ");
+      this.authService.doRegister(model.username, name[0], name[1], model.email, model.password);
+    } else {
+      this.toastr.error('Form data is invalid...');
+    }
   }
 
+  doFacebook() {
+    console.log("Facebook");
+    this.authService.doFacebook();
+  }
+
+  doGoogle() {
+    console.log("Google");
+    this.authService.doGoogle();
+  }
+
+}
+
+interface User {
+  username: string;
+  name: string;
+  email: string;
+  password: string;
+  repeatPassword: string;
 }

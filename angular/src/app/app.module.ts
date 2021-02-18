@@ -8,6 +8,8 @@ import { LoginSignupComponent } from './login-signup/login-signup.component';
 import { RegisterComponent } from './register/register.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
+import { EqualValidator } from './equal-validator.directive';
+
 import { HttpClientModule } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { ToastrModule } from 'ngx-toastr';
@@ -21,7 +23,8 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
     HomeComponent,
     LoginSignupComponent,
     RegisterComponent,
-    ResetPasswordComponent
+    ResetPasswordComponent,
+    EqualValidator
   ],
   imports: [
     BrowserModule,

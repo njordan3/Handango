@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../environments/environment';
 import {Subject} from 'rxjs';
-import { ToastrService } from 'ngx-toastr';
+import {ToastrService} from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root'
@@ -17,17 +17,18 @@ export class AuthService {
   }
 
   doFacebook() {
-    window.location.href = environment.domainUrl+'/facebook';
+    //window.location.href = environment.domainUrl+'/facebook';
   }
 
   doGoogle() {
-    window.location.href = environment.domainUrl+'/google';
+    //window.location.href = environment.domainUrl+'/google';
   }
 
-  doRegister(username: string, name: string, email: string, password: string) {
+  doRegister(username: string, fname: string, lname: string, email: string, password: string) {
     this.http.post(environment.localUrl + '/register', {
       username: username,
-      name: name,
+      firstname: fname,
+      lastname: lname,
       email: email,
       password: password
     }, {

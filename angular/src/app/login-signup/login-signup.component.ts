@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../auth.service';
-import { NgForm } from '@angular/forms';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'login-signup',
@@ -9,11 +9,21 @@ import { NgForm } from '@angular/forms';
 })
 export class LoginSignupComponent {
 
-  constructor(private authService: AuthService) {}
+  user: User = {
+    email: "",
+    password: ""
+  }
+
+  constructor(private authService: AuthService, private toastr: ToastrService) {}
 
   //https://stackoverflow.com/questions/41195708/how-to-get-form-data-in-angular-2
-  doLogin(form : NgForm) {
-    this.authService.doLogin(form.value.email, form.value.password);
+  doLogin(model: User, isValid: boolean|null) {
+    if (isValid) {
+      this.authService.doLogin(model.email, model.password);
+    } else {
+      this.toastr.error('Form data is invalid...');
+    }
+    
   }
 
   doLogout() {
@@ -30,4 +40,9 @@ export class LoginSignupComponent {
     this.authService.doGoogle();
   }
 
+}
+
+interface User {
+  email: string;
+  password: string;
 }

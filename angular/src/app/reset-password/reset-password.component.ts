@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth.service';
-import { NgForm } from '@angular/forms';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-reset-password',
@@ -9,12 +9,23 @@ import { NgForm } from '@angular/forms';
 })
 export class ResetPasswordComponent implements OnInit {
 
-  constructor(private authService: AuthService) { }
+  user: User = {
+    email: ''
+  }
+
+  constructor(private authService: AuthService, private toastr : ToastrService) { }
 
   ngOnInit(): void { }
 
-  doForgotPassword(form: NgForm) {
-    this.authService.doForgotPassword(form.value.email);
+  doForgotPassword(model: User, isValid: boolean|null) {
+    if (isValid)
+      this.authService.doForgotPassword(model.email);
+    else
+      this.toastr.error("Form data is invalid...");
   }
 
+}
+
+interface User {
+  email: string;
 }
