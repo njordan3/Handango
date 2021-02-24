@@ -4,6 +4,7 @@ import {FingerSpellingInterp} from '../../../assets/ts/fingerspelling-interp';
 import {MultipleChoice} from '../../../assets/ts/multiple-choice';
 import {Webcam} from '../../../assets/ts/web-cam';
 import {io} from 'socket.io-client';
+import { environment } from './../../../environments/environment';
 
 //get lesson info from URL
 let lesson_num: number = parseInt(window.location.pathname.split('/')[1].charAt(6));
@@ -27,7 +28,10 @@ function sendProgress() {
     socket.emit(`${part}-progress`, msg);
 }
 export function sendComplete() {
-    socket.emit(`${part}-complete`, {lesson: lesson_num});
+    if (environment.production)
+        socket.emit(`${part}-complete`, {lesson: lesson_num});
+    else
+        window.location.href = `http://localhost:4200/lesson${lesson_num}/quiz`;
 }
 //////////////////////////////[Lesson Setup]//////////////////////////////
 var lessons: any[] = [];
@@ -125,5 +129,8 @@ export function getAnswers(): any {
 
 export function goBack() {
     callStop();
-    window.location.href = `https://duohando.com/lesson${lesson_num}/lecture`;
+    if (environment.production)
+        window.location.href = `https://duohando.com/lesson${lesson_num}/lecture`;
+    else
+        window.location.href = `http://localhost:4200/lesson${lesson_num}/lecture`;
 }

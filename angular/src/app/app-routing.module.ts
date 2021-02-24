@@ -6,6 +6,7 @@ import { RegisterComponent } from './register/register.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component'
 import { LoginGuard } from './login.guard';
 import { LessonGuard } from './lesson.guard';
+import { ForgetEmailComponent } from './forget-email/forget-email.component'
 
 const routes: Routes = [
   {path: "", pathMatch: "full", redirectTo: "/home"},
@@ -14,6 +15,8 @@ const routes: Routes = [
   {path: "register", component: RegisterComponent},
   {path: "resetPassword", component: ResetPasswordComponent},
   {path: "dashboard", pathMatch: "full", redirectTo: "/home"},
+  {path: "forgetEmail", component: ForgetEmailComponent},
+
   ///////////////[LESSON 1]///////////////
   {path: "lesson1", pathMatch: "full", redirectTo: "lesson1/lecture"},
   {path: "lesson1/lecture",

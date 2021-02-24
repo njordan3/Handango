@@ -1,4 +1,5 @@
 import {io} from 'socket.io-client';
+import { environment } from './../../../environments/environment';
 
 //get lesson info from URL
 let lesson_num: number = parseInt(window.location.pathname.split('/')[1].charAt(6));
@@ -61,9 +62,15 @@ export function launch(slide: number): void {
 }
 
 export function complete() {
-    window.location.href = `https://duohando.com/lesson${lesson_num}/practice`;
+    if (environment.production)
+        window.location.href = `https://duohando.com/lesson${lesson_num}/practice`;
+    else
+        window.location.href = `http://localhost:4200/lesson${lesson_num}/practice`;
 }
 
 export function goBack() {
-    window.location.href = `https://duohando.com/dashboard`;
+    if (environment.production)
+        window.location.href = `https://duohando.com/dashboard`;
+    else
+        window.location.href = `http://localhost:4200/dashboard`;
 }

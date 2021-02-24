@@ -17,6 +17,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 //import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ForgetEmailComponent } from './forget-email/forget-email.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     LoginSignupComponent,
     RegisterComponent,
     ResetPasswordComponent,
-    EqualValidator
+    EqualValidator,
+    ForgetEmailComponent
   ],
   imports: [
     BrowserModule,
