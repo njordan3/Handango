@@ -16,6 +16,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 //import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { ForgetEmailComponent } from './forget-email/forget-email.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
     LoginSignupComponent,
     RegisterComponent,
     ResetPasswordComponent,
-    EqualValidator
+    EqualValidator,
+    ForgetEmailComponent
   ],
   imports: [
     BrowserModule,

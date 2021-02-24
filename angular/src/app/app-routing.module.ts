@@ -4,6 +4,7 @@ import { HomeComponent } from './home/home.component';
 import { LoginSignupComponent } from './login-signup/login-signup.component';
 import { RegisterComponent } from './register/register.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component'
+import { ForgetEmailComponent } from './forget-email/forget-email.component'
 
 const routes: Routes = [
   {path: "", pathMatch: "full", redirectTo: "/home"},
@@ -11,6 +12,8 @@ const routes: Routes = [
   {path: "loginSignup", component: LoginSignupComponent},
   {path: "register", component: RegisterComponent},
   {path: "resetPassword", component: ResetPasswordComponent},
+  {path: "forgetEmail", component: ForgetEmailComponent},
+
   ///////////////[LESSON 1]///////////////
   {path: "lesson1", pathMatch: "full", redirectTo: "lesson1/lecture"},
   {path: "lesson1/lecture",
