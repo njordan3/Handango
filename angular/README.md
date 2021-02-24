@@ -16,4 +16,4 @@
     * Change from a Google/Facebook account to an email account: Input a username, new email, and password; this should return the user to the home page
     * Change from a Google account to Facebook account: Press button
     * Change from a Facebook account to a Google account: Press button
-* **LESSONS IN GENERAL:** User can return to the last part of the lesson (from practice back to lecture) at any time; User can return to the dashboard at any time; user can logout at any time
+* ~~**LESSONS IN GENERAL:** User can return to the last part of the lesson (from practice back to lecture) at any time; User can return to the dashboard at any time; user can logout at any time~~
