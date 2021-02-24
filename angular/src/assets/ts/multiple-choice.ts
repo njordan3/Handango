@@ -10,6 +10,8 @@ export class MultipleChoice {
     private questions: any[];
     private id: number;
     done: boolean;
+    answers_correct: number = 0;
+    answers_count: number = 0;
     constructor(questions: any[]) {
         this.questions = questions;
         this.id = MultipleChoice.count++;
@@ -18,6 +20,8 @@ export class MultipleChoice {
 
     setUp() {
         this.answers = new Array(this.questions.length);
+        this.answers_count = this.answers.length;
+
         let that = this;
         
         document.getElementsByClassName('quiz')[this.id-1].id = `quiz-${this.id}`;
@@ -47,11 +51,11 @@ export class MultipleChoice {
     private checkAnswers(e: Event) {
         let t = (e.target as Element).id.split("|");
         this.answers[t[0]] = parseInt(t[1]);
-        let count = 0;
+        this.answers_correct = 0;
         for (let i = 0; i < this.answers.length; i++) {
-            if (this.answers[i] === this.questions[i].correct) count++;
+            if (this.answers[i] === this.questions[i].correct) this.answers_correct++;
         }
-        this.done = (count === this.answers.length);
+        this.done = (this.answers_correct === this.answers_count);
         console.log(this.done);
     }
 }

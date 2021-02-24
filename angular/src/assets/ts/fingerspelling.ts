@@ -13,6 +13,8 @@ export class FingerSpelling {
     private phrase: string[];
     private id: number;
     done: boolean;
+    answers_correct: number = 0;
+    answers_count: number = 0;
     constructor(phrase: string[]) {
         this.phrase = phrase;
         this.id = FingerSpelling.count++;
@@ -53,6 +55,8 @@ export class FingerSpelling {
         
                 //get answer boxes
                 this.answers = ASL_answer_bank.querySelectorAll(".fs-ASL-bank-answer");
+                this.answers_count = this.answers.length;
+
                 return resolve();
             });
         });
@@ -169,13 +173,14 @@ export class FingerSpelling {
     }
 
     private checkAnswers() {
-        let letters_correct = 0;
+        //partial credit is given
+        this.answers_correct = 0;
         for (let i = 0; i < this.answers.length; i++) {
             if (this.answers[i].id.charAt(6).toUpperCase() === this.answers[i].childNodes[0]?.id.charAt(3)) {
-                letters_correct++;
+                this.answers_correct++;
             }
         }
-        this.done = (letters_correct === this.answers.length);
+        this.done = (this.answers_correct === this.answers_count);
         console.log(this.done);
     }
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth.service';
 import {ToastrService} from 'ngx-toastr';
 
@@ -7,16 +7,19 @@ import {ToastrService} from 'ngx-toastr';
   templateUrl: './login-signup.component.html',
   styleUrls: ['./login-signup.component.css']
 })
-export class LoginSignupComponent {
+export class LoginSignupComponent implements OnInit {
+
+  loggedIn: boolean = false;
 
   user: User = {
     email: "",
     password: ""
   }
 
-  constructor(private authService: AuthService, private toastr: ToastrService) {}
+  constructor(private authService: AuthService, private toastr: ToastrService) { }
 
-  //https://stackoverflow.com/questions/41195708/how-to-get-form-data-in-angular-2
+  ngOnInit(): void { }
+
   doLogin(model: User, isValid: boolean|null) {
     if (isValid) {
       this.authService.doLogin(model.email, model.password);

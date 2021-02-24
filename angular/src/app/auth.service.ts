@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../environments/environment';
-import {Subject} from 'rxjs';
 import {ToastrService} from 'ngx-toastr';
 
 @Injectable({
@@ -9,23 +8,18 @@ import {ToastrService} from 'ngx-toastr';
 })
 export class AuthService {
 
-  loggedIn : Subject<boolean>;
-
-  constructor(private http : HttpClient, private toastr : ToastrService) {
-    this.loggedIn = new Subject();
-    //this.getLogin();
-  }
+  constructor(private http : HttpClient, private toastr : ToastrService) { }
 
   doFacebook() {
-    //window.location.href = environment.domainUrl+'/facebook';
+    window.location.href = environment.domainUrl+'/facebook';
   }
 
   doGoogle() {
-    //window.location.href = environment.domainUrl+'/google';
+    window.location.href = environment.domainUrl+'/google';
   }
 
   doRegister(username: string, fname: string, lname: string, email: string, password: string) {
-    this.http.post(environment.localUrl + '/register', {
+    this.http.post(environment.domainUrl + '/register', {
       username: username,
       firstname: fname,
       lastname: lname,
@@ -46,7 +40,7 @@ export class AuthService {
   }
 
   doLogin(email: string, password: string) {
-    this.http.post(environment.localUrl + '/login', {
+    this.http.post(environment.domainUrl + '/login', {
       email: email,
       password: password
     }, {
@@ -56,40 +50,22 @@ export class AuthService {
       if (resp.error) {
         this.toastr.error(resp.error);
       } else {
-        this.toastr.success(`Welcome ${resp.username}!`);
-        this.loggedIn.next(true);
+        this.toastr.success(`Welcome ${resp.name}!`);
       }
     }, (errorResp) => {
-      this.loggedIn.next(false);
+      console.log(errorResp)
       this.toastr.error("Something went wrong trying to login...");
     });
   }
 
-  getLogin() {
-    this.http.get(environment.localUrl + '/login', {
-      withCredentials: true // <=========== important!
-    }).subscribe((resp: any) => {
-      if (resp.error) {
-        console.log(resp.error);
-      } else {
-        (resp.loggedIn) ? console.log("Already logged in") : console.log("Not logged in");
-        this.loggedIn.next(resp.loggedIn);
-      }
-    }, (errorResp) => {
-      console.log(errorResp);
-    })
-  }
-
   logout() {
-    this.http.post(environment.localUrl + '/logout', {}, {
+    this.http.post(environment.domainUrl + '/logout', {}, {
       withCredentials: true
-    }).subscribe(() => {
-      this.loggedIn.next(false);
-    });
+    }).subscribe(() => { });
   }
 
   doForgotPassword(email: string) {
-    this.http.post(environment.localUrl + '/forgot-password', {
+    this.http.post(environment.domainUrl + '/forgot-password', {
       email: email
     }).subscribe((resp: any) => {
       console.log(resp);
@@ -102,4 +78,41 @@ export class AuthService {
       this.toastr.error("Something went wrong changing your password...");
     });
   }
+
+  //used in login.guard
+  getLogin(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.http.get(environment.domainUrl + '/login', {
+        withCredentials: true
+      }).subscribe((resp: any) => {
+        if (resp.error) {
+          return resolve(false);
+        } else {
+          return resolve(resp.loggedIn)
+        }
+      }, (errorResp) => {
+        console.log(errorResp);
+        return resolve(false);
+      })
+    });
+  }
+
+  //used in lesson.guard
+  getLessonUnlocked(num: number, type: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.http.post(environment.domainUrl + '/is-lesson-unlocked', {
+        num: num,
+        type: type
+      }, {
+        withCredentials: true
+      }).subscribe((resp: any) => {
+        console.log(resp);
+        return resolve(resp);
+      }, (errorResp) => {
+        console.log(errorResp);
+        return resolve({loggedIn: false, unlocked: false});
+      })
+    });
+  }
+
 }

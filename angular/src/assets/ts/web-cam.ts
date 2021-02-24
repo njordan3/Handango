@@ -9,20 +9,22 @@ export class Webcam {
         </div>
         <p class="wc-ASL-bank"></p>
     </div>`;
-    private answers: any;
     private sendInterval: any;
     private video: any;
     private socket: any;
     private ASL: string;
     private id: number;
     private isStreaming: boolean;
-    private done: boolean;
-    constructor(ASL: string, socket: any) {
+    answer_correct: boolean = false;
+    pauseTimer: Function|null;
+    startTimer: Function|null;
+    constructor(ASL: string, socket: any, pauseTimer: Function|null = null, startTimer: Function|null = null) {
         this.ASL = ASL;
         this.id = Webcam.count++;
-        this.done = false;
         this.isStreaming = false;
         this.socket = socket;
+        this.pauseTimer = pauseTimer;
+        this.startTimer = startTimer;
     }
 
     setUp(): Promise<void> {
@@ -55,7 +57,7 @@ export class Webcam {
         canvas.getContext('2d')?.drawImage(this.video, 0, 0);
         canvas.toBlob(function(blob) {
             console.log("blob made");
-            //that.socket.emit('asl-frame', blob); //use blob instead of base64 because there is less wasted space
+            that.socket.emit('asl-frame', blob); //use blob instead of base64 because there is less wasted space
         }, 'image/jpeg', 1.0);
     }
 
@@ -63,6 +65,7 @@ export class Webcam {
         let that = this;
         if (!this.isStreaming) {
             if (this.hasGetUserMedia()) {
+                if (this.pauseTimer !== null) this.pauseTimer();
                 navigator.mediaDevices.getUserMedia({video: {width: 320, height: 240}})  //only get video
                     .then((stream) => { 
                         this.video.srcObject = stream;
@@ -75,8 +78,6 @@ export class Webcam {
                 alert("getUserMedia() is not supported by your browser");
             }
         }
-    
-        
     }
     
     stop() {
@@ -91,6 +92,7 @@ export class Webcam {
             this.video.srcObject = null;
             this.isStreaming = false;
             clearInterval(this.sendInterval);
+            if (this.startTimer) this.startTimer();
         }
     }
 }

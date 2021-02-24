@@ -12,6 +12,8 @@ export class DragDrop {
     private ASL: string[];
     private id: number;
     done: boolean;
+    answers_correct: number = 0;
+    answers_count: number = 0;
     constructor(ASL: string[]) {
         this.ASL = ASL;
         this.id = DragDrop.count++;
@@ -46,6 +48,7 @@ export class DragDrop {
                 ASL_answer_bank.innerHTML = this.buildHTML("answers");
     
                 this.answers = ASL_answer_bank.querySelectorAll(".dd-ASL-bank-answer");
+                this.answers_count = this.answers.length;
                 
                 //set up event listeners
                 ASL_bank.ondrop = function(e: DragEvent) { that.drop(e); }
@@ -129,14 +132,13 @@ export class DragDrop {
         document.getElementById(temp)?.appendChild(drag);
     }
     
-    //checks answers of all DragDrop instances
     private checkAnswers() {
-        let count = 0;
+        this.answers_correct = 0;
         for (let i = 0; i < this.answers.length; i++) {
             let child = this.answers[i].childNodes[0];
-            if(this.answers[i].id.charAt(6) === child?.id.charAt(3)) count++;
+            if(this.answers[i].id.charAt(6) === child?.id.charAt(3)) this.answers_correct++;
         }
-        this.done = (count===this.answers.length);
+        this.done = (this.answers_correct === this.answers_count);
         console.log(this.done);
     }
 }

@@ -12,6 +12,8 @@ export class FingerSpellingInterp {
     private phrase: string[];
     private id: number;
     done: boolean;
+    answers_correct: number = 0;
+    answers_count: number = 0;
     constructor(phrase: string[]) {
         this.phrase = phrase;
         this.id = FingerSpellingInterp.count++;
@@ -53,7 +55,9 @@ export class FingerSpellingInterp {
             ASL_bank.innerHTML = this.buildHTML("bank");
 
             //get answer boxes
-            this.answers = ASL_answer_bank.querySelectorAll(".fsi-ASL-bank-answer")
+            this.answers = ASL_answer_bank.querySelectorAll(".fsi-ASL-bank-answer");
+            this.answers_count = this.answers.length;
+
             for (let i = 0; i < this.answers.length; i++) {
                 this.answers[i].addEventListener('input', function() { that.checkAnswers(); });
             }
@@ -81,11 +85,11 @@ export class FingerSpellingInterp {
     }
 
     private checkAnswers() {
-        let count = 0;
+        this.answers_correct = 0;
         for (let i = 0; i < this.answers.length; i++) {
-            if (this.answers[i].value === this.phrase[this.answers[i].id.charAt(8)]) count++;
+            if (this.answers[i].value === this.phrase[this.answers[i].id.charAt(8)]) this.answers_correct++;
         }
-        this.done = (count === this.answers.length);
+        this.done = (this.answers_correct === this.answers_count);
         console.log(this.done);
     }
 }
