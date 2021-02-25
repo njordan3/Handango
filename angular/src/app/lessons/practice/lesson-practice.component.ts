@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { launch } from './lesson-practice';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { callStop } from './lesson-practice';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LessonPracticeNextModal } from './modals/lesson-practice-next-modal.component';
@@ -15,7 +15,7 @@ import { LessonPracticePrevModal } from './modals/lesson-practice-prev-modal.com
 export class LessonPracticeComponent implements OnInit {
   type: string = "";
   lesson_num: number = 1;
-  constructor(private activatedRoute: ActivatedRoute, private router: Router, private modalService: NgbModal) {
+  constructor(private activatedRoute: ActivatedRoute, private modalService: NgbModal) {
     this.type = "Practice";
   }
 

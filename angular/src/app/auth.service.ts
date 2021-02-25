@@ -79,6 +79,20 @@ export class AuthService {
     });
   }
 
+  doConfirm(data: any, type: string, secret: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.http.post(environment.domainUrl + '/confirm', {
+        data: data,
+        type: type,
+        secret: secret
+      }).subscribe((resp: any) => {
+        resolve(resp);
+      }, (errorResp) => {
+        resolve({error: "Something went wrong confirming your action..."});
+      });
+    });
+  }
+
   doForgotEmail(username: string) {
     this.http.post(environment.domainUrl + '/forgot-email', {
       username: username

@@ -11,7 +11,7 @@ export class LoginGuard implements CanActivate {
   constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute) { }
 
   canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> | boolean {
-    if (environment.production) {
+    if (environment.live) {
       return new Promise((resolve, reject) => {
         this.authService.getLogin()
           .then((loggedIn) => {

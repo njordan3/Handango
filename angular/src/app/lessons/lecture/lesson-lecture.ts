@@ -62,14 +62,14 @@ export function launch(slide: number): void {
 }
 
 export function complete() {
-    if (environment.production)
+    if (environment.live)
         window.location.href = `https://duohando.com/lesson${lesson_num}/practice`;
     else
         window.location.href = `http://localhost:4200/lesson${lesson_num}/practice`;
 }
 
 export function goBack() {
-    if (environment.production)
+    if (environment.live)
         window.location.href = `https://duohando.com/dashboard`;
     else
         window.location.href = `http://localhost:4200/dashboard`;

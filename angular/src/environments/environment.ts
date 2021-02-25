@@ -3,9 +3,10 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false,
+  production: true,
   localUrl: 'http://localhost:3000',
-  domainUrl: 'https://duohando.com:3000'
+  domainUrl: 'https://duohando.com:3000',
+  live: false
 };
 
 /*

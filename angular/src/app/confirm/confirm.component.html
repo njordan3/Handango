@@ -1,0 +1,76 @@
+<div class="form-gap"></div>
+<div class="container">
+	<div class="row px-3">
+		<div class="col-lg-10 col-xl-4 flex-row mx-auto px-0">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <div class="text-center">
+
+            <ng-template [ngIf]="type === 'pcs'">
+                <h3><i class="fa fa-lock fa-4x"></i></h3>
+                <h2 class="text-center">Create a new password!</h2>
+                <p>Make your new password safe, and this time rememberable!</p>
+            </ng-template>
+            
+            <div class="panel-body">
+              <form #confirmForm="ngForm" novalidate (ngSubmit)="doConfirm(confirmForm.value, confirmForm.valid)" id="confirm-form" role="form" autocomplete="off" class="form">
+                
+                <ng-template [ngIf]="type === 'pcs'">
+                    <div class="form-group input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+                        </div>
+                        <input name="password" class="form-control" placeholder="Create password" type="password"
+                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[-+_!@#$%^&*.,?]).{8,}"
+                        [ngModel]="user.password" required validateEqual="repeatPassword" reverse="true" #password="ngModel">
+                    </div>
+                    <!--Validation error messages-->
+                    <div class="form-group input-group" [hidden]="password.valid || (password.pristine && !confirmForm.submitted)">
+                        <small class="text-danger">
+                            Password is required and format take the form of:
+                            <ul>
+                                <li>At least 8 characters</li>
+                                <li>At least 1 uppercase or lowercase</li>
+                                <li>At least 1 symbol (-+_!@#$%^&*.,?)</li>
+                              </ul>
+                        </small>
+                    </div> <!-- form-group// -->
+    
+                    <div class="form-group input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+                        </div>
+                        <input name="repeatPassword" class="form-control" placeholder="Repeat password" type="password"
+                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[-+_!@#$%^&*.,?]).{8,}"
+                        [ngModel]="user.repeatPassword" required validateEqual="password" reverse="false" #repeatPassword="ngModel">
+                    </div>
+                    <!--Validation error messages-->
+                    <div class="form-group input-group" [hidden]="repeatPassword.valid || (repeatPassword.pristine && !confirmForm.submitted)" class="text-danger">
+                        <small>
+                            Passwords need to match and maintain the same format
+                        </small>
+                    </div> <!-- form-group// -->
+                    <div class="form-group">
+                        <button name="confirm-submit" [disabled]="!confirmForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">
+                            Send email
+                        </button>
+                    </div> 
+                </ng-template>
+
+                <ng-template [ngIf]="message !== null">
+                    <h2 class="text-center">Looks like things went well!</h2>
+                    <p>{{message}}</p>
+                </ng-template>
+
+                <ng-template [ngIf]="error !== null">
+                    <h2 class="text-center">Uh Oh...</h2>
+                    <p>{{error}}</p>
+                </ng-template>            
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+	</div>
+</div>

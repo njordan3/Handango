@@ -20,7 +20,7 @@ socket.on('complete-confirmation', function() {
 });
 
 export function sendComplete() {
-    if (environment.production) {
+    if (environment.live) {
         let grade = getAnswers();
         socket.emit(`${part}-complete`, {lesson: lesson_num, grade: grade});
     } else {
@@ -180,7 +180,7 @@ export function getAnswers(): any {
 
 export function goBack() {
     callStop();
-    if (environment.production)
+    if (environment.live)
         window.location.href = `https://duohando.com/lesson${lesson_num}/practice`;
     else
         window.location.href = `http://localhost:4200/lesson${lesson_num}/practice`;

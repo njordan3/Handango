@@ -3,10 +3,13 @@ import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { LoginSignupComponent } from './login-signup/login-signup.component';
 import { RegisterComponent } from './register/register.component';
-import { ResetPasswordComponent } from './reset-password/reset-password.component'
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { ForgetEmailComponent } from './forget-email/forget-email.component';
+import { ConfirmComponent } from './confirm/confirm.component';
+
 import { LoginGuard } from './login.guard';
 import { LessonGuard } from './lesson.guard';
-import { ForgetEmailComponent } from './forget-email/forget-email.component'
+import { VerifyGuard } from './verify.guard';
 
 const routes: Routes = [
   {path: "", pathMatch: "full", redirectTo: "/home"},
@@ -16,6 +19,8 @@ const routes: Routes = [
   {path: "resetPassword", component: ResetPasswordComponent},
   {path: "dashboard", pathMatch: "full", redirectTo: "/home"},
   {path: "forgetEmail", component: ForgetEmailComponent},
+  {path: "verify", canActivate: [VerifyGuard]},
+  {path: "confirm", component: ConfirmComponent},
 
   ///////////////[LESSON 1]///////////////
   {path: "lesson1", pathMatch: "full", redirectTo: "lesson1/lecture"},

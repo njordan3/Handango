@@ -12,7 +12,7 @@ export class LessonGuard implements CanLoad {
   constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute, private toastr : ToastrService) { }
 
   canLoad(route: Route, segments: UrlSegment[]): Promise<boolean> | boolean {
-    if (environment.production) {
+    if (environment.live) {
       return new Promise((resolve, reject) => {
         this.authService.getLessonUnlocked(parseInt(segments[0].path[6]), segments[1].path)  //param1 gets the lesson number
           .then((resp) => {

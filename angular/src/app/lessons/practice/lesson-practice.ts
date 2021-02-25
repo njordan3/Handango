@@ -28,7 +28,7 @@ function sendProgress() {
     socket.emit(`${part}-progress`, msg);
 }
 export function sendComplete() {
-    if (environment.production)
+    if (environment.live)
         socket.emit(`${part}-complete`, {lesson: lesson_num});
     else
         window.location.href = `http://localhost:4200/lesson${lesson_num}/quiz`;
@@ -129,7 +129,7 @@ export function getAnswers(): any {
 
 export function goBack() {
     callStop();
-    if (environment.production)
+    if (environment.live)
         window.location.href = `https://duohando.com/lesson${lesson_num}/lecture`;
     else
         window.location.href = `http://localhost:4200/lesson${lesson_num}/lecture`;

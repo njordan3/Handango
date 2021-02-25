@@ -18,6 +18,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ForgetEmailComponent } from './forget-email/forget-email.component';
+import { ConfirmComponent } from './confirm/confirm.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { ForgetEmailComponent } from './forget-email/forget-email.component';
     RegisterComponent,
     ResetPasswordComponent,
     EqualValidator,
-    ForgetEmailComponent
+    ForgetEmailComponent,
+    ConfirmComponent
   ],
   imports: [
     BrowserModule,

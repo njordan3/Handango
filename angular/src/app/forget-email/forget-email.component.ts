@@ -15,8 +15,7 @@ export class ForgetEmailComponent implements OnInit {
 
   constructor(private authService: AuthService, private toastr : ToastrService) { }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void { }
 
   doForgotEmail(model: User, isValid: boolean|null) {
     if (isValid)
