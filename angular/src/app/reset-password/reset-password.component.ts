@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth.service';
-import {ToastrService} from 'ngx-toastr';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-reset-password',
@@ -23,7 +23,6 @@ export class ResetPasswordComponent implements OnInit {
     else
       this.toastr.error("Form data is invalid...");
   }
-
 }
 
 interface User {

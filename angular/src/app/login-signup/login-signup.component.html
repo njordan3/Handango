@@ -7,7 +7,7 @@
         <h4 class="title text-center mt-4">
           Login into account
         </h4>
-        <form #loginForm="ngForm" novalidate (ngSubmit)="doLogin(loginForm.value, loginForm.valid)" class="form-box px-3">
+        <form #loginForm="ngForm" novalidate (ngSubmit)="doLogin(loginForm.value, loginForm.valid)" class="form-box px-3" autocomplete="off">
           <div class="form-input">
             <span><i class="fa fa-envelope"></i></span>
             <input type="email" name="email" id="email" placeholder="Email Address" tabindex="10"

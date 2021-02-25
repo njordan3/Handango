@@ -75,7 +75,21 @@ export class AuthService {
         this.toastr.success(`An email with instructions has been sent to ${email}`);
       }
     }, (errorResp) => {
-      this.toastr.error("Something went wrong changing your password...");
+      this.toastr.error("Something went wrong searching for that email...");
+    });
+  }
+
+  doForgotEmail(username: string) {
+    this.http.post(environment.domainUrl + '/forgot-email', {
+      username: username
+    }).subscribe((resp: any) => {
+      if (resp.error) {
+        this.toastr.error(resp.error);
+      } else {
+        this.toastr.success(`An email with instructions has been sent to ${username}`);
+      }
+    }, (errorResp) => {
+      this.toastr.error("Something went wrong searching for that username...");
     });
   }
 

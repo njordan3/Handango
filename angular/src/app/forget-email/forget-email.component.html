@@ -7,30 +7,31 @@
                 <div class="text-center">
                   <h3><i class="fa fa-envelope fa-4x"></i></h3>
                   <h2 class="text-center">Forgot Email?</h2>
-                  <p>No worries! Give us your account's username and we'll send you an email with instructions.</p>
+                  <p>No worries! Give us your account's username and we'll send your tied account an email with instructions.</p>
                   <div class="panel-body">
     
-                    <form>
+                    <form #forgotEmailForm="ngForm" novalidate (ngSubmit)="doForgotEmail(forgotEmailForm.value, forgotEmailForm.valid)" autocomplete="off">
                       <div class="form-group">
                         <div class="input-group flex-nowrap">
                           <span class="input-group-text" id = "addon-wrapping"><i class="fas fa-user"></i></span>
-                          <input id="username" name="username" placeholder="Username" class="form-control"  type="username" >
+                          <input name="username" class="form-control" placeholder="Username" type="text" 
+                          minlength="5" maxlength="50"
+                          required [ngModel]="user.username" #username="ngModel">
+                        </div>
+                        <!--Validation error messages-->
+                        <div class="form-group input-group" [hidden]="username.valid || (username.pristine && !forgotEmailForm.submitted)">
+                          <small class="text-danger">
+                              Username is required (minimum 5 characters).
+                          </small>
                         </div>
                       </div>
                       <div class="form-group">
-                        <button class="btn btn-lg btn-primary btn-block" type="submit">
+                        <button name="recover-submit" [disabled]="!forgotEmailForm.valid" class="btn btn-lg btn-primary btn-block" type="submit">
                           Send username
                         </button>
-                     
                       </div>
-                      
                       <input type="hidden" class="hide" name="token" id="token" value=""> 
-                      
                     </form>
-
-
-        
-    
                   </div>
                 </div>
               </div>
