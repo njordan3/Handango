@@ -1,9 +1,9 @@
 **==============[FOR NOT LOGGED IN]==============**
 * **HOME PAGE:** Basically an advertisement for Handango; why people should use it
 * **ABOUT PAGE:** Details about lessons and account information; Q&A?
-* **FORGOT PASSWORD PAGE:** input an email; a secret needs to get embedded in that page
-* **CHANGE PASSWORD PAGE:** input a new password
-* **FORGOT EMAIL PAGE:** input username
+* ~~**FORGOT PASSWORD PAGE:** input an email; a secret needs to get embedded in that page~~
+* ~~**CHANGE PASSWORD PAGE:** input a new password~~
+* ~~**FORGOT EMAIL PAGE:** input username~~
 * **BAD REQUEST PAGE:** User tried a route that doesn't do anything so show them an error
 
 **==============[FOR LOGGED IN]==============**
