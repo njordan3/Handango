@@ -7,7 +7,7 @@
 * **BAD REQUEST PAGE:** User tried a route that doesn't do anything so show them an error
 
 **==============[FOR LOGGED IN]==============**
-* **2FA PAGE OR POPUP?:** input a 6 digit code
+* ~~**2FA PAGE OR POPUP?:** input a 6 digit code~~
 * **DASHBOARD PAGE:** User can see and choose the lessons that they have unlocked and information about the lessons
 * **SETTINGS PAGE:** User can change their account information
     * Enable 2FA: Button is clicked which will show a QR code image and a string to the user, and they must input a 6 digit code in order to enable 2FA
