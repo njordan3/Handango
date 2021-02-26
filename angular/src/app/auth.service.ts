@@ -39,22 +39,97 @@ export class AuthService {
     });
   }
 
-  doLogin(email: string, password: string) {
-    this.http.post(environment.domainUrl + '/login', {
-      email: email,
-      password: password
-    }, {
-      withCredentials: true
-    }).subscribe((resp: any) => {
-      console.log(resp);
-      if (resp.error) {
-        this.toastr.error(resp.error);
-      } else {
-        this.toastr.success(`Welcome ${resp.name}!`);
-      }
-    }, (errorResp) => {
-      console.log(errorResp)
-      this.toastr.error("Something went wrong trying to login...");
+  doLogin(email: string, password: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.http.post(environment.domainUrl + '/login', {
+        email: email,
+        password: password
+      }, {
+        withCredentials: true
+      }).subscribe((resp: any) => {
+        if (resp.error) {
+          return reject(resp.error);
+        } else {
+          return resolve(resp);
+        }
+      }, (errorResp) => {
+        console.log(errorResp)
+        return reject("Something went wrong trying to login...");
+      });
+    });
+  }
+
+  doLogin2FACheck(code: number): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.http.post(environment.domainUrl + '/login2FACheck', {
+        code: code
+      }, {
+        withCredentials: true
+      }).subscribe((resp: any) => {
+        if (resp.error) {
+          return reject(resp.error);
+        } else {
+          return resolve(resp);
+        }
+      }, (errorResp) => {
+        console.log(errorResp)
+        return reject("Something went wrong trying to check login two-factor...");
+      });
+    });
+  }
+
+  do2FACheck(code: number ): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.http.post(environment.domainUrl + '/2FACheck', {
+        code: code
+      }, {
+        withCredentials: true
+      }).subscribe((resp: any) => {
+        if (resp.error) {
+          return reject(resp.error);
+        } else {
+          return resolve(resp);
+        }
+      }, (errorResp) => {
+        console.log(errorResp)
+        return reject("Something went wrong trying to check two-factor...");
+      });
+    });
+  }
+
+  doActivate2FAData(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.http.get(environment.domainUrl + '/getActivate2FAData', {
+        withCredentials: true
+      }).subscribe((resp: any) => {
+        if (resp.error) {
+          return reject(resp.error);
+        } else {
+          return resolve(resp);
+        }
+      }, (errorResp) => {
+        console.log(errorResp)
+        return reject("Something went wrong trying to get two-factor data...");
+      });
+    });
+  }
+
+  doActivate2FACheck(code: number): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.http.post(environment.domainUrl + '/tryActivate2FA', {
+        code: code
+      }, {
+        withCredentials: true
+      }).subscribe((resp: any) => {
+        if (resp.error) {
+          return reject(resp.error);
+        } else {
+          return resolve(resp);
+        }
+      }, (errorResp) => {
+        console.log(errorResp)
+        return reject("Something went wrong trying to get check two-factor activation...");
+      });
     });
   }
 

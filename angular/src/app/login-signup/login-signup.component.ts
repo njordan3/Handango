@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth.service';
-import {ToastrService} from 'ngx-toastr';
+import { ToastrService } from 'ngx-toastr';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Login2FAModal } from './login-2FA-modal.component';
+import { Activate2FAModal } from './activate-2FA-modal.component';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'login-signup',
@@ -16,17 +20,30 @@ export class LoginSignupComponent implements OnInit {
     password: ""
   }
 
-  constructor(private authService: AuthService, private toastr: ToastrService) { }
+  constructor(private authService: AuthService, private toastr: ToastrService, private modalService: NgbModal, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit(): void { }
 
   doLogin(model: User, isValid: boolean|null) {
     if (isValid) {
-      this.authService.doLogin(model.email, model.password);
+      this.authService.doLogin(model.email, model.password)
+        .then((resp) => {
+          console.log(resp);
+          if (resp.twoFactor) {
+            this.modalService.open(Login2FAModal, { centered: true, animation: true, keyboard: false, backdrop: 'static' });
+            //this.modalService.open(Activate2FAModal, { centered: true, animation: true, keyboard: false, backdrop: 'static', size: "lg" });
+            
+          } else {
+            this.toastr.success(`Welcome ${resp.name}!`);
+            this.router.navigate(['/dashboard'], { relativeTo: this.route });
+          }
+        })
+        .catch((err) => {
+          this.toastr.error(err);
+        });
     } else {
       this.toastr.error('Form data is invalid...');
     }
-    
   }
 
   doLogout() {

@@ -1,0 +1,9 @@
+input[type="text"] {
+    -webkit-appearance: none;
+    margin: 0;
+    text-align: center;
+}
+input[type="text"] {
+    -moz-appearance: textfield;
+    text-align: center;
+}

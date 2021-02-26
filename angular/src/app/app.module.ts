@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
+import { CommonModule } from '@angular/common';  
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
@@ -18,13 +19,20 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ForgetEmailComponent } from './forget-email/forget-email.component';
+
 import { ConfirmComponent } from './confirm/confirm.component';
+import { Login2FAModal } from './login-signup/login-2FA-modal.component';
+import { Activate2FAModal } from './login-signup/activate-2FA-modal.component';
+import { TwoFactorModal } from './login-signup/2FA-modal.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
     LoginSignupComponent,
+    Login2FAModal,
+    Activate2FAModal,
+    TwoFactorModal,
     RegisterComponent,
     ResetPasswordComponent,
     EqualValidator,
@@ -39,7 +47,8 @@ import { ConfirmComponent } from './confirm/confirm.component';
     ReactiveFormsModule,
     BrowserAnimationsModule,
     ToastrModule.forRoot(),
-    NgbModule
+    NgbModule,
+    CommonModule
   ],
   providers: [AuthService],
   bootstrap: [AppComponent]
