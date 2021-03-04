@@ -7,6 +7,7 @@
   height: 700px;
   position: relative;
   margin: auto;
+  text-align: center;
 }
 
 .slide {
@@ -40,7 +41,6 @@
   color: black;
   font-weight: bold;
   font-size: 18px;
-  transition: 0.6s ease;
   border-radius: 0 3px 3px 0;
   user-select: none;
 }
@@ -51,28 +51,50 @@
   border-radius: 3px 0 0 3px;
 }
 
-/* On hover, add a black background color with a little bit see-through */
-.prev:hover, .next:hover {
-  background-color: rgba(0,0,0,0.8);
+.text-lg {
+  color: black;
+  font-size: 30px;
+  padding: 8px 12px;
+  width: 100%;
+  margin-left: auto;
+  text-align: left;
 }
 
-/* Caption text */
-.text {
+.text-md {
   color: black;
-  font-size: 15px;
+  font-size: 25px;
   padding: 8px 12px;
-  bottom: 0;
   width: 100%;
+  margin-left: auto;
+  text-align: left;
+}
+
+.text-sm {
+  color: black;
+  font-size: 20px;
+  padding: 8px 12px;
+  width: 100%;
+  margin-left: auto;
+  text-align: left;
+}
+
+.header {
   text-align: center;
 }
 
-/* Number text (1/3 etc) */
-.numbertext {
-  color: black;
-  font-size: 12px;
-  padding: 8px 12px;
-  position: absolute;
-  top: 0;
+.visited-button {
+  background-color: cadetblue;
+}
+
+.last-button {
+  background-color: coral;
+}
+
+.table, .tablerow, .tablecol {
+  border: 1px solid black;
+}
+.tablerow, .tablecol {
+  padding: 0px;
 }
 
 #next-part {
