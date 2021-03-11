@@ -59,7 +59,7 @@ function isLoggedIn(req, res, next) {
         return next();
 
     console.log("Not logged in");
-    res.json({loggedIn: false});
+    res.json({loggedIn: false, message: "You are not authorized for this page..."});
 }
 
 /*

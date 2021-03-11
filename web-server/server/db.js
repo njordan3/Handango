@@ -9,6 +9,8 @@ module.exports = {
     findUser: findUser,
     Register: Register,
     comparePassword: comparePassword,
+    getUserLessons: getUserLessons,
+    setPracticeAnswer: setPracticeAnswer,
     add2FA: add2FA,
     changeEmail: changeEmail,
     changePassword: changePassword,
@@ -48,6 +50,36 @@ function connectToDB() {
            return resolve();
         });
     });
+}
+
+function getUserLessons(id, lesson_num) {
+    return new Promise((resolve, reject) => {
+        connection.connect(function(err) {
+            if (err) { return reject(err); }
+            else {
+                connection.query('CALL getUserLessons(?,?)', [id, lesson_num], function(err, result) {
+                    if (err) { return reject(err.sqlMessage); }
+                    if (!result[0][0]) return reject("There was a problem getting user lessons...");
+                    return resolve(result[0]);
+                });
+            }
+        });
+    }); 
+}
+
+function setPracticeAnswer(practice_id, type_id, answers, type) {
+    return new Promise((resolve, reject) => {
+        connection.connect(function(err) {
+            if (err) { return reject(err); }
+            else {
+                connection.query('CALL setPracticeAnswer(?,?,?,?)', [practice_id, type_id, answers, type], function(err, result) {
+                    if (err) { return reject(err.sqlMessage); }
+                    if (!result[0][0]) return reject("There was a problem setting practice answers...");
+                    return resolve();
+                });
+            }
+        });
+    }); 
 }
 
 function add2FA(params) {
@@ -286,12 +318,12 @@ function comparePassword(email, password, row) {
     });   
 }
 
-function setLectureProgress(email, id, progress, lesson) {
+function setLectureProgress(email, ext_id, progress, lesson) {
     return new Promise((resolve, reject) => {
         connection.connect(function(err) {
             if (err) { return reject(err); }
             else {
-                connection.query('CALL setLectureProgress(?,?,?,?)', [email, id, progress, lesson], function(err, result) {
+                connection.query('CALL setLectureProgress(?,?,?,?)', [email, ext_id, progress, lesson], function(err, result) {
                     if (err) { return reject(err.sqlMessage); }
                     if (result[0].length !== 0) { return resolve(result[0][0]); }
                     else { return reject(`There was a problem setting lecture progress for lesson ${lesson}`); }
@@ -301,12 +333,12 @@ function setLectureProgress(email, id, progress, lesson) {
     });
 }
 
-function setPracticeProgress(email, id, progress, lesson) {
+function setPracticeProgress(email, ext_id, progress, lesson) {
     return new Promise((resolve, reject) => {
         connection.connect(function(err) {
             if (err) { return reject(err); }
             else {
-                connection.query('CALL setPracticeProgress(?,?,?,?)', [email, id, progress, lesson], function(err, result) {
+                connection.query('CALL setPracticeProgress(?,?,?,?)', [email, ext_id, progress, lesson], function(err, result) {
                     if (err) { return reject(err.sqlMessage); }
                     if (result[0].length !== 0) { return resolve(result[0][0]); }
                     else { return reject(`There was a problem setting practice progress for lesson ${lesson}`); }

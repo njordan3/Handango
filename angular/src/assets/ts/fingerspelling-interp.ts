@@ -10,12 +10,19 @@ export class FingerSpellingInterp {
     private images: HTMLImageElement[] = [];
     private answers: any;
     private phrase: string[];
+    private ans: string[]|null;
+    private ans_id: number|null;
+    private socket: any;
     private id: number;
     done: boolean;
     answers_correct: number = 0;
     answers_count: number = 0;
-    constructor(phrase: string[]) {
+    setAnswer: Function|null;
+    constructor(phrase: string[], ans: string[]|null = null, ans_id: number|null = null, setAnswer: Function|null = null) {
         this.phrase = phrase;
+        this.ans = ans;
+        this.ans_id = ans_id;
+        this.setAnswer = setAnswer;
         this.id = FingerSpellingInterp.count++;
         this.done = false;
     }
@@ -54,6 +61,8 @@ export class FingerSpellingInterp {
             //build ASL bank with images
             ASL_bank.innerHTML = this.buildHTML("bank");
 
+            this.plugAnswers(<NodeListOf<HTMLElement>>ASL_answer_bank.querySelectorAll(".fsi-ASL-bank-answer"));
+
             //get answer boxes
             this.answers = ASL_answer_bank.querySelectorAll(".fsi-ASL-bank-answer");
             this.answers_count = this.answers.length;
@@ -78,18 +87,32 @@ export class FingerSpellingInterp {
         //fill out answer bank
         } else if (type === "answers") {
             for (let i = 0; i < this.phrase.length; i++) {
-                html += `<label for="fsi-text${i}">Word ${i+1}:</label><input type="text" autocomplete="off" class="fsi-ASL-bank-answer" id="fsi-text${i}"></input><div class="break"></div>`;
+                html += `<label for="fsi-text${i}">Word ${i+1}:</label><input type="text" autocomplete="off" class="fsi-ASL-bank-answer" id="fsi-text${i}-${this.phrase[i]}"></input><div class="break"></div>`;
             }
         }
         return html;
     }
 
+    private plugAnswers(answerBank: NodeListOf<HTMLElement>): void {
+        if (this.ans !== null) {
+            for (let i = 0; i < answerBank.length; i++) {
+                (answerBank[i] as HTMLInputElement).value = this.ans[i];
+            }
+        }
+    }
+
     private checkAnswers() {
         this.answers_correct = 0;
+        let sendAnswers: string[] = [];
         for (let i = 0; i < this.answers.length; i++) {
             if (this.answers[i].value === this.phrase[this.answers[i].id.charAt(8)]) this.answers_correct++;
+            
+            let temp = this.answers[i].value
+            if (temp === undefined) temp = "";
+            sendAnswers.push(temp);
         }
         this.done = (this.answers_correct === this.answers_count);
         console.log(this.done);
+        if (this.setAnswer) this.setAnswer({type: "FingerspellingInterp", id: this.ans_id, answers: sendAnswers});
     }
 }

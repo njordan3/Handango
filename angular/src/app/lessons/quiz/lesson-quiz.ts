@@ -103,7 +103,7 @@ export function launch(data: any): void {
                 lessons.push(new MultipleChoice(data[i].phrases));
                 break;
             case "Webcam":
-                lessons.push(new Webcam(data[i].phrases, socket, pauseTimer, startTimer));
+                lessons.push(new Webcam(data[i].phrases, socket, null, null, pauseTimer, startTimer));
                 break;
             default:
                 console.log(`can't load practice type: ${data[i].type}`);

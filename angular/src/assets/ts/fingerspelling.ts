@@ -11,12 +11,19 @@ export class FingerSpelling {
     private images: HTMLImageElement[] = [];
     private answers: any;
     private phrase: string[];
+    private ans: string[]|null;
+    private ans_id: number|null;
+    private socket: any;
     private id: number;
     done: boolean;
     answers_correct: number = 0;
     answers_count: number = 0;
-    constructor(phrase: string[]) {
+    setAnswer: Function|null;
+    constructor(phrase: string[], ans: string[]|null = null, ans_id: number|null = null, setAnswer: Function|null = null) {
         this.phrase = phrase;
+        this.ans = ans;
+        this.ans_id = ans_id;
+        this.setAnswer = setAnswer;
         this.id = FingerSpelling.count++;
         this.done = false;
     }
@@ -52,7 +59,9 @@ export class FingerSpelling {
         
                 //build ASL bank with images
                 this.resetASLBank();
-        
+
+                this.plugAnswers(<HTMLElement>document.getElementsByClassName(`fs-ASL-bank`)[this.id-1], <NodeListOf<HTMLElement>>ASL_answer_bank.querySelectorAll(".fs-ASL-bank-answer"));
+
                 //get answer boxes
                 this.answers = ASL_answer_bank.querySelectorAll(".fs-ASL-bank-answer");
                 this.answers_count = this.answers.length;
@@ -78,19 +87,28 @@ export class FingerSpelling {
             }
         //fill out answer bank
         } else if (type === "answers") {
-            let duplicates: any;
+            let duplicates: any = {};
             for (let i = 0; i < this.phrase.length; i++) {
                 for (let j = 0; j < this.phrase[i].length; j++) {
                     let id = "";
                     if (document.getElementById(`fs-box${this.phrase[i][j]}`) !== null) {
                         if (duplicates[this.phrase[i][j]] === undefined) {
-                            duplicates[this.phrase[i][j]] = {count: 1};
+                            let count = 1;
+                            while (document.getElementById(`fs-box${this.phrase[i][j]}${count}`) !== null) { count++; }
+                            duplicates[this.phrase[i][j]] = {count: count};
+                            id = `${this.phrase[i][j]}${duplicates[this.phrase[i][j]].count}`;
                         } else {
+                            id = `${this.phrase[i][j]}${duplicates[this.phrase[i][j]].count}`;
                             duplicates[this.phrase[i][j]].count++;
                         }
-                        id = `${this.phrase[i][j]}${duplicates[this.phrase[i][j]].count}`;
                     } else {
-                        id = this.phrase[i][j];
+                        if (duplicates[this.phrase[i][j]] === undefined) {
+                            duplicates[this.phrase[i][j]] = {count: 1};
+                            id = this.phrase[i][j];
+                        } else {
+                            id = `${this.phrase[i][j]}${duplicates[this.phrase[i][j]].count}`;
+                            duplicates[this.phrase[i][j]].count++;
+                        }
                     }
                     html += `<div class="fs-ASL-bank-answer" id="fs-box${id}"></div>`;
                 }
@@ -98,6 +116,29 @@ export class FingerSpelling {
             }
         }
         return html;
+    }
+
+    private plugAnswers(bank: HTMLElement, answerBank: NodeListOf<HTMLElement>): void {
+        if (this.ans !== null) {
+            for (let i = 0; i < this.ans.length; i++) {
+                for (let j = 0; j < bank.childNodes.length; j++) {
+                    let child = bank.childNodes[j] as HTMLElement;
+                    if (this.ans[i] === child.id.charAt(3)) {
+                        if (document.getElementById(`fs-box${this.ans[i].toLowerCase()}`) === null) {
+                            (answerBank[i] as HTMLElement).id = `fs-box${this.ans[i].toLowerCase()}|filled`;
+                        } else {
+                            let count = 1;
+                            while(document.getElementById(`fs-box${this.ans[i]}${count}`) !== null) { count++; }
+                            (answerBank[i] as HTMLElement).id = `fs-box${this.ans[i].toLowerCase()}${count}|filled`;
+                            
+                        }
+                        answerBank[i].appendChild(child);
+                        (answerBank[i] as HTMLElement).style.width = child.style.width;
+                        this.resetASLBank();
+                    }
+                }
+            }
+        }
     }
 
     private resetASLBank() {
@@ -175,12 +216,19 @@ export class FingerSpelling {
     private checkAnswers() {
         //partial credit is given
         this.answers_correct = 0;
+        let sendAnswers: string[] = [];
         for (let i = 0; i < this.answers.length; i++) {
-            if (this.answers[i].id.charAt(6).toUpperCase() === this.answers[i].childNodes[0]?.id.charAt(3)) {
+            let child = this.answers[i].childNodes[0];
+            if (this.answers[i].id.charAt(6).toUpperCase() === child?.id.charAt(3)) {
                 this.answers_correct++;
             }
+            let temp = child?.id.charAt(3);
+            if (temp === undefined) temp = "";
+            sendAnswers.push(temp);
         }
+        
         this.done = (this.answers_correct === this.answers_count);
         console.log(this.done);
+        if (this.setAnswer) this.setAnswer({type: "Fingerspelling", id: this.ans_id, answers: sendAnswers});
     }
 }
