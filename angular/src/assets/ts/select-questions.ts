@@ -49,12 +49,12 @@ export class SelectQuestions {
 
         //get answer boxes
         this.answers = ASL_answer_bank.querySelectorAll(".sq-ASL-bank-answer");
-        this.answers_count = this.answers.length;
+        this.answers_count = 1;
 
         for (let i = 0; i < this.answers.length; i++) {
             (this.answers[i] as HTMLElement).onclick = function(e: MouseEvent) { 
                 e.preventDefault();
-                let lastSelected = document.getElementById(`sq-${that.selected}`)
+                let lastSelected = document.getElementById(`sq-${that.selected}-${that.id}`)
                 let target = (e.target as HTMLElement)
 
                 if (lastSelected)
@@ -65,6 +65,7 @@ export class SelectQuestions {
                 that.checkAnswers();
             };
         }
+        this.checkAnswers();
     }
 
     private buildHTML(type: string) {
@@ -77,7 +78,7 @@ export class SelectQuestions {
             for (let i = 0; i < this.choices.length; i++) {
                 html += 
                 `<div class="sq-selected">
-                    <video class="sq-ASL-bank-answer" id="sq-${this.choices[i]}" width="360" height="240" draggable="true" controls >
+                    <video class="sq-ASL-bank-answer" id="sq-${this.choices[i]}-${this.id}" width="360" height="240" draggable="true" controls >
                         <source src="../../../assets/Images/${this.choices[i]}.mp4">>
                         Your browser doesn't support the displaying videos...
                     </video>
@@ -90,7 +91,7 @@ export class SelectQuestions {
     private plugAnswers(answerBank: NodeListOf<HTMLElement>): void {
         if (this.ans !== null) {
             this.selected = this.ans[0];
-            let target = document.getElementById(`sq-${this.ans[0]}`)
+            let target = document.getElementById(`sq-${this.ans[0]}-${this.id}`)
             if (target)
                 (target?.parentNode as HTMLElement).style.backgroundColor = "cadetblue";
         }
@@ -100,6 +101,7 @@ export class SelectQuestions {
         this.answers_correct = 0;
         let sendAnswers: string[] = [];
         this.done = (this.selected === (this.answer as any).toLowerCase().replaceAll(" ", ""))
+        if (this.done) this.answers_correct = 1;
         
         let temp = this.selected;
         if (!temp) temp = "";

@@ -64,6 +64,7 @@ export class FingerSpellingInterpQuestions {
             for (let i = 0; i < this.answers.length; i++) {
                 this.answers[i].addEventListener('input', function() { that.checkAnswers(); });
             }
+            this.checkAnswers();
         });
     }
 
@@ -82,7 +83,7 @@ export class FingerSpellingInterpQuestions {
         //fill out answer bank
         } else if (type === "answers") {
             for (let i = 0; i < this.phrase.length; i++) {
-                html += `<label for="fsiq-text${i}">Phrase ${i+1}:</label><input type="text" autocomplete="off" class="fsiq-ASL-bank-answer" id="fsiq-text${i}-${this.phrase[i]}"></input><div class="break"></div>`;
+                html += `<label for="fsiq-text${i}-${this.phrase[i]}-${this.id}">Phrase ${i+1}:</label><input type="text" autocomplete="off" class="fsiq-ASL-bank-answer" id="fsiq-text${i}-${this.phrase[i]}-${this.id}"></input><div class="break"></div>`;
             }
         }
         return html;
@@ -108,6 +109,6 @@ export class FingerSpellingInterpQuestions {
         }
         this.done = (this.answers_correct === this.answers_count);
         console.log(this.done);
-        if (this.setAnswer) this.setAnswer({type: "FingerspellingInterpQuestions", id: this.ans_id, answers: sendAnswers});
+        if (this.setAnswer) this.setAnswer({type: "FingerSpellingInterpQuestions", id: this.ans_id, answers: sendAnswers});
     }
 }

@@ -25,22 +25,25 @@ export class MultipleChoice {
         this.done = false;
     }
 
-    setUp() {
-        this.answers = new Array(this.questions.length);
-        this.answers_count = this.answers.length;
+    setUp(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.answers = new Array(this.questions.length);
+            this.answers_count = this.answers.length;
 
-        let that = this;
-        
-        document.getElementsByClassName('quiz')[this.id-1].id = `quiz-${this.id}`;
-        var quiz = <HTMLElement>document.getElementById(`quiz-${this.id}`);
-        quiz.innerHTML = this.buildHTML();
-        
-        this.plugAnswers(quiz.querySelectorAll('.choices'));
+            let that = this;
+            
+            document.getElementsByClassName('quiz')[this.id-1].id = `quiz-${this.id}`;
+            var quiz = <HTMLElement>document.getElementById(`quiz-${this.id}`);
+            quiz.innerHTML = this.buildHTML();
+            
+            this.plugAnswers(quiz.querySelectorAll('.choices'));
 
-        var choices = quiz.querySelectorAll('.choices');
-        for (let i = 0; i < choices.length; i++) {
-            choices[i].addEventListener('change', function(e: Event) { that.checkAnswers(e); });
-        }
+            var choices = quiz.querySelectorAll('.choices');
+            for (let i = 0; i < choices.length; i++) {
+                choices[i].addEventListener('change', function(e: Event) { that.checkAnswers(e); });
+            }
+            resolve();
+        });
     }
 
     private buildHTML() {
@@ -60,12 +63,15 @@ export class MultipleChoice {
         if (this.ans !== null) {
             for (let i = 0; i < answerBank.length; i++) {
                 for (let j = 0; j < this.ans.length; j++) {
-                    if (answerBank[i].id === `${j}|${this.ans[j]}|${this.id}`)
+                    if (answerBank[i].id === `${j}|${this.ans[j]}|${this.id}`) {
                         (answerBank[i] as HTMLInputElement).checked = true;
                         this.answers[j] = this.ans[j];
+                    }
                 }
             }
-            
+            for (let i = 0; i < this.answers.length; i++) {
+                if (this.answers[i] === this.questions[i].correct) this.answers_correct++;
+            }
         }
     }
 
@@ -85,6 +91,9 @@ export class MultipleChoice {
         
         this.done = (this.answers_correct === this.answers_count);
         console.log(this.done);
-        if (this.setAnswer) this.setAnswer({type: "MultipleChoice", id: this.ans_id, answers: sendAnswers});
+        
+        let lesson_num: number = parseInt(window.location.pathname.split('/')[1].charAt(6));
+        let types = ["MultipleChoice", "MultipleChoiceNumbers", "MultipleChoiceQuestions"];
+        if (this.setAnswer) this.setAnswer({type: types[lesson_num-1], id: this.ans_id, answers: sendAnswers});
     }
 }

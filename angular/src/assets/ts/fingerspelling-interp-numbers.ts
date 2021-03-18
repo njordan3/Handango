@@ -28,124 +28,125 @@ export class FingerSpellingInterpNumbers {
         this.done = false;
     }
 
-    setUp() {
-        var promises = [];
-        for (let i = 0; i < this.phrase.length; i++) {
-            let num = parseInt(this.phrase[i]);
+    setUp(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            var promises = [];
+            for (let i = 0; i < this.phrase.length; i++) {
+                let num = parseInt(this.phrase[i]);
 
-            this.files[i] = [];
+                this.files[i] = [];
 
-            if( num > 999999 ) {    // add images for numbers in the millions
-                this.files[i] = this.numberToImages( Math.floor( num / 1000000 ) );
-                this.files[i].push(`../../../assets/Images/1000000a.jpg`);
-                this.files[i].push(`../../../assets/Images/1000000b.jpg`);
-                this.files[i].push(`../../../assets/Images/1000000c.jpg`);
-                this.files[i].push(`../../../assets/Images/1000000d.jpg`);
-                this.files[i].push(`../../../assets/Images/1000000e.jpg`);
-                num = Math.floor( num % 1000000 );
-            }
-            if( num > 999 ) {   // add images for numbers in the thousands
-                this.files[i] = this.files[i].concat(this.numberToImages( Math.floor( num / 1000 ) ));
-                this.files[i].push(`../../../assets/Images/1000b.jpg`);
-                num = Math.floor( num % 1000 );
-            }					
-            if( num > 0 ) { // add images for numbers less than 1000
-                this.files[i] = this.files[i].concat(this.numberToImages( num ));
-            } else if ( this.files[i].length == 0 ) {
-                this.files[i].push(`../../../assets/Images/0.jpg`);
-            }
-            let temp = this.files[i].slice(0);  //assign temp by value instead of reference
-
-            for (let j = 0; j < temp.length; j++) {
-                let step: any = temp[j].split('/');
-                step = step[step.length-1].split('.')[0];
-                if (step.charAt(step.length-1) === 'a') {
-                    temp = [step.slice(0, -1)];
-                    break;
+                if( num > 999999 ) {    // add images for numbers in the millions
+                    this.files[i] = this.numberToImages( Math.floor( num / 1000000 ) );
+                    this.files[i].push(`../../../assets/Images/1000000a.jpg`);
+                    this.files[i].push(`../../../assets/Images/1000000b.jpg`);
+                    this.files[i].push(`../../../assets/Images/1000000c.jpg`);
+                    this.files[i].push(`../../../assets/Images/1000000d.jpg`);
+                    this.files[i].push(`../../../assets/Images/1000000e.jpg`);
+                    num = Math.floor( num % 1000000 );
                 }
-                if (step.charAt(1) === 'R' || step.charAt(step.length-1) === 'b') {
-                    step = step.slice(0, -1);
+                if( num > 999 ) {   // add images for numbers in the thousands
+                    this.files[i] = this.files[i].concat(this.numberToImages( Math.floor( num / 1000 ) ));
+                    this.files[i].push(`../../../assets/Images/1000b.jpg`);
+                    num = Math.floor( num % 1000 );
+                }					
+                if( num > 0 ) { // add images for numbers less than 1000
+                    this.files[i] = this.files[i].concat(this.numberToImages( num ));
+                } else if ( this.files[i].length == 0 ) {
+                    this.files[i].push(`../../../assets/Images/0.jpg`);
                 }
-                temp[j] = step;
-            }
+                let temp = this.files[i].slice(0);  //assign temp by value instead of reference
 
-            //loading the assets
-            promises.push(
-                new Promise((resolve, reject) => {
-                    let key = this.getKey(this.files[i][0]);
-                    this.images[key] = new Array<HTMLImageElement>();
-                    for (let j = 0; j < this.files[i].length; j++) {
-                        this.images[key].push(new Image());
-                        this.images[key][j].src = this.files[i][j];
-                        this.images[key][j].onload = function() {
-                            resolve(true);
-                        }
+                for (let j = 0; j < temp.length; j++) {
+                    let step: any = temp[j].split('/');
+                    step = step[step.length-1].split('.')[0];
+                    if (step.charAt(step.length-1) === 'a') {
+                        temp = [step.slice(0, -1)];
+                        break;
                     }
-                })
-            );
-        }
-        
-        Promise.all(promises).then(result => {
-            console.log("Finger Spelling Interpretation Numbers ASL Assets loaded!");
+                    if (step.charAt(1) === 'R' || step.charAt(step.length-1) === 'b') {
+                        step = step.slice(0, -1);
+                    }
+                    temp[j] = step;
+                }
 
-            document.getElementsByClassName(`fsin-ASL-bank`)[this.id-1].id = `fsin-ASL-bank-${this.id}`;
-            document.getElementsByClassName(`fsin-ASL-answer-bank`)[this.id-1].id = `fsin-ASL-answer-bank-${this.id}`;
+                //loading the assets
+                promises.push(
+                    new Promise((resolve, reject) => {
+                        let key = this.getKey(this.files[i][0]);
+                        this.images[key] = new Array<HTMLImageElement>();
+                        for (let j = 0; j < this.files[i].length; j++) {
+                            this.images[key].push(new Image());
+                            this.images[key][j].src = this.files[i][j];
+                            this.images[key][j].onload = function() {
+                                resolve(true);
+                            }
+                        }
+                    })
+                );
+            }
+            
+            Promise.all(promises).then(result => {
+                console.log("Finger Spelling Interpretation Numbers ASL Assets loaded!");
 
-            var ASL_bank = <HTMLElement>document.getElementById(`fsin-ASL-bank-${this.id}`);
-            var ASL_answer_bank = <HTMLElement>document.getElementById(`fsin-ASL-answer-bank-${this.id}`);
-            let that = this;
+                document.getElementsByClassName(`fsin-ASL-bank`)[this.id-1].id = `fsin-ASL-bank-${this.id}`;
+                document.getElementsByClassName(`fsin-ASL-answer-bank`)[this.id-1].id = `fsin-ASL-answer-bank-${this.id}`;
 
-            //build answer bank
-            ASL_answer_bank.innerHTML = this.buildHTML("answers");
+                var ASL_bank = <HTMLElement>document.getElementById(`fsin-ASL-bank-${this.id}`);
+                var ASL_answer_bank = <HTMLElement>document.getElementById(`fsin-ASL-answer-bank-${this.id}`);
+                let that = this;
 
-            //build ASL bank with images
-            ASL_bank.innerHTML = this.buildHTML("bank");
+                //build answer bank
+                ASL_answer_bank.innerHTML = this.buildHTML("answers");
 
-            this.plugAnswers(<NodeListOf<HTMLElement>>ASL_answer_bank.querySelectorAll(".fsin-ASL-bank-answer"));
+                //build ASL bank with images
+                ASL_bank.innerHTML = this.buildHTML("bank");
 
-            //get answer boxes
-            this.answers = ASL_answer_bank.querySelectorAll(".fsin-ASL-bank-answer");
-            this.answers_count = this.answers.length;
+                this.plugAnswers(<NodeListOf<HTMLElement>>ASL_answer_bank.querySelectorAll(".fsin-ASL-bank-answer"));
 
-            for (let i = 0; i < this.answers.length; i++) {
-                this.answers[i].addEventListener('input', function() { that.checkAnswers(); });
-                
-                let temp1 = <NodeListOf<HTMLElement>>ASL_bank.querySelectorAll('.fsin-ASL-image-box');
-                let button = (temp1[i].getElementsByClassName('fsin-play')[0] as HTMLElement)
-                if (button) {
-                    button.onclick = function(e: Event) {
-                        let imgBox = ((e.target as HTMLElement).parentNode as HTMLElement);
-                        let frames = imgBox.getElementsByClassName('fsin-ASL-image');
-                        let text = (imgBox.getElementsByClassName('fsin-text-overlay')[0] as HTMLElement);
-                        (frames[0] as HTMLElement).style.opacity = "1.0";
-                        text.style.display = "none";
-                        update_image(0);
-                        function update_image(frame: number) {
-                            if(frame < frames.length) {
-                                if (frame > 0) (frames[frame-1] as HTMLElement).style.display = "none";
-                                (frames[frame] as HTMLElement).style.display = "block";
-                                setTimeout(function() { update_image(frame+1); }, 666);
-                            } else { // Done displaying frames
-                                (frames[frames.length-1] as HTMLElement).style.display = "none";
-                                (frames[0] as HTMLElement).style.display = "block";
-                                (frames[0] as HTMLElement).style.opacity = "0.5";
-                                text.style.display = "block";
+                //get answer boxes
+                this.answers = ASL_answer_bank.querySelectorAll(".fsin-ASL-bank-answer");
+                this.answers_count = this.answers.length;
+
+                for (let i = 0; i < this.answers.length; i++) {
+                    this.answers[i].addEventListener('input', function() { that.checkAnswers(); });
+                    
+                    let temp1 = <NodeListOf<HTMLElement>>ASL_bank.querySelectorAll('.fsin-ASL-image-box');
+                    let button = (temp1[i].getElementsByClassName('fsin-play')[0] as HTMLElement)
+                    if (button) {
+                        button.onclick = function(e: Event) {
+                            let imgBox = ((e.target as HTMLElement).parentNode as HTMLElement);
+                            let frames = imgBox.getElementsByClassName('fsin-ASL-image');
+                            let text = (imgBox.getElementsByClassName('fsin-text-overlay')[0] as HTMLElement);
+                            (frames[0] as HTMLElement).style.opacity = "1.0";
+                            text.style.display = "none";
+                            update_image(0);
+                            function update_image(frame: number) {
+                                if(frame < frames.length) {
+                                    if (frame > 0) (frames[frame-1] as HTMLElement).style.display = "none";
+                                    (frames[frame] as HTMLElement).style.display = "block";
+                                    setTimeout(function() { update_image(frame+1); }, 666);
+                                } else { // Done displaying frames
+                                    (frames[frames.length-1] as HTMLElement).style.display = "none";
+                                    (frames[0] as HTMLElement).style.display = "block";
+                                    (frames[0] as HTMLElement).style.opacity = "0.5";
+                                    text.style.display = "block";
+                                }
                             }
                         }
                     }
                 }
-            }
+                this.checkAnswers();
+                resolve();
+            });
         });
     }
 
     private getKey(element: string): string {
-        let key = "";
-        if (element === "c100") {
-            key = "c100";
-        } else if (element.length > 1) {
-            key = element.slice(0, -1);
-        } else {
-            key = element;
+        let key = element.split('/')[5].split('.')[0];
+    
+        if (key[key.length-1] == 'a') {
+            key = key.slice(0, -1);
         }
         return key;
     }
@@ -159,7 +160,7 @@ export class FingerSpellingInterpNumbers {
                 if (document.getElementById(`fsin-img-box-${key}`) === null) {
                     html += `<div class="fsin-ASL-image-box" id="fsin-img-box-${key}">`;
                     let j = 0;
-                    for (j = 0; j < this.files[i].length; j++) {
+                    for (j = 0; j < this.images[key].length; j++) {
                         if (document.getElementById(`fsin-img-${key}|${j}`) === null) {
                             html += `<img style="display: ${j === 0 ? "block" : "none"};" class="fsin-ASL-image" id="fsin-img-${key}|${j}" src="${this.images[key][j].src}">`;
                         } else {
@@ -223,7 +224,7 @@ export class FingerSpellingInterpNumbers {
         }
         this.done = (this.answers_correct === this.answers_count);
         console.log(this.done);
-        if (this.setAnswer) this.setAnswer({type: "FingerspellingInterpNumbers", id: this.ans_id, answers: sendAnswers});
+        if (this.setAnswer) this.setAnswer({type: "FingerSpellingInterpNumbers", id: this.ans_id, answers: sendAnswers});
     }
 
     private numberToImages(num: number ): string[] {

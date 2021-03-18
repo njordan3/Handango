@@ -56,7 +56,7 @@ export class DragDrop {
                 ASL_bank.innerHTML = this.buildHTML("bank");
                 ASL_answer_bank.innerHTML = this.buildHTML("answers");
 
-                this.plugAnswers(ASL_bank, ASL_answer_bank);
+                this.plugAnswers(ASL_bank, <NodeListOf<HTMLElement>>ASL_answer_bank.querySelectorAll('.dd-ASL-bank-answer'));
     
                 this.answers = ASL_answer_bank.querySelectorAll(".dd-ASL-bank-answer");
                 this.answers_count = this.answers.length;
@@ -71,6 +71,7 @@ export class DragDrop {
                 for (let i = 0; i < temp1.length; i++) { temp1[i].ondragstart = function(e: DragEvent) { that.drag(e); } }
                 for (let i = 0; i < temp2.length; i++) { temp2[i].ondragstart = function(e: DragEvent) { that.drag(e); } }
                 for (let i = 0; i < temp3.length; i++) { temp3[i].ondrop = function(e: DragEvent) { that.drop(e); }; temp3[i].ondragover = function(e) { that.allowDrop(e); } }
+                this.checkAnswers();
                 return resolve();
             });
         })
@@ -80,23 +81,35 @@ export class DragDrop {
         var html = "";
         if (type === "bank") {
             for (let i = 0; i < this.images.length; i++) {
-                html += `<img class="dd-ASL-image" id="dd-${this.ASL[i]}" src="${this.images[i].src}" draggable="true">`;
+                if (document.getElementById(`dd-${this.ASL[i]}`) === null) {
+                    html += `<img class="dd-ASL-image" id="dd-${this.ASL[i]}" src="${this.images[i].src}" draggable="true">`;
+                } else {
+                    let count = 1;
+                    while(document.getElementById(`dd-${this.ASL[i]}-${count}`) !== null) { count++; }
+                    html += `<img class="dd-ASL-image" id="dd-${this.ASL[i]}-${count}" src="${this.images[i].src}" draggable="true">`;
+                }
             }
         } else if (type === "answers") {
             for (let i = 0; i < this.ASL.length; i++) {
-                html += `<div class="dd-ASL-bank-answer" id="dd-box${this.ASL[i]}" draggable="false"></div>`;
+                if (document.getElementById(`dd-box${this.ASL[i]}`) === null) {
+                    html += `<p>${this.ASL[i]}</p><div class="dd-ASL-bank-answer" id="dd-box${this.ASL[i]}" draggable="false"></div>`;
+                } else {
+                    let count = 1;
+                    while(document.getElementById(`dd-box${this.ASL[i]}-${count}`) !== null) { count++; }
+                    html += `<p>${this.ASL[i]}</p><div class="dd-ASL-bank-answer" id="dd-box${this.ASL[i]}-${count}" draggable="false"></div>`;
+                }
             }
         }
         return html;
     }
         
-    private plugAnswers(bank: HTMLElement, answerBank: HTMLElement): void {
+    private plugAnswers(bank: HTMLElement, answerBank: NodeListOf<HTMLElement>): void {
         if (this.ans !== null) {
             for (let i = 0; i < this.ans.length; i++) {
                 for (let j = 0; j < bank.childNodes.length; j++) {
                     let child = bank.childNodes[j] as HTMLElement;
                     if (this.ans[i] === child.id.charAt(3)) {
-                        answerBank.childNodes[i].appendChild(child);
+                        answerBank[i].appendChild(child);
                     }
                 }
             }

@@ -1,10 +1,18 @@
-import {DragDrop} from '../../../assets/ts/drag-drop';
-import {FingerSpelling} from '../../../assets/ts/fingerspelling';
-import {FingerSpellingInterp} from '../../../assets/ts/fingerspelling-interp';
-import {MultipleChoice} from '../../../assets/ts/multiple-choice';
-import {Webcam} from '../../../assets/ts/web-cam';
-import {io} from 'socket.io-client';
+import { io } from 'socket.io-client';
 import { environment } from './../../../environments/environment';
+import { LessonQuizCompleteModal } from './modals/lesson-quiz-complete-modal.component';
+
+import { DragDrop } from 'src/assets/ts/drag-drop';
+import { DragDropNumbers } from 'src/assets/ts/drag-drop-numbers';
+import { DragDropQuestions } from 'src/assets/ts/drag-drop-questions';
+import { FingerSpelling } from 'src/assets/ts/fingerspelling';
+import { FingerSpellingNumbers } from 'src/assets/ts/fingerspelling-numbers';
+import { FingerSpellingInterp } from 'src/assets/ts/fingerspelling-interp';
+import { FingerSpellingInterpNumbers } from 'src/assets/ts/fingerspelling-interp-numbers';
+import { FingerSpellingInterpQuestions } from 'src/assets/ts/fingerspelling-interp-questions';
+import { MultipleChoice } from 'src/assets/ts/multiple-choice';
+import { Webcam } from 'src/assets/ts/web-cam';
+import { SelectQuestions } from 'src/assets/ts/select-questions';
 
 //get lesson info from URL
 let lesson_num: number = parseInt(window.location.pathname.split('/')[1].charAt(6));
@@ -15,14 +23,17 @@ var socket = io('https://duohando.com:3000', {
     withCredentials: true
 });
 
-socket.on('complete-confirmation', function() {
-    window.location.href = "https://duohando.com/dashboard";
+
+socket.on('complete-confirmation', function(data: any) {
+    LessonQuizCompleteModal.submitScore(data);
 });
+
 
 export function sendComplete() {
     if (environment.live) {
         let grade = getAnswers();
-        socket.emit(`${part}-complete`, {lesson: lesson_num, grade: grade});
+        let time = {min: getMinutes(distance), sec: getSeconds(distance)};
+        socket.emit(`quiz-complete`, {lesson: lesson_num, grade: grade, time: time});
     } else {
         window.location.href = "http://localhost:4200/dashboard";
     }
@@ -39,9 +50,9 @@ var paused = false;
 var pauseTime: any = {min: 0, sec: 0};
 function getMinutes(distance: number) { return Math.floor((distance % 3600000) / (60000)); }
 function getSeconds(distance: number) { return Math.floor((distance % 60000) / 1000); }
-function setupTimer() {
+function setupTimer(time: number) {
     countDownDate = new Date();
-    countDownDate.setMinutes(countDownDate.getMinutes() + 10);  //add 10 minutes
+    countDownDate.setMinutes(countDownDate.getMinutes() + time);
     now = new Date().getTime();
     distance = countDownDate.getTime() - now;
 
@@ -87,7 +98,7 @@ export function pauseTimer() {
 //////////////////////////////[Lesson Setup]//////////////////////////////
 var slideIndex = 1;
 var lessons: any[] = [];
-export function launch(data: any): void {
+export function launch(data: any, time: number): void {
     for (let i = 0; i < Object.keys(data).length; i++) {
         switch(data[i].type) {
             case "DragDrop":
@@ -99,11 +110,31 @@ export function launch(data: any): void {
             case "FingerSpelling":
                 lessons.push(new FingerSpelling(data[i].phrases));
                 break;
+            case "MultipleChoiceNumbers":
+            case "MultipleChoiceQuestions":
             case "MultipleChoice":
                 lessons.push(new MultipleChoice(data[i].phrases));
                 break;
-            case "Webcam":
-                lessons.push(new Webcam(data[i].phrases, socket, null, null, pauseTimer, startTimer));
+            case "WebCam":
+                lessons.push(new Webcam(data[i].phrase[0], socket));
+                break;
+            case "DragDropNumbers":
+                lessons.push(new DragDropNumbers(data[i].phrases));
+                break;
+            case "DragDropQuestions":
+                lessons.push(new DragDropQuestions(data[i].phrases));
+                break;
+            case "FingerSpellingNumbers":
+                lessons.push(new FingerSpellingNumbers(data[i].phrases));
+                break;
+            case "FingerSpellingInterpNumbers":
+                lessons.push(new FingerSpellingInterpNumbers(data[i].phrases));
+                break;
+            case "FingerSpellingInterpQuestions":
+                lessons.push(new FingerSpellingInterpQuestions(data[i].phrases));
+                break;
+            case "SelectQuestions":
+                lessons.push(new SelectQuestions(data[i].phrases));
                 break;
             default:
                 console.log(`can't load practice type: ${data[i].type}`);
@@ -153,7 +184,7 @@ export function launch(data: any): void {
     if (prev_slide) prev_slide.onclick = function() { callStop(); plusSlides(-1); }
     if (next_slide) next_slide.onclick = function() { callStop(); plusSlides(1); }
 
-    setupTimer();
+    setupTimer(time);
     startTimer();
 }
 

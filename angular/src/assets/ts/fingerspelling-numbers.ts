@@ -144,7 +144,7 @@ export class FingerSpellingNumbers {
                 //get answer boxes
                 this.answers = ASL_answer_bank.querySelectorAll(".fsn-ASL-bank-answer");
                 this.answers_count = this.answers.length;
-                
+                this.checkAnswers();
                 return resolve();
             });
         });
@@ -212,6 +212,7 @@ export class FingerSpellingNumbers {
         } else if (type === "answers") {
             let duplicates: any = {};
             for (let i = 0; i < this.phraseSteps.length; i++) {
+                html += `<p>${this.phraseSteps[i].join().replace(',', '')}</p><div class="break"></div>`;
                 for (let j = 0; j < this.phraseSteps[i].length; j++) {
                     let id = "";
                     let step = this.phraseSteps[i][j];
@@ -249,7 +250,7 @@ export class FingerSpellingNumbers {
                     let child = bank.childNodes[j] as HTMLElement;
                     if (this.ans[i] === child?.id.split('-')[3]) {
                         answerBank[i].appendChild(child);
-                        (answerBank[i] as HTMLElement).id = (answerBank[i] as HTMLElement).id+`|filled`;
+                        answerBank[i].id = `${answerBank[i].id}|filled`;
                         this.resetASLBank();
                     }
                 }
@@ -416,7 +417,6 @@ export class FingerSpellingNumbers {
         
         for (let i = 0; i < this.answers.length; i++) {
             let child = this.answers[i].childNodes[0];
-            console.log(this.answers[i].id.split('-')[2]?.split('|')[0], child?.id.split('-')[3]);
             if (this.answers[i].id.split('-')[2]?.split('|')[0] === child?.id.split('-')[3]) {
                 this.answers_correct++;
             }
@@ -427,7 +427,7 @@ export class FingerSpellingNumbers {
         
         this.done = (this.answers_correct === this.answers_count);
         console.log(this.done);
-        if (this.setAnswer) this.setAnswer({type: "FingerspellingNumbers", id: this.ans_id, answers: sendAnswers});
+        if (this.setAnswer) this.setAnswer({type: "FingerSpellingNumbers", id: this.ans_id, answers: sendAnswers});
     }
 
     private numberToImages(num: number ): string[] {

@@ -51,7 +51,7 @@ export class DragDropQuestions {
                 ASL_bank.innerHTML = this.buildHTML("bank");
                 ASL_answer_bank.innerHTML = this.buildHTML("answers");
 
-                this.plugAnswers(ASL_bank.querySelectorAll(".ddq-ASL-image"), ASL_answer_bank);
+                this.plugAnswers(ASL_bank.querySelectorAll(".ddq-ASL-image"), ASL_answer_bank.querySelectorAll(".ddq-ASL-bank-answer"));
     
                 this.answers = ASL_answer_bank.querySelectorAll(".ddq-ASL-bank-answer");
                 this.answers_count = this.answers.length;
@@ -66,6 +66,7 @@ export class DragDropQuestions {
                 for (let i = 0; i < temp1.length; i++) { temp1[i].ondragstart = function(e: DragEvent) { that.drag(e); } }
                 for (let i = 0; i < temp2.length; i++) { temp2[i].ondragstart = function(e: DragEvent) { that.drag(e); } }
                 for (let i = 0; i < temp3.length; i++) { temp3[i].ondrop = function(e: DragEvent) { that.drop(e); }; temp3[i].ondragover = function(e) { that.allowDrop(e); } }
+                this.checkAnswers();
                 return resolve();
             });
         })
@@ -76,26 +77,27 @@ export class DragDropQuestions {
         if (type === "bank") {
             for (let i = 0; i < this.files.length; i++) {
                 html += `
-                <video class="ddq-ASL-image" id="ddq-${this.ASL[i]}" width="360" height="240" draggable="true" controls >
+                <video class="ddq-ASL-image" id="ddq-${this.ASL[i]}-${this.id}" width="360" height="240" draggable="true" controls >
                     <source src="${this.files[i]}">>
                     Your browser doesn't support the displaying videos...
                 </video>`;
             }
         } else if (type === "answers") {
             for (let i = 0; i < this.ASL.length; i++) {
-                html += `<div class="ddq-ASL-bank-answer" id="ddq-box-${this.ASL[i]}" draggable="false"></div>`;
+                html += `<p>${this.ASL[i]}</p><div class="ddq-ASL-bank-answer" id="ddq-box-${this.ASL[i]}-${this.id}" draggable="false"></div>`;
             }
         }
         return html;
     }
         
-    private plugAnswers(bank: NodeListOf<HTMLElement>, answerBank: HTMLElement): void {
+    private plugAnswers(bank: NodeListOf<HTMLElement>, answerBank: NodeListOf<HTMLElement>): void {
         if (this.ans !== null) {
             for (let i = 0; i < this.ans.length; i++) {
                 for (let j = 0; j < bank.length; j++) {
                     let child = bank[j] as HTMLElement;
                     if (this.ans[i] === child?.id.split('-')[1]) {
-                        answerBank.childNodes[i].appendChild(child);
+                        answerBank[i].appendChild(child);
+                        answerBank[i].id = `${answerBank[i].id}|filled`;
                     }
                 }
             }
@@ -163,7 +165,7 @@ export class DragDropQuestions {
             let child = this.answers[i].childNodes[0];
             if(this.answers[i].id.split('-')[2].split('|')[0] === child?.id.split('-')[1]) this.answers_correct++;
 
-            let temp = child?.id.charAt(3);
+            let temp = child?.id.split('-')[1];
             if (temp === undefined) temp = "";
             sendAnswers.push(temp);
         }

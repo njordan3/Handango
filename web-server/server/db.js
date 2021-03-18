@@ -10,6 +10,7 @@ module.exports = {
     Register: Register,
     comparePassword: comparePassword,
     getUserLessons: getUserLessons,
+    getRandomQuiz: getRandomQuiz,
     setPracticeAnswer: setPracticeAnswer,
     add2FA: add2FA,
     changeEmail: changeEmail,
@@ -24,7 +25,7 @@ module.exports = {
     setLectureProgress: setLectureProgress,
     setPracticeProgress: setPracticeProgress,
     setPracticeComplete: setPracticeComplete,
-    setQuizComplete: setQuizComplete
+    setQuizInfo: setQuizInfo
 }
 
 function initDB() {
@@ -58,6 +59,21 @@ function getUserLessons(id, lesson_num) {
             if (err) { return reject(err); }
             else {
                 connection.query('CALL getUserLessons(?,?)', [id, lesson_num], function(err, result) {
+                    if (err) { return reject(err.sqlMessage); }
+                    if (!result[0][0]) return reject("There was a problem getting user lessons...");
+                    return resolve(result[0]);
+                });
+            }
+        });
+    }); 
+}
+
+function getRandomQuiz(lesson_num) {
+    return new Promise((resolve, reject) => {
+        connection.connect(function(err) {
+            if (err) { return reject(err); }
+            else {
+                connection.query('CALL getRandomQuiz(?)', [lesson_num], function(err, result) {
                     if (err) { return reject(err.sqlMessage); }
                     if (!result[0][0]) return reject("There was a problem getting user lessons...");
                     return resolve(result[0]);
@@ -363,15 +379,15 @@ function setPracticeComplete(email, id, lesson) {
     });
 }
 
-function setQuizComplete(email, id, lesson) {
+function setQuizInfo(email, id, lesson, grade, score, time) {
     return new Promise((resolve, reject) => {
         connection.connect(function(err) {
             if (err) { return reject(err); }
             else {
-                connection.query('CALL setQuizComplete(?,?,?)', [email, id, lesson], function(err, result) {
+                connection.query('CALL setQuizInfo(?,?,?,?,?,?)', [email, id, lesson, grade, score, time], function(err, result) {
                     if (err) { return reject(err.sqlMessage); }
                     if (result[0].length !== 0) { return resolve(result[0][0]); }
-                    else { return reject(`There was a problem setting quiz complete for lesson ${lesson}`); }
+                    else { return reject(`There was a problem setting quiz info for lesson ${lesson}`); }
                 });
             }
         });

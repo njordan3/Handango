@@ -44,7 +44,7 @@ export function sendComplete() {
 
 function setAnswer(msg: any) {
     msg.practice_id = practice_id;
-    console.log(msg);
+    //console.log(msg);
     socket.emit('update-answer', msg);
 }
 //////////////////////////////[Lesson Setup]//////////////////////////////
@@ -64,11 +64,13 @@ export function launch(data: any, slide: number): void {
             case "FingerSpelling":
                 lessons.push(new FingerSpelling(data[i].phrases, data[i].answers, data[i].id, setAnswer));
                 break;
+            case "MultipleChoiceNumbers":
+            case "MultipleChoiceQuestions":
             case "MultipleChoice":
                 lessons.push(new MultipleChoice(data[i].phrases, data[i].answers, data[i].id, setAnswer));
                 break;
-            case "Webcam":
-                lessons.push(new Webcam(data[i].phrases, socket, data[i].answers, data[i].id));
+            case "WebCam":
+                lessons.push(new Webcam(data[i].phrase[0], socket, data[i].answers, data[i].id));
                 break;
             case "DragDropNumbers":
                 lessons.push(new DragDropNumbers(data[i].phrases, data[i].answers, data[i].id, setAnswer));
@@ -92,29 +94,6 @@ export function launch(data: any, slide: number): void {
                 console.log(`can't load practice type: ${data[i].type}`);
         }
     }
-    
-    lessons.push(new FingerSpellingNumbers(["10", "3", "33"], null, null));
-
-    lessons.push(new FingerSpellingNumbers(["4000", "600", "100"], null, null));
-
-    lessons.push(new FingerSpellingInterpNumbers(["10", "3", "33"], null, null));
-
-    lessons.push(new FingerSpellingInterpNumbers(["4000", "600", "100"], null, null));
-
-    lessons.push(new DragDropNumbers(["10", "3", "33"], null, null));
-
-    lessons.push(new DragDropNumbers(["4000", "600", "100"], null, null));
-
-    lessons.push(new DragDropQuestions(["yes", "no", "mine"], null, null));
-    lessons.push(new DragDropQuestions(["address", "your", "interview"], null, null));
-    
-    lessons.push(new FingerSpellingInterpQuestions(["yes", "no", "mine"], null, null));
-    lessons.push(new FingerSpellingInterpQuestions(["address", "nicetomeetyou", "interview"], null, null));
-    
-
-    lessons.push(new SelectQuestions({answer: "yes", choices: ["yes", "no", "mine"]}, null, null))
-
-    lessons.push(new SelectQuestions({answer: "nice to meet you", choices: ["address", "nicetomeetyou", "interview"]}, null, null))
 
     //setup each lessons' HTML template in the slideshow container
     for (let i = 0; i < lessons.length; i++) {
@@ -123,11 +102,9 @@ export function launch(data: any, slide: number): void {
     //setup each lesson one after the other is finished
     let promiseChain = Promise.resolve();
     for (let i = 0; i < lessons.length; i++) {
-        const makePromise = function(i: number) {
-            return lessons[i].setUp();
-        }
-        promiseChain = promiseChain.then(makePromise(i));
+        promiseChain = promiseChain.then(() => lessons[i].setUp());
     }
+    promiseChain.then(() => console.log("DONE"))
 
     //////////////////////////////[SLIDE LOGIC]//////////////////////////////
     const slides = <HTMLCollectionOf<HTMLElement>>document.getElementsByClassName("mySlides");

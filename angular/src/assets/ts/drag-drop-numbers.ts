@@ -101,8 +101,7 @@ export class DragDropNumbers {
                 //set innerHTMLs for both banks
                 ASL_bank.innerHTML = this.buildHTML("bank");
                 ASL_answer_bank.innerHTML = this.buildHTML("answers");
-
-                this.plugAnswers(ASL_bank, ASL_answer_bank);
+                this.plugAnswers(ASL_bank, ASL_answer_bank.querySelectorAll('.ddn-ASL-bank-answer'));
     
                 this.answers = ASL_answer_bank.querySelectorAll(".ddn-ASL-bank-answer");
                 this.answers_count = this.answers.length;
@@ -167,22 +166,10 @@ export class DragDropNumbers {
                     }
                 }
                 for (let i = 0; i < temp3.length; i++) { temp3[i].ondrop = function(e: DragEvent) { that.drop(e); }; temp3[i].ondragover = function(e) { that.allowDrop(e); } }
-
+                this.checkAnswers();
                 return resolve();
             });
         })
-    }
-
-    private getKey(element: string): string {
-        let key = "";
-        if (element === "c100") {
-            key = "c100";
-        } else if (element.length > 1) {
-            key = element.slice(0, -1);
-        } else {
-            key = element;
-        }
-        return key;
     }
     
     private buildHTML(type: string): string {
@@ -252,20 +239,21 @@ export class DragDropNumbers {
                         duplicates[step].count++;
                     }
                 }
-                html += `<div class="ddn-ASL-bank-answer" id="ddn-box-${id}"></div>`;
+                html += `<p>${this.ASL[i]}</p><div class="ddn-ASL-bank-answer" id="ddn-box-${id}"></div>`;
             }
         }
 
         return html;
     }
         
-    private plugAnswers(bank: HTMLElement, answerBank: HTMLElement): void {
+    private plugAnswers(bank: HTMLElement, answerBank: NodeListOf<HTMLElement>): void {
         if (this.ans !== null) {
             for (let i = 0; i < this.ans.length; i++) {
                 for (let j = 0; j < bank.childNodes.length; j++) {
                     let child = bank.childNodes[j] as HTMLElement;
                     if (this.ans[i] === child.id.split('-')[3]) {
-                        answerBank.childNodes[i].appendChild(child);
+                        answerBank[i].appendChild(child);
+                        answerBank[i].id = `${answerBank[i].id}|filled`;
                     }
                 }
             }
@@ -363,7 +351,7 @@ export class DragDropNumbers {
             let child = this.answers[i].childNodes[0];
             if(this.answers[i].id.split('-')[2].split('|')[0] === child?.id.split('-')[3]) this.answers_correct++;
 
-            let temp = child?.id.charAt(3);
+            let temp = child?.id.split('-')[3];
             if (temp === undefined) temp = "";
             sendAnswers.push(temp);
         }

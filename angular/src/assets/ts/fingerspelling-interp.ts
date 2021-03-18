@@ -27,49 +27,53 @@ export class FingerSpellingInterp {
         this.done = false;
     }
 
-    setUp() {
-        //loading the assets
-        var promises = [];
-        let k = 0;
-        for (let i = 0; i < this.phrase.length; i++) {
-            for (let j = 0; j < this.phrase[i].length; j++) {
-                promises.push(
-                    new Promise((resolve, reject) => {
-                        this.images.push(new Image());
-                        this.images[k].src = `../../../assets/Images/${this.phrase[i][j].toUpperCase()}.png`
-                        this.images[k].onload = function() {
-                            resolve(true);
-                        }
-                        k++
-                    })
-                );
+    setUp(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            //loading the assets
+            var promises = [];
+            let k = 0;
+            for (let i = 0; i < this.phrase.length; i++) {
+                for (let j = 0; j < this.phrase[i].length; j++) {
+                    promises.push(
+                        new Promise((resolve, reject) => {
+                            this.images.push(new Image());
+                            this.images[k].src = `../../../assets/Images/${this.phrase[i][j].toUpperCase()}.png`
+                            this.images[k].onload = function() {
+                                resolve(true);
+                            }
+                            k++
+                        })
+                    );
+                }
             }
-        }
-        Promise.all(promises).then(result => {
-            console.log("Finger Spelling Interpretation ASL Assets loaded!");
+            Promise.all(promises).then(result => {
+                console.log("Finger Spelling Interpretation ASL Assets loaded!");
 
-            document.getElementsByClassName(`fsi-ASL-bank`)[this.id-1].id = `fsi-ASL-bank-${this.id}`;
-            document.getElementsByClassName(`fsi-ASL-answer-bank`)[this.id-1].id = `fsi-ASL-answer-bank-${this.id}`;
+                document.getElementsByClassName(`fsi-ASL-bank`)[this.id-1].id = `fsi-ASL-bank-${this.id}`;
+                document.getElementsByClassName(`fsi-ASL-answer-bank`)[this.id-1].id = `fsi-ASL-answer-bank-${this.id}`;
 
-            var ASL_bank = <HTMLElement>document.getElementById(`fsi-ASL-bank-${this.id}`);
-            var ASL_answer_bank = <HTMLElement>document.getElementById(`fsi-ASL-answer-bank-${this.id}`);
-            let that = this;
+                var ASL_bank = <HTMLElement>document.getElementById(`fsi-ASL-bank-${this.id}`);
+                var ASL_answer_bank = <HTMLElement>document.getElementById(`fsi-ASL-answer-bank-${this.id}`);
+                let that = this;
 
-            //build answer bank
-            ASL_answer_bank.innerHTML = this.buildHTML("answers");
+                //build answer bank
+                ASL_answer_bank.innerHTML = this.buildHTML("answers");
 
-            //build ASL bank with images
-            ASL_bank.innerHTML = this.buildHTML("bank");
+                //build ASL bank with images
+                ASL_bank.innerHTML = this.buildHTML("bank");
 
-            this.plugAnswers(<NodeListOf<HTMLElement>>ASL_answer_bank.querySelectorAll(".fsi-ASL-bank-answer"));
+                this.plugAnswers(<NodeListOf<HTMLElement>>ASL_answer_bank.querySelectorAll(".fsi-ASL-bank-answer"));
 
-            //get answer boxes
-            this.answers = ASL_answer_bank.querySelectorAll(".fsi-ASL-bank-answer");
-            this.answers_count = this.answers.length;
+                //get answer boxes
+                this.answers = ASL_answer_bank.querySelectorAll(".fsi-ASL-bank-answer");
+                this.answers_count = this.answers.length;
 
-            for (let i = 0; i < this.answers.length; i++) {
-                this.answers[i].addEventListener('input', function() { that.checkAnswers(); });
-            }
+                for (let i = 0; i < this.answers.length; i++) {
+                    this.answers[i].addEventListener('input', function() { that.checkAnswers(); });
+                }
+                this.checkAnswers();
+                resolve();
+            });
         });
     }
 
@@ -113,6 +117,6 @@ export class FingerSpellingInterp {
         }
         this.done = (this.answers_correct === this.answers_count);
         console.log(this.done);
-        if (this.setAnswer) this.setAnswer({type: "FingerspellingInterp", id: this.ans_id, answers: sendAnswers});
+        if (this.setAnswer) this.setAnswer({type: "FingerSpellingInterp", id: this.ans_id, answers: sendAnswers});
     }
 }
