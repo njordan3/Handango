@@ -13,13 +13,17 @@ export class Webcam {
     private video: any;
     private socket: any;
     private ASL: string;
+    private ans: string[]|null;
+    private ans_id: number|null;
     private id: number;
     private isStreaming: boolean;
     answer_correct: boolean = false;
     pauseTimer: Function|null;
     startTimer: Function|null;
-    constructor(ASL: string, socket: any, pauseTimer: Function|null = null, startTimer: Function|null = null) {
+    constructor(ASL: string, socket: any, ans: string[]|null = null, ans_id: number|null = null, pauseTimer: Function|null = null, startTimer: Function|null = null) {
         this.ASL = ASL;
+        this.ans = ans;
+        this.ans_id = ans_id;
         this.id = Webcam.count++;
         this.isStreaming = false;
         this.socket = socket;

@@ -3,6 +3,8 @@ const db = require('./db');
 const sharedSession = require("express-socket.io-session");
 let { isLoggedIn, just2FAd } = require('./middleware');
 
+const quizTime = 10;    //minutes
+
 module.exports = {
     initLessonRoutes: initLessonRoutes,
     initSocketIO: initSocketIO
@@ -20,68 +22,42 @@ function initSocketIO(session, io) {
             socket.email = socket.handshake.session.passport.user.email;
             socket.id = socket.handshake.session.passport.user.id;
             socket.on('lecture-progress', function(data) {
-                db.setLectureProgress(socket.email, socket.id, data.slide, data.lesson)
-                    .then(function(row) {
-                        //update session variables
-                        socket.handshake.session.passport.user.lessons[data.lesson-1].lecture_prog = row.lesson_lectprog.split(",")[data.lesson-1];
-                        socket.handshake.session.save();
-                    })
+                db.setLectureProgress(socket.email, socket.ext_id, data.slide, data.lesson)
                     .catch(function(err) {
                         console.log(err);
                     });
             });
             socket.on('practice-progress', function(data) {
-                db.setPracticeProgress(socket.email, socket.id, data.slide, data.lesson)
-                    .then(function(row) {
-                        //update session variables
-                        socket.handshake.session.passport.user.lessons[data.lesson-1].practice_prog = row.lesson_practprog.split(",")[data.lesson-1];
-                        socket.handshake.session.save();
-                    })
+                db.setPracticeProgress(socket.email, socket.ext_id, data.slide, data.lesson)
                     .catch(function(err) {
                         console.log(err);
                     });
             });
             socket.on('practice-complete', function(data) {
-                db.setPracticeComplete(socket.email, socket.id, data.lesson)
-                    .then(function(row) {
-                        //update session variables
-                        socket.handshake.session.passport.user.lessons[data.lesson-1].practice_complete = row.lesson_practcomp.split(",")[data.lesson-1];
-                        socket.handshake.session.save();
-                        return Promise.resolve();
-                    })
+                db.setPracticeComplete(socket.email, socket.ext_id, data.lesson)
                     .then(function() { socket.emit('complete-confirmation'); })
                     .catch(function(err) {
                         console.log(err);
                     });
             });
             socket.on('quiz-complete', function(data) {
-                console.log(data.grade);
-                db.setQuizComplete(socket.email, socket.id, data.lesson)
-                    .then(function(row) {
-                        //organize lessons into array of JSONs to update session variables because a new lesson was unlocked
-                        let desc = row.lesson_desc.split(",");
-                        let unlock_date = row.lesson_udate.split(",");
-                        let lecture_prog = row.lesson_lectprog.split(",");
-                        let practice_prog = row.lesson_practprog.split(",");
-                        let practice_comp = row.lesson_practcomp.split(",");
-                        let complete = row.lesson_complete.split(",");
-                        let lessons = [];
-                        for (let i = 0; i < desc.length; i++) { 
-                            lessons[i] = { 
-                                desc: desc[i], unlock_date: unlock_date[i],
-                                lecture_prog: lecture_prog[i], practice_prog: practice_prog[i],
-                                practice_complete: practice_comp[i], complete: complete[i]
-                            };
-                        }
-                        socket.handshake.session.passport.user.lessons = lessons;
-                        socket.handshake.session.save();
-
-                        return Promise.resolve();                        
+                let grade = Math.floor((data.grade.answers_correct/data.grade.answers_count)*100)
+                let score = Math.floor(grade*100 * (quizTime+(data.time.min+(data.time.sec/60)))/quizTime)
+                let sendData = {
+                    score: score,
+                    answers_count: data.grade.answers_count,
+                    answers_correct: data.grade.answers_correct,
+                    passed: (grade >= 70.0)
+                };
+                
+                db.setQuizInfo(socket.email, socket.ext_id, data.lesson, grade, score, JSON.stringify(data.time))
+                    .then(function() { 
+                        socket.emit('complete-confirmation', sendData); 
                     })
-                    .then(function() { socket.emit('complete-confirmation'); })
                     .catch(function(err) {
                         console.log(err);
                     });
+                
             });
             socket.on('asl-frame', function(data) {
                 //maybe use bitmap or other file formats instead of jpeg?
@@ -89,282 +65,188 @@ function initSocketIO(session, io) {
                 //BLOB = BINARY LARGE OBJECT
                 console.log(data);
             });
+            socket.on('update-answer', function(data) {
+                db.setPracticeAnswer(data.practice_id, data.id, `{"answers": ${JSON.stringify(data.answers)}}`, data.type)
+                    .then(function() {
+                        console.log("answer updated");
+                    })
+                    .catch(function(err) {
+                        console.log(err);
+                    });
+            })
         } else {
             console.log("Socket connection is not logged in");
         }
     });
+    /*
+    db.getUserLessons(402, 1)
+        .then(function(lesson) {    
+            let lessonDetails = lesson.shift();
+            if (lesson != undefined && lesson.length > 0) {
+                let lectureDetails = lessonDetails.PID.split('-');
+                let practiceDetails = lessonDetails.answers.split('-');
+                let quizDetails = lessonDetails.phrases;
+                let lessonData = getLessonData(lesson);
+            }
+            
+        })
+        .catch(function(err) {
+            console.log(err);
+        })
+    */
+    /*
+    db.getRandomQuiz(1)
+        .then(function(quiz) {
+            let questions = [];
+            for (let i = 0; i < quiz.length; i++) {
+                questions.push(quiz[i].phrases);
+            }
+        })
+        .catch(function(err) {
+            console.log(err);
+        });
+    */
 }
 
 function initLessonRoutes(app) {
     app.post('/is-lesson-unlocked', isLoggedIn, function(req, res) {
-        let msg = {};
-        if (!req.session.passport) {    //check login status
-            msg = {
-                loggedIn: false,
-                unlocked: false,
-                message: "Login to unlock this lesson."
-            };
-        } else {
-            msg.loggedIn = true;
-            let {num, type} = req.body;
-            let lessons = req.session.passport.user.lessons;
-            if (lessons[num-1] !== undefined) {   //if logged in, check if lesson is unlocked
-                if (type === 'quiz') {   //if it's a quiz, check if the practice is complete
-                    if (lessons[num-1].practice_complete == 1) {
-                        msg.unlocked = true;
-                        msg.lesson = lessonData[num-1].quiz;
-                    } else {
-                        msg.unlocked = false;
-                        msg.message = "Finish this lesson's practice to unlock the quiz.";
+        let {num, type} = req.body;
+        let msg = {loggedIn: true};
+        db.getUserLessons(req.session.passport.user.id, num)
+            .then(function(lesson) {
+                let lessonDetails = lesson.shift();
+                if (lesson != undefined && lesson.length > 0) {
+                    let lectureDetails = lessonDetails.PID.split('-');
+                    let practiceDetails = lessonDetails.answers.split('-');
+                    let quizDetails = lessonDetails.phrases;
+                    let lessonData = getLessonData(lesson);
+                    switch(type) {
+                        case "lecture":
+                            msg.unlocked = true;
+                            msg.slide = lectureDetails[1];
+                            msg.desc = lectureDetails[0];
+                            res.json(msg);
+                            break;
+                        case "practice": {
+                            msg.unlocked = true;
+                            msg.lesson = lessonData;
+                            msg.slide = practiceDetails[1];
+                            res.json(msg);
+                            break;
+                        }
+                        case "quiz": {
+                            if (practiceDetails[2] == 1) {
+                                db.getRandomQuiz(num)
+                                    .then(function(quiz) {
+                                        let questions = [];
+                                        for (let i = 0; i < quiz.length; i++) {
+                                            questions.push(quiz[i].phrases);
+                                        }
+                                        msg.unlocked = true;
+                                        msg.lesson = questions;
+                                        msg.time = quizTime;
+                                        res.json(msg);
+                                    })
+                                    .catch(function(err) {
+                                        console.log(err);
+                                        msg.unlocked = false;
+                                        msg.message = err;
+                                        res.json(msg);
+                                    });
+                            } else {
+                                msg.unlocked = false;
+                                msg.message = "Finish this lesson's practice to unlock the quiz.";
+                                res.json(msg);
+                            }
+                            break;
+                        }
                     }
                 } else {
-                    msg.unlocked = true;
-                    msg.lesson = lessonData[num-1][type];
-                    msg.slide = lessons[num-1][`${type}_prog`];
+                    msg.unlocked = false;
+                    msg.message = "Finish the prior lesson's quiz to unlock this lesson.";
+                    res.json(msg);
                 }
-            } else {
-                msg.unlocked = false;
-                msg.message = "Finish the prior lesson's quiz to unlock this lesson.";
-            }
-            
-        }
-        res.json(msg);
+                
+            })
+            .catch(function(err) {
+                console.log(err);
+                res.json(err);
+            });
     });
 }
 
-let lessonData = [
-    {
-        practice: [ //==========[PRACTICE 1]==========
-            {type: "Webcam", phrases: "G"},
-            {type: "DragDrop", phrases: ["J", "B", "Z"]},
-            {type: "FingerSpellingInterp", phrases: ["food", "drink", "napkin"]},
-            {type: "FingerSpelling", phrases: ["food", "drink", "napkin"]},
-            {type: "MultipleChoice", phrases: [
-                {
-                    question: "Question 1?",
-                    choices:    [
-                        "Choice 1",
-                        "Choice 2",
-                        "Choice 3",
-                        "Choice 4",
-                    ],
-                    correct: 1
-                },
-                {
-                    question: "Question 2?",
-                    choices:    [
-                        "Choice 1",
-                        "Choice 2",
-                        "Choice 3",
-                        "Choice 4",
-                    ],
-                    correct: 3
-                },
-                {
-                    question: "Question 3?",
-                    choices:    [
-                        "Choice 1",
-                        "Choice 2",
-                        "Choice 3",
-                        "Choice 4",
-                    ],
-                    correct: 0
-                }
-            ]},
-        ],
-        quiz: [ //==========[QUIZ 1]==========
-            {type: "Webcam", phrases: "G"},
-            {type: "DragDrop", phrases: ["J", "B", "Z"]},
-            {type: "FingerSpellingInterp", phrases: ["food", "drink", "napkin"]},
-            {type: "FingerSpelling", phrases: ["food", "drink", "napkin"]},
-            {type: "MultipleChoice", phrases: [
-                {
-                    question: "Question 1?",
-                    choices:    [
-                        "Choice 1",
-                        "Choice 2",
-                        "Choice 3",
-                        "Choice 4",
-                    ],
-                    correct: 1
-                },
-                {
-                    question: "Question 2?",
-                    choices:    [
-                        "Choice 1",
-                        "Choice 2",
-                        "Choice 3",
-                        "Choice 4",
-                    ],
-                    correct: 3
-                },
-                {
-                    question: "Question 3?",
-                    choices:    [
-                        "Choice 1",
-                        "Choice 2",
-                        "Choice 3",
-                        "Choice 4",
-                    ],
-                    correct: 0
-                }
-            ]},
-        ]
-    },
-    {
-        practice: [ //==========[PRACTICE 2]==========
-            {type: "Webcam", phrases: "G"},
-            {type: "DragDrop", phrases: ["J", "B", "Z"]},
-            {type: "FingerSpellingInterp", phrases: ["food", "drink", "napkin"]},
-            {type: "FingerSpelling", phrases: ["food", "drink", "napkin"]},
-            {type: "MultipleChoice", phrases: [
-                {
-                    question: "Question 1?",
-                    choices:    [
-                        "Choice 1",
-                        "Choice 2",
-                        "Choice 3",
-                        "Choice 4",
-                    ],
-                    correct: 1
-                },
-                {
-                    question: "Question 2?",
-                    choices:    [
-                        "Choice 1",
-                        "Choice 2",
-                        "Choice 3",
-                        "Choice 4",
-                    ],
-                    correct: 3
-                },
-                {
-                    question: "Question 3?",
-                    choices:    [
-                        "Choice 1",
-                        "Choice 2",
-                        "Choice 3",
-                        "Choice 4",
-                    ],
-                    correct: 0
-                }
-            ]},
-        ],
-        quiz: [ //==========[QUIZ 2]==========
-            {type: "Webcam", phrases: "G"},
-            {type: "DragDrop", phrases: ["J", "B", "Z"]},
-            {type: "FingerSpellingInterp", phrases: ["food", "drink", "napkin"]},
-            {type: "FingerSpelling", phrases: ["food", "drink", "napkin"]},
-            {type: "MultipleChoice", phrases: [
-                {
-                    question: "Question 1?",
-                    choices:    [
-                        "Choice 1",
-                        "Choice 2",
-                        "Choice 3",
-                        "Choice 4",
-                    ],
-                    correct: 1
-                },
-                {
-                    question: "Question 2?",
-                    choices:    [
-                        "Choice 1",
-                        "Choice 2",
-                        "Choice 3",
-                        "Choice 4",
-                    ],
-                    correct: 3
-                },
-                {
-                    question: "Question 3?",
-                    choices:    [
-                        "Choice 1",
-                        "Choice 2",
-                        "Choice 3",
-                        "Choice 4",
-                    ],
-                    correct: 0
-                }
-            ]},
-        ]
-    },
-    {
-        practice: [ //==========[PRACTICE 3]==========
-            {type: "Webcam", phrases: "G"},
-            {type: "DragDrop", phrases: ["J", "B", "Z"]},
-            {type: "FingerSpellingInterp", phrases: ["food", "drink", "napkin"]},
-            {type: "FingerSpelling", phrases: ["food", "drink", "napkin"]},
-            {type: "MultipleChoice", phrases: [
-                {
-                    question: "Question 1?",
-                    choices:    [
-                        "Choice 1",
-                        "Choice 2",
-                        "Choice 3",
-                        "Choice 4",
-                    ],
-                    correct: 1
-                },
-                {
-                    question: "Question 2?",
-                    choices:    [
-                        "Choice 1",
-                        "Choice 2",
-                        "Choice 3",
-                        "Choice 4",
-                    ],
-                    correct: 3
-                },
-                {
-                    question: "Question 3?",
-                    choices:    [
-                        "Choice 1",
-                        "Choice 2",
-                        "Choice 3",
-                        "Choice 4",
-                    ],
-                    correct: 0
-                }
-            ]},
-        ],
-        quiz: [ //==========[QUIZ 3]==========
-            {type: "Webcam", phrases: "G"},
-            {type: "DragDrop", phrases: ["J", "B", "Z"]},
-            {type: "FingerSpellingInterp", phrases: ["food", "drink", "napkin"]},
-            {type: "FingerSpelling", phrases: ["food", "drink", "napkin"]},
-            {type: "MultipleChoice", phrases: [
-                {
-                    question: "Question 1?",
-                    choices:    [
-                        "Choice 1",
-                        "Choice 2",
-                        "Choice 3",
-                        "Choice 4",
-                    ],
-                    correct: 1
-                },
-                {
-                    question: "Question 2?",
-                    choices:    [
-                        "Choice 1",
-                        "Choice 2",
-                        "Choice 3",
-                        "Choice 4",
-                    ],
-                    correct: 3
-                },
-                {
-                    question: "Question 3?",
-                    choices:    [
-                        "Choice 1",
-                        "Choice 2",
-                        "Choice 3",
-                        "Choice 4",
-                    ],
-                    correct: 0
-                }
-            ]},
-        ]
+
+//parsing is specific to how data is formatted in the MySQL procedure
+function parseSQLJSON(sqlJSON) {
+    let result = [];
+    let start = "";
+    let end = "";
+    if (sqlJSON === null) {
+        return null;
+    } else if (sqlJSON.search('},{') > 0) {
+        sqlJSON = sqlJSON.split('},{');
+        start = "{";
+        end = "}";
+        
+        for (let i = 0; i < sqlJSON.length; i++) {
+            if (i === 0) sqlJSON[i] = `${sqlJSON[i]}${end}`;
+            else if (i > 0 && i+1 < sqlJSON.length) sqlJSON[i] = `${start}${sqlJSON[i]}${end}`;
+            else sqlJSON[i] = `${start}${sqlJSON[i]}`;
+            result.push(JSON.parse(sqlJSON[i]))
+        }
+    } else if (sqlJSON.search(' | ') > 0) {
+        sqlJSON = sqlJSON.split(' | ');
+        for (let i = 0; i < sqlJSON.length; i++) {
+            let temp1 = sqlJSON[i].split('--');
+            let temp2 = JSON.parse(temp1[0]);            
+            temp2.id = temp1[1];
+            result.push(temp2);
+        }
+    } else {
+        let temp = [sqlJSON];
+        sqlJSON = temp;
+        for (let i = 0; i < sqlJSON.length; i++) {
+            if (i === 0) sqlJSON[i] = `${sqlJSON[i]}${end}`;
+            else if (i > 0 && i+1 < sqlJSON.length) sqlJSON[i] = `${start}${sqlJSON[i]}${end}`;
+            else sqlJSON[i] = `${start}${sqlJSON[i]}`;
+            result.push(JSON.parse(sqlJSON[i]))
+        }
     }
-];
+    return result;
+}
+
+function combinePhraseAnswer(phrases, answers) {
+    let combined = [];
+    //parse question phrases and question answers seperately
+    phrases = parseSQLJSON(phrases);
+    answers = parseSQLJSON(answers);
+    //combine qestion phrases and question answers
+    for (let i = 0; i < phrases.length; i++) {
+        combined[i] = phrases[i];
+        if (answers !== null)
+            combined[i].answers = answers[i].answers;
+        else
+            combined[i].answers = null;
+        combined[i].id = phrases[i].id;
+    }
+    return combined;
+}
+
+function getLessonData(lesson) {
+    let temp = [];
+    let result = [];
+    //combine the phrases and answers into one JSON
+    for (let i = 0 ; i < lesson.length; i++) {
+        if (lesson[i].phrases && lesson[i].answers)
+            temp.push(combinePhraseAnswer(lesson[i].phrases, lesson[i].answers));
+    }
+    //attach practice id to the before returning
+    for (let i = 0; i < temp.length; i++) {
+        for (let j = 0; j < temp[i].length; j++) {
+            temp[i][j].practice_id = lesson[i].PID;
+            result.push(temp[i][j]);
+        }
+    }
+    
+    return result;
+}

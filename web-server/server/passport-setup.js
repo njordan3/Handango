@@ -25,10 +25,10 @@ module.exports = function(passport) {
         done(null, user);
     });
     passport.deserializeUser(function(usr, done) {
-        db.findUser(usr.email, usr.id, false)
+        db.findUser(usr.email, usr.ext_id, false)
             .then(function(row) {
                 if (row.sqlMessage) { return Promise.reject(`User ${usr.email} not found in Deserialize`); }
-                else { done(null, {email: row.email, id: row.external_id}); }
+                else { done(null, {email: row.email, ext_id: row.external_id}); }
             })
             .catch(function(err) { done(null, false, {error: err}); })
     });
@@ -61,6 +61,7 @@ module.exports = function(passport) {
                 .then(function(row) { return db.Login(row); })
                 .then(function(row) { 
                     //organize lessons into array of JSONs
+                    /*
                     let desc = row.lesson_desc.split(",");
                     let unlock_date = row.lesson_udate.split(",");
                     let lecture_prog = row.lesson_lectprog.split(",");
@@ -75,8 +76,9 @@ module.exports = function(passport) {
                             practice_complete: practice_comp[i], complete: complete[i]
                         };
                     }
-
-                    return done(null, {email: row.email, name: row.fname, type: row.external_type, id: row.external_id, secret: row.twofactor_secret, just2FAd: false, lessons: lessons});
+                    */
+                    //return done(null, {email: row.email, name: row.fname, type: row.external_type, id: row.external_id, secret: row.twofactor_secret, just2FAd: false, lessons: lessons});
+                    return done(null, { id: row.id, email: row.email, name: row.fname, type: row.external_type, ext_id: row.external_id, secret: row.twofactor_secret, just2FAd: false });
                 })
                 .catch(function(err) {
                     console.log(err);
@@ -147,6 +149,7 @@ module.exports = function(passport) {
                 })
                 .then(function(row) { return db.Login(row); })
                 .then(function(row) {
+                    /*
                     //organize lessons into array of JSONs
                     let desc = row.lesson_desc.split(",");
                     let unlock_date = row.lesson_udate.split(",");
@@ -164,6 +167,8 @@ module.exports = function(passport) {
                     }
 
                     return done(null, {email: row.email, name: row.fname, type: row.external_type, id: row.external_id, secret: row.twofactor_secret, just2FAd: false, lessons: lessons});
+                    */
+                    return done(null, { id: row.id, email: row.email, name: row.fname, type: row.external_type, ext_id: row.external_id, secret: row.twofactor_secret, just2FAd: false });
                 })
                 .catch(function(err) {
                     console.log(err);
@@ -226,6 +231,7 @@ module.exports = function(passport) {
                 })
                 .then(function(row) { return db.Login(row); })
                 .then(function(row) {
+                    /*
                     //organize lessons into array of JSONs
                     let desc = row.lesson_desc.split(",");
                     let unlock_date = row.lesson_udate.split(",");
@@ -242,6 +248,8 @@ module.exports = function(passport) {
                         };
                     }
                     return done(null, {email: email, name: row.fname, type: null, id: null, secret: row.twofactor_secret, just2FAd: false, lessons: lessons});
+                    */
+                    return done(null, { id: row.id, email: row.email, name: row.fname, type: row.external_type, ext_id: row.external_id, secret: row.twofactor_secret, just2FAd: false });
                 })
                 .catch(function(err) {
                     console.log(err);

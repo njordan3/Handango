@@ -22,7 +22,7 @@ export class LessonGuard implements CanLoad {
                 this.toastr.error(resp.message);
                 return resolve(false);
               }
-              route.data = {lesson: resp.lesson, slide: resp.slide, lesson_num: segments[0].path[6]};
+              route.data = {lesson: resp.lesson, slide: resp.slide, lesson_num: segments[0].path[6], time: resp.time};
               return resolve(true);
             } else {
               this.router.navigate(['/loginSignup'], { relativeTo: this.route, });
@@ -33,7 +33,7 @@ export class LessonGuard implements CanLoad {
       });
     } else {
       route.data = {lesson: [
-        {type: "Webcam", phrases: "G"},
+        {type: "WebCam", phrases: "G"},
         {type: "DragDrop", phrases: ["J", "B", "Z"]},
         {type: "FingerSpellingInterp", phrases: ["food", "drink", "napkin"]},
         {type: "FingerSpelling", phrases: ["food", "drink", "napkin"]},

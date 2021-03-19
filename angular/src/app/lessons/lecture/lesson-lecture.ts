@@ -3,7 +3,6 @@ import { environment } from './../../../environments/environment';
 
 //get lesson info from URL
 let lesson_num: number = parseInt(window.location.pathname.split('/')[1].charAt(6));
-let part: string = window.location.pathname.split('/')[2];
 
 var slideIndex: number = 1;
 //////////////////////////////[SOCKET.IO]//////////////////////////////
@@ -16,7 +15,8 @@ function sendProgress() {
         lesson: lesson_num,
         slide: slideIndex
     }
-    socket.emit(`${part}-progress`, msg);
+    console.log(msg);
+    socket.emit(`lecture-progress`, msg);
 }
 
 var buttonInfo: any;

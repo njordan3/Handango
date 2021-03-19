@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { sendComplete, getAnswers, startTimer, callStop } from '../lesson-quiz';
+import { LessonQuizCompleteModal } from './lesson-quiz-complete-modal.component';
 
 @Component({
   selector: 'lessonQuizNextModal',
@@ -35,6 +36,7 @@ export class LessonQuizNextModal {
         this.modalService.dismissAll();
         callStop();
         sendComplete();
+        this.modalService.open(LessonQuizCompleteModal, { centered: true, animation: true, keyboard: false, backdrop: 'static' });
     }
 
     static updateResults() {

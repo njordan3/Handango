@@ -23,7 +23,7 @@ export class LessonQuizComponent implements OnInit {
     //grab route data set in lesson.guard
     this.activatedRoute.data.subscribe(data => {
       this.lesson_num = data.lesson_num;
-      launch(data.lesson); //build all the lessons after the HTML template has loaded
+      launch(data.lesson, data.time); //build all the lessons after the HTML template has loaded
 
       let that = this;
       
