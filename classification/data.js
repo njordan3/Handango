@@ -1,4 +1,5 @@
-const tf = require('@tensorflow/tfjs-node-gpu');
+
+const tf = require('@tensorflow/tfjs-node');
 const fs = require('fs');
 const path = require('path');
 
@@ -19,6 +20,13 @@ function loadImages(dataDir) {
     }
 
 
+    // if (files[i].toLocaleLowerCase().startsWith("A1")) {
+    //   labels.push(0);
+    // } else if (files[i].toLocaleLowerCase().startsWith("B1")) {
+    //   labels.push(1);
+    // }
+
+
     var filePath = path.join(dataDir, files[i]);
 
     var buffer = fs.readFileSync(filePath);
@@ -33,10 +41,19 @@ function loadImages(dataDir) {
     images.push(imageTensor);
 
 
-    if (files[i].toLocaleLowerCase().startsWith("hello")) {
+    // if (files[i].toLocaleLowerCase().startsWith("hello")) {
+    //   labels.push(0);
+    // } else if (files[i].toLocaleLowerCase().startsWith("thanks")) {
+    //   labels.push(1);
+    // }
+    if (files[i].toLocaleLowerCase().startsWith("a1")) {
       labels.push(0);
-    } else if (files[i].toLocaleLowerCase().startsWith("thanks")) {
+    } else if (files[i].toLocaleLowerCase().startsWith("b1")) {
       labels.push(1);
+    } else if (files[i].toLocaleLowerCase().startsWith("c1")) {
+      labels.push(2);
+    } else if (files[i].toLocaleLowerCase().startsWith("d1")) {
+      labels.push(3);
     }
   }
     return [images, labels];
@@ -51,8 +68,9 @@ class AslDataset {
 
 
   loadData() {
-    console.log('Loading images...');
+    console.log('Loading train images...');
     this.trainData = loadImages(TRAIN_IMAGES_DIR);
+    console.log('Loading test images...');
     this.testData = loadImages(TEST_IMAGES_DIR);
     console.log('Images loaded successfully');
   }
