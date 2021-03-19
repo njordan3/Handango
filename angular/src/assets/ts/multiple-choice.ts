@@ -92,7 +92,7 @@ export class MultipleChoice {
         this.done = (this.answers_correct === this.answers_count);
         console.log(this.done);
         
-        let lesson_num: number = parseInt(window.location.pathname.split('/')[1].charAt(6));
+        let lesson_num: number = parseInt(window.location.pathname.split('/')[2].charAt(6));
         let types = ["MultipleChoice", "MultipleChoiceNumbers", "MultipleChoiceQuestions"];
         if (this.setAnswer) this.setAnswer({type: types[lesson_num-1], id: this.ans_id, answers: sendAnswers});
     }

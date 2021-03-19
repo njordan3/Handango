@@ -5,6 +5,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Login2FAModal } from './login-2FA-modal.component';
 import { Activate2FAModal } from './activate-2FA-modal.component';
 import { Router, ActivatedRoute } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'login-signup',
@@ -26,7 +27,8 @@ export class LoginSignupComponent implements OnInit {
 
   doLogin(model: User, isValid: boolean|null) {
     if (isValid) {
-      this.authService.doLogin(model.email, model.password)
+      if (environment.live) {
+        this.authService.doLogin(model.email, model.password)
         .then((resp) => {
           console.log(resp);
           if (resp.twoFactor) {
@@ -41,6 +43,9 @@ export class LoginSignupComponent implements OnInit {
         .catch((err) => {
           this.toastr.error(err);
         });
+      } else {
+        this.router.navigate(['/dashboard'], { relativeTo: this.route });
+      }
     } else {
       this.toastr.error('Form data is invalid...');
     }
@@ -51,15 +56,20 @@ export class LoginSignupComponent implements OnInit {
   }
 
   doFacebook() {
-    console.log("Facebook");
-    this.authService.doFacebook();
+    if (environment.live) {
+      this.authService.doFacebook();
+    } else {
+      this.router.navigate(['/dashboard'], { relativeTo: this.route });
+    }
   }
 
   doGoogle() {
-    console.log("Google");
-    this.authService.doGoogle();
+    if (environment.live) {
+      this.authService.doGoogle();
+    } else {
+      this.router.navigate(['/dashboard'], { relativeTo: this.route });
+    }
   }
-
 }
 
 interface User {

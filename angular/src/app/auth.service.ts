@@ -182,7 +182,7 @@ export class AuthService {
     });
   }
 
-  //used in login.guard
+  //used in login.guard and dashboard.guard
   getLogin(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.http.get(environment.domainUrl + '/login', {

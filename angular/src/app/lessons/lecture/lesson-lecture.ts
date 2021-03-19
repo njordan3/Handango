@@ -2,7 +2,7 @@ import {io} from 'socket.io-client';
 import { environment } from './../../../environments/environment';
 
 //get lesson info from URL
-let lesson_num: number = parseInt(window.location.pathname.split('/')[1].charAt(6));
+let lesson_num: number = 1;
 
 var slideIndex: number = 1;
 //////////////////////////////[SOCKET.IO]//////////////////////////////
@@ -22,6 +22,7 @@ function sendProgress() {
 var buttonInfo: any;
 export function launch(slide: number): Promise<void> {
     return new Promise((resolve, reject) => {
+        lesson_num = parseInt(window.location.pathname.split('/')[2].charAt(6));
         //dynamic import lesson slides
         import(`./lesson${lesson_num}-lecture.html`).then(lecture => {
             document.getElementsByClassName('slideshow-container')[0].innerHTML += lecture.html;
@@ -69,9 +70,9 @@ export function launch(slide: number): Promise<void> {
 
 export function complete() {
     if (environment.live)
-        window.location.href = `https://duohando.com/lesson${lesson_num}/practice`;
+        window.location.href = `https://duohando.com/dashboard/lesson${lesson_num}/practice`;
     else
-        window.location.href = `http://localhost:4200/lesson${lesson_num}/practice`;
+        window.location.href = `http://localhost:4200/dashboard/lesson${lesson_num}/practice`;
 }
 
 export function goBack() {

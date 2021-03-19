@@ -15,8 +15,8 @@ import { Webcam } from 'src/assets/ts/web-cam';
 import { SelectQuestions } from 'src/assets/ts/select-questions';
 
 //get lesson info from URL
-let lesson_num: number = parseInt(window.location.pathname.split('/')[1].charAt(6));
-let part = window.location.pathname.split('/')[2];
+let lesson_num: number = parseInt(window.location.pathname.split('/')[2].charAt(6));
+let part = window.location.pathname.split('/')[3];
 
 //////////////////////////////[SOCKET.IO]//////////////////////////////
 var socket = io('https://duohando.com:3000', {
@@ -212,7 +212,7 @@ export function getAnswers(): any {
 export function goBack() {
     callStop();
     if (environment.live)
-        window.location.href = `https://duohando.com/lesson${lesson_num}/practice`;
+        window.location.href = `https://duohando.com/dashboard/lesson${lesson_num}/practice`;
     else
-        window.location.href = `http://localhost:4200/lesson${lesson_num}/practice`;
+        window.location.href = `http://localhost:4200/dashboard/lesson${lesson_num}/practice`;
 }

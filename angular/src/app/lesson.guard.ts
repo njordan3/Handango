@@ -33,7 +33,7 @@ export class LessonGuard implements CanLoad {
       });
     } else {
       route.data = {lesson: [
-        {type: "WebCam", phrases: "G"},
+        {type: "WebCam", phrase: "G"},
         {type: "DragDrop", phrases: ["J", "B", "Z"]},
         {type: "FingerSpellingInterp", phrases: ["food", "drink", "napkin"]},
         {type: "FingerSpelling", phrases: ["food", "drink", "napkin"]},
@@ -69,7 +69,7 @@ export class LessonGuard implements CanLoad {
               correct: 0
           }
       ]}
-      ], slide: 1, lesson_num: segments[0].path[6]};
+      ], slide: 1, lesson_num: segments[0].path[6], time: 10};
       return true;
     }
   }

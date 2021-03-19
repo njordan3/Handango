@@ -14,8 +14,8 @@ import { Webcam } from 'src/assets/ts/web-cam';
 import { SelectQuestions } from 'src/assets/ts/select-questions';
 
 //get lesson info from URL
-let lesson_num: number = parseInt(window.location.pathname.split('/')[1].charAt(6));
-let part: string = window.location.pathname.split('/')[2];
+let lesson_num: number = parseInt(window.location.pathname.split('/')[2].charAt(6));
+let part: string = window.location.pathname.split('/')[3];
 let practice_id: number;
 
 var slideIndex: number = 1;
@@ -25,7 +25,7 @@ var socket = io('https://duohando.com:3000', {
 });
 
 socket.on('complete-confirmation', function() {
-    window.location.href = `https://duohando.com/lesson${lesson_num}/quiz`;
+    window.location.href = `https://duohando.com/dashboard/lesson${lesson_num}/quiz`;
 });
 
 function sendProgress() {
@@ -39,7 +39,7 @@ export function sendComplete() {
     if (environment.live)
         socket.emit(`${part}-complete`, {lesson: lesson_num});
     else
-        window.location.href = `http://localhost:4200/lesson${lesson_num}/quiz`;
+        window.location.href = `http://localhost:4200/dashboard/lesson${lesson_num}/quiz`;
 }
 
 function setAnswer(msg: any) {
@@ -163,7 +163,7 @@ export function getAnswers(): any {
 export function goBack() {
     callStop();
     if (environment.live)
-        window.location.href = `https://duohando.com/lesson${lesson_num}/lecture`;
+        window.location.href = `https://duohando.com/dashboard/lesson${lesson_num}/lecture`;
     else
-        window.location.href = `http://localhost:4200/lesson${lesson_num}/lecture`;
+        window.location.href = `http://localhost:4200/dashboard/lesson${lesson_num}/lecture`;
 }
