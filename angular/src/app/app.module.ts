@@ -24,6 +24,11 @@ import { ConfirmComponent } from './confirm/confirm.component';
 import { Login2FAModal } from './login-signup/login-2FA-modal.component';
 import { Activate2FAModal } from './login-signup/activate-2FA-modal.component';
 import { TwoFactorModal } from './login-signup/2FA-modal.component';
+import { UserProfileComponent } from './user-profile/user-profile.component';
+import { AboutComponent } from './about/about.component';
+import { SecuritySettingsComponent } from './security-settings/security-settings.component';
+import { NavBarComponent } from './nav-bar/nav-bar.component';
+import { UserSettingsComponent } from './user-settings/user-settings.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +42,12 @@ import { TwoFactorModal } from './login-signup/2FA-modal.component';
     ResetPasswordComponent,
     EqualValidator,
     ForgetEmailComponent,
-    ConfirmComponent
+    ConfirmComponent,
+    UserProfileComponent,
+    AboutComponent,
+    SecuritySettingsComponent,
+    NavBarComponent,
+    UserSettingsComponent
   ],
   imports: [
     BrowserModule,

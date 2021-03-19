@@ -6,10 +6,14 @@ import { RegisterComponent } from './register/register.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { ForgetEmailComponent } from './forget-email/forget-email.component';
 import { ConfirmComponent } from './confirm/confirm.component';
+import { UserProfileComponent } from './user-profile/user-profile.component';
+import { SecuritySettingsComponent } from './security-settings/security-settings.component';
+import { UserSettingsComponent } from './user-settings/user-settings.component';
 
 import { LoginGuard } from './login.guard';
 import { LessonGuard } from './lesson.guard';
 import { VerifyGuard } from './verify.guard';
+import { from } from 'rxjs';
 
 const routes: Routes = [
   {path: "", pathMatch: "full", redirectTo: "/home"},
@@ -21,6 +25,9 @@ const routes: Routes = [
   {path: "forgetEmail", component: ForgetEmailComponent},
   {path: "verify", canActivate: [VerifyGuard]},
   {path: "confirm", component: ConfirmComponent},
+  {path: "userProfile", component: UserProfileComponent},
+  {path: "securitySettings", component: SecuritySettingsComponent},
+  {path: "Settings", component: UserSettingsComponent},
 
   ///////////////[LESSON 1]///////////////
   {path: "lesson1", pathMatch: "full", redirectTo: "lesson1/lecture"},
