@@ -1,4 +1,5 @@
 #ignore all these folders
+classification/data
 .vscode/
 build/
 c++/
