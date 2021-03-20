@@ -41,11 +41,6 @@ function loadImages(dataDir) {
     images.push(imageTensor);
 
 
-    // if (files[i].toLocaleLowerCase().startsWith("hello")) {
-    //   labels.push(0);
-    // } else if (files[i].toLocaleLowerCase().startsWith("thanks")) {
-    //   labels.push(1);
-    // }
     if (files[i].toLocaleLowerCase().startsWith("a1")) {
       labels.push(0);
     } else if (files[i].toLocaleLowerCase().startsWith("b1")) {
@@ -131,7 +126,7 @@ class AslDataset {
   getTestData() {
     return {
       images: tf.concat(this.testData[0]),
-      labels: tf.oneHot(tf.tensor1d(this.testData[1], 'int32'), 4).toFloat()
+      labels: tf.oneHot(tf.tensor1d(this.testData[1], 'int32'), 26).toFloat()
     }
   }
 }
