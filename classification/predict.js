@@ -68,7 +68,7 @@ const run = async function () {
   			};
   		}).sort(function (a, b) {
   			return b.probability - a.probability;
-  		}).slice(0, 5);
+  		}).slice(0, 2);
 
 
     	top5.forEach(function (p) {

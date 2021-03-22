@@ -11,7 +11,7 @@ async function run(epochs, batchSize, modelSavePath) {
 
   model.summary();
 
-  const validationSplit = 0.15;
+  const validationSplit = 0.20;
   await model.fit(trainImages, trainLabels, {
     epochs,
     batchSize,
@@ -32,4 +32,4 @@ async function run(epochs, batchSize, modelSavePath) {
   }
 }
 
-run(100, 32, './model');
+run(50, 32, './model');
