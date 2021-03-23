@@ -21,9 +21,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ForgetEmailComponent } from './forget-email/forget-email.component';
 
 import { ConfirmComponent } from './confirm/confirm.component';
-import { Login2FAModal } from './login-signup/login-2FA-modal.component';
-import { Activate2FAModal } from './login-signup/activate-2FA-modal.component';
-import { TwoFactorModal } from './login-signup/2FA-modal.component';
+import { Login2FAModal } from './two-factor-auth/login-2FA-modal.component';
+import { TwoFactorModal } from './two-factor-auth/2FA-modal.component';
 import { AboutComponent } from './about/about.component';
 
 import { NavBarComponent } from './nav-bar/nav-bar.component';
@@ -34,7 +33,6 @@ import { NavBarComponent } from './nav-bar/nav-bar.component';
     HomeComponent,
     LoginSignupComponent,
     Login2FAModal,
-    Activate2FAModal,
     TwoFactorModal,
     RegisterComponent,
     ResetPasswordComponent,

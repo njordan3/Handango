@@ -7,6 +7,7 @@ import { SecuritySettingsComponent } from '../security-settings/security-setting
 import { UserSettingsComponent } from '../user-settings/user-settings.component';
 
 import { LessonGuard } from '../lesson.guard';
+import { SettingsGuard } from '../settings.guard';
 
 const routes: Routes = [
   {
@@ -15,6 +16,7 @@ const routes: Routes = [
         {path: "", pathMatch: "full", component: DashboardComponent},
         {path: "userProfile", pathMatch: "full", component: UserProfileComponent},
         {path: "securitySettings", pathMatch: "full", component: SecuritySettingsComponent},
+        {path: "GuardedSettings", canActivate: [SettingsGuard]},
         {path: "Settings", pathMatch: "full", component: UserSettingsComponent},
       
         ///////////////[LESSON 1]///////////////

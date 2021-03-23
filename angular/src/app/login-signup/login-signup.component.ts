@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Login2FAModal } from './login-2FA-modal.component';
-import { Activate2FAModal } from './activate-2FA-modal.component';
+import { Login2FAModal } from '../two-factor-auth/login-2FA-modal.component';
 import { Router, ActivatedRoute } from '@angular/router';
 import { environment } from 'src/environments/environment';
 
@@ -32,9 +31,7 @@ export class LoginSignupComponent implements OnInit {
         .then((resp) => {
           console.log(resp);
           if (resp.twoFactor) {
-            this.modalService.open(Login2FAModal, { centered: true, animation: true, keyboard: false, backdrop: 'static' });
-            //this.modalService.open(Activate2FAModal, { centered: true, animation: true, keyboard: false, backdrop: 'static', size: "lg" });
-            
+            this.modalService.open(Login2FAModal, { centered: true, animation: true, keyboard: false, backdrop: 'static' });            
           } else {
             this.toastr.success(`Welcome ${resp.name}!`);
             this.router.navigate(['/dashboard'], { relativeTo: this.route });

@@ -78,14 +78,10 @@ function isLoggedIn(req, res, next) {
             continue with the request by calling next();
 */
 function just2FAd(req, res, next) {
-    if (req.session.passport.user.secret === null) {
+    if (req.session.passport.user.secret === null || req.body.just2FAd) {
         return next();
     }
-    if (!req.session.passport.user.just2FAd) {
-        console.log("Was not just 2FAd");
-        return res.json({just2FAd: false})
-    }
-    return next();
+    return res.json({loggedIn: true, twoFactor: true});
 }
 
 function isExternalUser(req, res, next) {
@@ -117,7 +113,7 @@ function isNotFacebookUser(req, res, next) {
 }
 
 function isEmailPassUser(req, res, next) {
-    if (req.session.passport.user.type === null && req.session.passport.user.id === null) {
+    if (req.session.passport.user.type === null && req.session.passport.user.ext_id === null) {
         return next();
     }
 

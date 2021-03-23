@@ -20,7 +20,7 @@ function initSocketIO(session, io) {
         //check if logged in
         if (socket.handshake.session.passport) {
             socket.email = socket.handshake.session.passport.user.email;
-            socket.id = socket.handshake.session.passport.user.id;
+            socket.ext_id = socket.handshake.session.passport.user.ext_id;
             socket.on('lecture-progress', function(data) {
                 db.setLectureProgress(socket.email, socket.ext_id, data.slide, data.lesson)
                     .catch(function(err) {

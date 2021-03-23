@@ -41,13 +41,11 @@ export class TwoFactorModal {
         if (isValid) {
             this.authService.do2FACheck(model.code as number)
                 .then((resp) => {
-                    //this.toastr.success(`Welcome ${resp.name}!`);
                     this.modalService.dismissAll();
-                    //this.router.navigate(['/dashboard'], { relativeTo: this.route });
                 })
                 .catch((err) => {
                     this.toastr.error(err);
-                })
+                });
         } else {
             this.toastr.error('Form data is invalid...');
         }

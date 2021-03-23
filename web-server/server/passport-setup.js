@@ -60,25 +60,12 @@ module.exports = function(passport) {
                 })
                 .then(function(row) { return db.Login(row); })
                 .then(function(row) { 
-                    //organize lessons into array of JSONs
-                    /*
-                    let desc = row.lesson_desc.split(",");
-                    let unlock_date = row.lesson_udate.split(",");
-                    let lecture_prog = row.lesson_lectprog.split(",");
-                    let practice_prog = row.lesson_practprog.split(",");
-                    let practice_comp = row.lesson_practcomp.split(",");
-                    let complete = row.lesson_complete.split(",");
-                    let lessons = [];
-                    for (let i = 0; i < desc.length; i++) { 
-                        lessons[i] = { 
-                            desc: desc[i], unlock_date: unlock_date[i],
-                            lecture_prog: lecture_prog[i], practice_prog: practice_prog[i],
-                            practice_complete: practice_comp[i], complete: complete[i]
-                        };
-                    }
-                    */
-                    //return done(null, {email: row.email, name: row.fname, type: row.external_type, id: row.external_id, secret: row.twofactor_secret, just2FAd: false, lessons: lessons});
-                    return done(null, { id: row.id, email: row.email, name: row.fname, type: row.external_type, ext_id: row.external_id, secret: row.twofactor_secret, just2FAd: false });
+                    return done(null, {
+                        id: row.id, email: row.email, fname: row.fname, lname: row.lname,
+                        type: row.external_type, ext_id: row.external_id,
+                        secret: row.twofactor_secret, username: row.username,
+                        last_login: row.last_login, create_time: row.create_time,
+                    }); 
                 })
                 .catch(function(err) {
                     console.log(err);
@@ -99,7 +86,7 @@ module.exports = function(passport) {
                     let fullName = profile.name.split(' ');
                     let params = [
                         fullName[0], fullName[fullName.length-1],
-                        req.session.passport.user.username, profile.email,
+                        req.session.passport.user.email, profile.email,
                         null,
                         randomString({length: 128, type: 'url-safe'}),
                         null,
@@ -108,12 +95,14 @@ module.exports = function(passport) {
                     ];
                     return db.changeLoginType(params);
                 })
-                .then(function(row) {
-                    if (req.session.passport.user.secret !== null) {
-                        return Promise.resolve({email: row.email, name: row.fname, type: row.external_type, id: row.external_id, secret: row.twofactor_secret});
-                    } else { return Promise.resolve({email: row.email, id: row.external_id}); }
+                .then(function(row) { 
+                    return done(null, {
+                        id: row.id, email: row.email, fname: row.fname, lname: row.lname,
+                        type: row.external_type, ext_id: row.external_id,
+                        secret: row.twofactor_secret, username: row.username,
+                        last_login: row.last_login, create_time: row.create_time,
+                    }); 
                 })
-                .then(function(row) { return done(null, row); })
                 .catch(function(err) {
                     console.log(err);
                     return done(null, false, {error: err});
@@ -148,27 +137,13 @@ module.exports = function(passport) {
                     else { return Promise.resolve(row); }
                 })
                 .then(function(row) { return db.Login(row); })
-                .then(function(row) {
-                    /*
-                    //organize lessons into array of JSONs
-                    let desc = row.lesson_desc.split(",");
-                    let unlock_date = row.lesson_udate.split(",");
-                    let lecture_prog = row.lesson_lectprog.split(",");
-                    let practice_prog = row.lesson_practprog.split(",");
-                    let practice_comp = row.lesson_practcomp.split(",");
-                    let complete = row.lesson_complete.split(",");
-                    let lessons = [];
-                    for (let i = 0; i < desc.length; i++) { 
-                        lessons[i] = { 
-                            desc: desc[i], unlock_date: unlock_date[i],
-                            lecture_prog: lecture_prog[i], practice_prog: practice_prog[i],
-                            practice_complete: practice_comp[i], complete: complete[i]
-                        };
-                    }
-
-                    return done(null, {email: row.email, name: row.fname, type: row.external_type, id: row.external_id, secret: row.twofactor_secret, just2FAd: false, lessons: lessons});
-                    */
-                    return done(null, { id: row.id, email: row.email, name: row.fname, type: row.external_type, ext_id: row.external_id, secret: row.twofactor_secret, just2FAd: false });
+                .then(function(row) { 
+                    return done(null, {
+                        id: row.id, email: row.email, fname: row.fname, lname: row.lname,
+                        type: row.external_type, ext_id: row.external_id,
+                        secret: row.twofactor_secret, username: row.username,
+                        last_login: row.last_login, create_time: row.create_time,
+                    }); 
                 })
                 .catch(function(err) {
                     console.log(err);
@@ -190,7 +165,7 @@ module.exports = function(passport) {
                     let fullName = profile.name.split(' ');
                     let params = [
                         fullName[0], fullName[fullName.length-1],
-                        req.session.passport.user.username, profile.email,
+                        req.session.passport.user.email, profile.email,
                         null,
                         randomString({length: 128, type: 'url-safe'}),
                         null,
@@ -199,12 +174,14 @@ module.exports = function(passport) {
                     ];
                     return db.changeLoginType(params);
                 })
-                .then(function(row) {
-                    if (req.session.passport.user.secret !== null) {
-                        return Promise.resolve({email: row.email, name: row.fname, type: row.external_type, id: row.external_id, secret: row.twofactor_secret});
-                    } else { return Promise.resolve({username: row.email, id: row.external_id}); }
+                .then(function(row) { 
+                    return done(null, {
+                        id: row.id, email: row.email, fname: row.fname, lname: row.lname,
+                        type: row.external_type, ext_id: row.external_id,
+                        secret: row.twofactor_secret, username: row.username,
+                        last_login: row.last_login, create_time: row.create_time,
+                    }); 
                 })
-                .then(function(row) { return done(null, row); })
                 .catch(function(err) {
                     console.log(err);
                     return done(null, false, {error: err});
@@ -230,26 +207,13 @@ module.exports = function(passport) {
                     return db.comparePassword(email, password, row);
                 })
                 .then(function(row) { return db.Login(row); })
-                .then(function(row) {
-                    /*
-                    //organize lessons into array of JSONs
-                    let desc = row.lesson_desc.split(",");
-                    let unlock_date = row.lesson_udate.split(",");
-                    let lecture_prog = row.lesson_lectprog.split(",");
-                    let practice_prog = row.lesson_practprog.split(",");
-                    let practice_comp = row.lesson_practcomp.split(",");
-                    let complete = row.lesson_complete.split(",");
-                    let lessons = [];
-                    for (let i = 0; i < desc.length; i++) { 
-                        lessons[i] = { 
-                            desc: desc[i], unlock_date: unlock_date[i],
-                            lecture_prog: lecture_prog[i], practice_prog: practice_prog[i],
-                            practice_complete: practice_comp[i], complete: complete[i]
-                        };
-                    }
-                    return done(null, {email: email, name: row.fname, type: null, id: null, secret: row.twofactor_secret, just2FAd: false, lessons: lessons});
-                    */
-                    return done(null, { id: row.id, email: row.email, name: row.fname, type: row.external_type, ext_id: row.external_id, secret: row.twofactor_secret, just2FAd: false });
+                .then(function(row) { 
+                    return done(null, {
+                        id: row.id, email: row.email, fname: row.fname, lname: row.lname,
+                        type: row.external_type, ext_id: row.external_id,
+                        secret: row.twofactor_secret, username: row.username,
+                        last_login: row.last_login, create_time: row.create_time,
+                    }); 
                 })
                 .catch(function(err) {
                     console.log(err);

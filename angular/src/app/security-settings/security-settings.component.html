@@ -7,7 +7,7 @@
                     <div class="user-info">
                         <img class="img-profile img-circle img-responsive center-block" src="https://cambodiaict.net/wp-content/uploads/2019/12/computer-icons-user-profile-google-account-photos-icon-account.jpg" alt="">
                         <ul class="meta list list-unstyled">
-                            <li class="name">John Doe</li>
+                            <li class="name">{{FirstName}} {{LastName}}</li>
                         </ul>
                     </div>
             		<nav class="side-menu">
@@ -23,33 +23,77 @@
                 <div class="content-panel">
                     <h2 class="title">Security</h2>
                     <form class="form-horizontal">
-                        <fieldset class="fieldset">
+                        <fieldset class="fieldset" [hidden]="AccountType != null && Live">
                             <h3 class="fieldset-title">Change your current password</h3>
 
-                            <div class="form-group">
-                                <label class="col-md-2 col-md-3 col-xs-12 control-label">Current Password</label>
-                                <div class="col-md-10 col-sm-9 col-xs-12">
-                                    <input type="text" class="form-control" value="Current Password">
+                            <form #changePasswordForm="ngForm" novalidate (ngSubmit)="doChangePassword(changePasswordForm.value, changePasswordForm.valid)" id="change-password-form" role="form" autocomplete="off" class="form">
+                                <div class="form-group">
+                                    <label class="col-md-2 col-md-3 col-xs-12 control-label">Current Password</label>
+                                    <div class="col-md-10 col-sm-9 col-xs-12">
+                                        <input name="password" class="form-control" placeholder="Current Password" type="password"
+                                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[-+_!@#$%^&*.,?]).{8,}"
+                                        [ngModel]="user.password" required #password="ngModel">
+                                    </div>
                                 </div>
-                            </div>
-        
-                            <div class="form-group">
-                                <label class="col-md-2 col-sm-3 col-xs-12 control-label">New Password</label>
-                                <div class="col-md-10 col-sm-9 col-xs-12">
-                                    <input type="text" class="form-control" value="New Password">
+                                <!--Validation error messages-->
+                                <div class="form-group input-group" [hidden]="password.valid || (password.pristine && !changePasswordForm.submitted)">
+                                    <small class="text-danger">
+                                        Current password is required and format take the form of:
+                                        <ul>
+                                            <li>At least 8 characters</li>
+                                            <li>At least 1 uppercase or lowercase</li>
+                                            <li>At least 1 symbol (-+_!@#$%^&*.,?)</li>
+                                        </ul>
+                                    </small>
+                                </div> <!-- form-group// -->
+            
+                                <div class="form-group">
+                                    <label class="col-md-2 col-sm-3 col-xs-12 control-label">New Password</label>
+                                    <div class="col-md-10 col-sm-9 col-xs-12">
+                                        <input name="newPassword" class="form-control" placeholder="New Password" type="password"
+                                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[-+_!@#$%^&*.,?]).{8,}"
+                                        [ngModel]="user.newPassword" required validateEqual="repeatPassword" reverse="true" #newPassword="ngModel">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="col-md-10 col-sm-9 col-xs-12 col-md-push-2 col-sm-push-3 col-xs-push-0">
-                                    <input class="btn btn-primary" type="submit" value="Change Password">
+                                <!--Validation error messages-->
+                                <div class="form-group input-group" [hidden]="newPassword.valid || (newPassword.pristine && !changePasswordForm.submitted)">
+                                    <small class="text-danger">
+                                        New password is required and format take the form of:
+                                        <ul>
+                                            <li>At least 8 characters</li>
+                                            <li>At least 1 uppercase or lowercase</li>
+                                            <li>At least 1 symbol (-+_!@#$%^&*.,?)</li>
+                                        </ul>
+                                    </small>
+                                </div> <!-- form-group// -->
+
+                                <div class="form-group">
+                                    <label class="col-sm-3 col-xs-12 control-label">Confirm New Password</label>
+                                    <div class="col-md-10 col-sm-9 col-xs-12">
+                                        <input name="repeatPassword" class="form-control" placeholder="Repeat New Password" type="password"
+                                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[-+_!@#$%^&*.,?]).{8,}"
+                                        [ngModel]="user.repeatPassword" required validateEqual="newPassword" reverse="false" #repeatPassword="ngModel">
+                                    </div>
                                 </div>
-                            </div>
-                          
+                                <!--Validation error messages-->
+                                <div class="form-group input-group" [hidden]="repeatPassword.valid || (repeatPassword.pristine && !changePasswordForm.submitted)" class="text-danger">
+                                    <small>
+                                        Passwords need to match and maintain the same format
+                                    </small>
+                                </div> <!-- form-group// -->
+
+                                <div class="form-group">
+                                    <div class="col-md-10 col-sm-9 col-xs-12 col-md-push-2 col-sm-push-3 col-xs-push-0">
+                                        <button class="btn btn-primary" [disabled]="!changePasswordForm.valid" type="submit">Change Password</button>
+                                    </div>
+                                </div>
+                            </form>
+
                         </fieldset>
                         <hr>
-                        <div class="form-group">
+                        <div class="form-group" [hidden]="TwoFactored && Live">
                             <div class="col-md-10 col-sm-9 col-xs-12 col-md-push-2 col-sm-push-3 col-xs-push-0">
-                                <input class="btn btn-success" type="submit" value="Enable Two-Factor Authentication">
+                                <button class="btn btn-success" (click)="enable2FA()">Enable Two-Factor Authentication</button>
                             </div>
                         </div>
                     </form>

@@ -133,10 +133,18 @@ export class AuthService {
     });
   }
 
-  logout() {
-    this.http.post(environment.domainUrl + '/logout', {}, {
-      withCredentials: true
-    }).subscribe(() => { });
+  logout(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.post(environment.domainUrl + '/logout', {}, {
+        withCredentials: true
+      }).subscribe(() => { 
+        //'sleep' before going home so that there is time for the message to be seen
+        setTimeout(function() {
+          window.location.href = `https://duohando.com/home`;
+        }, 2000);
+        resolve();
+      });
+    });
   }
 
   doForgotPassword(email: string) {
@@ -152,6 +160,72 @@ export class AuthService {
     }, (errorResp) => {
       this.toastr.error("Something went wrong searching for that email...");
     });
+  }
+
+  doChangePassword(data: any, just2FAd: boolean): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.http.post(environment.domainUrl + '/changePassword', {
+        password: data.password,
+        password_new: data.newPassword,
+        just2FAd: just2FAd
+      }, {
+        withCredentials: true
+      }).subscribe((resp: any) => {
+        if (resp.error) {
+          reject(resp.error)
+        }
+        resolve(resp);
+      }, (errorResp) => {
+        resolve({loggedIn: true, error: "Something went wrong changing your password..."});
+      });
+    });
+  }
+
+  doChangeEmail(data: any, just2FAd: boolean): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.http.post(environment.domainUrl + '/changeEmail', {
+        email: data.email,
+        email_new: data.newEmail,
+        just2FAd: just2FAd
+      }, {
+        withCredentials: true
+      }).subscribe((resp: any) => {
+        if (resp.error) {
+          reject(resp.error)
+        }
+        resolve(resp);
+      }, (errorResp) => {
+        resolve({loggedIn: true, error: "Something went wrong changing your email..."});
+      });
+    });
+  }
+
+  doChangeToEmail(data: any, just2FAd: boolean): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.http.post(environment.domainUrl + '/changeToEmail', {
+        email: data.email,
+        password: data.password,
+        username: data.username,
+        just2FAd: just2FAd
+      }, {
+        withCredentials: true
+      }).subscribe((resp: any) => {
+        if (resp.error) {
+          reject(resp.error)
+        }
+        resolve(resp);
+      }, (errorResp) => {
+        resolve({loggedIn: true, error: "Something went wrong changing your account to email..."});
+      });
+    });
+  }
+
+  doChangeToFacebook(just2FAd: boolean): void {
+    window.location.href = environment.domainUrl+`/changeToFacebook?just2FAd=${just2FAd ? "true" : "false"}`;
+  }
+
+  doChangeToGoogle(just2FAd: boolean): void {
+    window.location.href = environment.domainUrl+`/changeToGoogle?just2FAd=${just2FAd ? "true" : "false"}`;
   }
 
   doConfirm(data: any, type: string, secret: string): Promise<any> {
@@ -217,5 +291,4 @@ export class AuthService {
       })
     });
   }
-
 }

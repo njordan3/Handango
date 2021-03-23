@@ -4,7 +4,7 @@ const db = require('./db');
 const bcrypt = require('bcrypt');
 const mailer = require('./email');
 
-let {isLoggedIn} = require('./middleware');
+let { isLoggedIn } = require('./middleware');
 
 
 module.exports = {
@@ -32,9 +32,9 @@ function initSecurityRoutes(app, passport) {
         });
     
         if (result) {
-            return res.json({message: "Two-Factor verification successful."});
+            res.json({message: "Two-Factor verification successful. Action complete."});
         } else {
-            return res.json({error: "Incorrect code. Try again."});
+            res.json({error: "Incorrect code. Try again."});
         }
     });
 
@@ -65,12 +65,10 @@ function initSecurityRoutes(app, passport) {
         }
     })
 
-    //isLoggedIn middlware
-    app.get('/getActivate2FAData', function(req, res) {
+    app.get('/getActivate2FAData', isLoggedIn, function(req, res) {
         var secret = speakeasy.generateSecret({length: 20});
         QRCode.toDataURL(secret.otpauth_url)
             .then(function(url) {
-                //req.session.passport.user.two = {qrcode: url, secret: secret.base32};
                 req.session.two = {qrcode: url, secret: secret.base32};
                 req.session.save();
                 res.json({qrcode: url, secret: secret.base32});
@@ -81,8 +79,7 @@ function initSecurityRoutes(app, passport) {
             });
     });
 
-    //isLoggedIn middlware
-    app.post('/tryActivate2FA', function(req, res) {
+    app.post('/tryActivate2FA', isLoggedIn, function(req, res) {
         //debug
         let t = speakeasy.totp({
             //secret: req.session.passport.user.two.secret,
@@ -93,7 +90,6 @@ function initSecurityRoutes(app, passport) {
         ///////////
 
         let result = speakeasy.totp.verify({
-            //secret: req.session.passport.user.two.secret,
             secret: req.session.two.secret,
             encoding: 'base32',
             token: req.body.code
@@ -101,20 +97,13 @@ function initSecurityRoutes(app, passport) {
     
         if (result) {
             let params = [
-                //req.session.passport.user.username,
-                //req.session.passport.user.id,
-                //req.session.passport.user.two.secret
-                req.session.temp.email,
-                req.session.temp.id,
+                req.session.passport.user.email,
+                req.session.passport.user.ext_id,
                 req.session.two.secret
             ];
             db.add2FA(params)
                 .then(() => {
-                    /*
-                    req.session.passport.user.secret = req.session.passport.user.two.secret;
-                    //delete temporary 2FA data in session
-                    delete req.session.passport.user.temp;
-                    */
+                    req.session.passport.user.secret = req.session.two.secret;
                     delete req.session.two;
                     req.session.save();
                     res.json({});

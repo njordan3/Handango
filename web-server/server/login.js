@@ -33,7 +33,7 @@ function initLoginRoutes(app, passport) {
         })(req, res, next);
     });
     app.get('/login', function(req, res) {
-        res.json({loggedIn: (req.session.passport !== undefined)})
+        res.json({loggedIn: req.isAuthenticated()})
     });
 
     app.get('/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
