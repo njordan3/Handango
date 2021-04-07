@@ -14,8 +14,9 @@ async function run(epochs, batchSize, modelSavePath) {
   const validationSplit = 0.20;
   await model.fit(trainImages, trainLabels, {
     epochs,
+    shuffle: true,
     batchSize,
-    validationSplit
+    validationSplit,
   });
 
   const {images: testImages, labels: testLabels} = data.getTestData();

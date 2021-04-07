@@ -5,6 +5,8 @@ const path = require('path');
 
 const TRAIN_IMAGES_DIR = './data/train';
 const TEST_IMAGES_DIR = './data/test';
+var NUM_OF_CLASSES = 4;
+
 
 function loadImages(dataDir) {
   const images = [];
@@ -45,11 +47,11 @@ function loadImages(dataDir) {
       labels.push(0);
     } else if (files[i].toLocaleLowerCase().startsWith("b")) {
       labels.push(1);
-    } /*else if (files[i].toLocaleLowerCase().startsWith("c")) {
+    } else if (files[i].toLocaleLowerCase().startsWith("c")) {
       labels.push(2);
     } else if (files[i].toLocaleLowerCase().startsWith("d")) {
       labels.push(3);
-    } else if (files[i].toLocaleLowerCase().startsWith("e")) {
+    } /*else if (files[i].toLocaleLowerCase().startsWith("e")) {
       labels.push(4);
     } else if (files[i].toLocaleLowerCase().startsWith("f")) {
       labels.push(5);
@@ -118,7 +120,7 @@ class AslDataset {
   getTrainData() {
     return {
       images: tf.concat(this.trainData[0]),
-      labels: tf.oneHot(tf.tensor1d(this.trainData[1], 'int32'), 2).toFloat()
+      labels: tf.oneHot(tf.tensor1d(this.trainData[1], 'int32'), NUM_OF_CLASSES).toFloat()
     }
   }
 
@@ -126,7 +128,7 @@ class AslDataset {
   getTestData() {
     return {
       images: tf.concat(this.testData[0]),
-      labels: tf.oneHot(tf.tensor1d(this.testData[1], 'int32'), 2).toFloat()
+      labels: tf.oneHot(tf.tensor1d(this.testData[1], 'int32'), NUM_OF_CLASSES).toFloat()
     }
   }
 }

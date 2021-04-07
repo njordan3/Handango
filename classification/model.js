@@ -64,7 +64,7 @@ model.add(tf.layers.flatten());
 model.add(tf.layers.dense({units: 256, activation: 'relu'}));
 model.add(tf.layers.dropout({rate: dropout_dense}));
 // Control the amount of classes here!
-model.add(tf.layers.dense({units: 2, activation: 'softmax'}));
+model.add(tf.layers.dense({units: 4, activation: 'softmax'}));
 
 const optimizer = tf.train.adam(0.0001);
 model.compile({

@@ -32,7 +32,16 @@ TARGET_CLASSES = {
   24: "Y",
   25: "Z"
 };
-
+function imageBufferToTensor(imageBuffer) {
+ return tf.tidy(() => {
+ const tfimage = tf.node.decodeImage(imageBuffer);
+ return tfimage.resizeBilinear([224, 224])
+ .expandDims()
+ .toFloat()
+ .div(127)
+ .sub(1);
+ });
+}
 console.log('test');
 const run = async function () {
   if (process.argv.length < 3 ) {
@@ -43,23 +52,30 @@ const run = async function () {
     const imgpath = process.argv[2];
 
     imageFile = fs.readFileSync(imgpath);
-
-    var tensor = tf.node.decodeImage(imageFile)
-    .resizeNearestNeighbor([96,96])
-    .toFloat()
-    .div(tf.scalar(255.0))
-    .expandDims();
-
-
-
-    // Assign model path to our model's directory
-    const modelPath =  'file://./model/model.json';
-
-    console.log('Loading model...');
-
-    const model = await tf.loadLayersModel(modelPath);
-
-    let predictions = await model.predict(tensor).data();
+    const model = await tf.loadLayersModel('file://model/model.json');
+    const mobilenet = await tf.loadLayersModel('https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json');
+    const cutoffLayer = mobilenet.getLayer('conv_pw_13_relu');
+    const truncatedModel = tf.model({ inputs: mobilenet.inputs,
+   outputs: cutoffLayer.output });
+   var tensor = imageBufferToTensor(imageFile);
+   const activation = truncatedModel.predict(imageFile);
+   let predictions = await model.predict(activation).data();
+    // var tensor = tf.node.decodeImage(imageFile)
+    // .resizeNearestNeighbor([96,96])
+    // .toFloat()
+    // .div(tf.scalar(255.0))
+    // .expandDims();
+    //
+    //
+    //
+    // // Assign model path to our model's directory
+    // const modelPath =  'file://./model/model.json';
+    //
+    // console.log('Loading model...');
+    //
+    // const model = await tf.loadLayersModel(modelPath);
+    //
+    // let predictions = await model.predict(tensor).data();
   	let top5 = Array.from(predictions)
   		.map(function (p, i) { // this is Array.map
   			return {
@@ -68,7 +84,7 @@ const run = async function () {
   			};
   		}).sort(function (a, b) {
   			return b.probability - a.probability;
-  		}).slice(0, 2);
+  		}).slice(0, 4);
 
 
     	top5.forEach(function (p) {

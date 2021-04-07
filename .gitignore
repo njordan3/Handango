@@ -1,5 +1,7 @@
 #ignore all these folders
 classification/data
+transfer/data
+model/CollectedImages
 .vscode/
 build/
 c++/
