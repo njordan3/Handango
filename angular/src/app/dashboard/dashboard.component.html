@@ -1,7 +1,45 @@
-<p>dashboard works!</p>
-<ul>
-    <li><a routerLink= '/dashboard/userProfile'>Change Settings</a></li>
-    <li><a routerLink= '/dashboard/lesson1'>Lesson 1</a></li>
-    <li><a routerLink= '/dashboard/lesson2'>Lesson 2</a></li>
-    <li><a routerLink= '/dashboard/lesson3'>Lesson 3</a></li>
-</ul>
+<body id="content">
+        <section class="jumbotron text-center">
+            <div class="container">
+            <h1>Dashboard</h1>
+            <p class="lead text-muted">Welcome to your dashboard! Here you can start the interactive lessons along with seeing the progress of them. Lessons will become unlocked as they are completed 
+                </p>
+            </div>
+        </section>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm">
+                    <div class="card" style="width: 18rem;">
+                        <img src= "assets/Images/lesson1.gif" class="card-img-top" alt="lesson1">
+                        <div class="card-body">
+                            <h5 class="card-title" style="text-align: center;" >Lesson 1</h5>
+                            <p class="card-text">Welcome to lesson one where you will learn the basics of fingerspelling in the American Sign Language</p>
+                            <a routerLink= '/dashboard/lesson1' class="btn btn-success">Start Lesson</a>
+                        </div>
+                    </div>
+                </div>    
+                <div class="col-sm">
+                    <div class="card" style="width: 18rem;">
+                        <img src= "assets/Images/lesson2.jpeg" class="card-img-top" alt="lesson1">
+                        <div class="card-body">
+                            <h5 class="card-title" style="text-align: center;" >Lesson 2</h5>
+                            <p class="card-text">Lesson two consists of learning the basics of counting. Make sure to complete lesson one before moving on to this lesson </p>
+                            <a routerLink= '/dashboard/lesson2' class="btn btn-success">Start Lesson</a>
+                        </div>
+                    </div>
+                </div>    
+                <div class="col-sm">
+                    <div class="card" style="width: 18rem;">
+                        <img src= "assets/Images/lesson3.jpeg" class="card-img-top" alt="lesson1">
+                        <div class="card-body">
+                            <h5 class="card-title" style="text-align: center;">Lesson 3</h5>
+                            <p class="card-text">If you've completed lessons one and two, then you are ready to move on to lesson 3. This lessons will guide you in engaging in a conversation that consist of questions </p>
+                            <a routerLink= '/dashboard/lesson3' class="btn btn-success">Start Lesson</a>
+                        </div>
+                    </div>
+                </div>    
+            </div>
+        </div>
+            
+
+</body>
