@@ -4,8 +4,18 @@ export class Webcam {
     <div class="mySlides">
         <div class="webcam-container">
             <video class="webcam" autoplay></video>
-            <button class="start">Start</button>
-            <button class="stop">Stop</button>
+            <div class = "row">
+                <div class = "col">
+                    <div>
+                        <button type="button" style="width: 130px;" class="btn btn-success start" class="start">Start Camera</button>
+                    </div>
+                </div>
+                <div class = "col">
+                    <div>
+                        <button style="width: 130px;" type= "button" class="btn btn-danger stop" class="stop">Stop Camera</button>
+                    </div>
+                </div
+            </div>
         </div>
         <p class="wc-ASL-bank"></p>
     </div>`;
