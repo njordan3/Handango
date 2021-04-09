@@ -1,5 +1,4 @@
 const db = require('./db');
-const twoFactor = require('./security');
 const randomString = require('crypto-random-string');
 const mailer = require('./email');
 const bcrypt = require('bcrypt');
@@ -24,11 +23,23 @@ function initDashboardRoutes(app, passport) {
 
     app.get('/userInfo', isLoggedIn, function(req, res) {
         let user = req.session.passport.user;
-        res.json({
-            fname: user.fname, lname: user.lname, username: user.username,
-            type: user.type, email: user.email, two_factored: user.secret !== null,
-            last_login: user.last_login, create_time: user.create_time
-        });
+        db.getUserLessonInfo(user.id)
+            .then(function(info) {
+                res.json({
+                    lessons: info,
+                    fname: user.fname, lname: user.lname, username: user.username,
+                    type: user.type, email: user.email, two_factored: user.secret !== null,
+                    last_login: user.last_login, create_time: user.create_time
+                });
+            })
+            .catch(function(err) {
+                res.json({
+                    error: err,
+                    fname: user.fname, lname: user.lname, username: user.username,
+                    type: user.type, email: user.email, two_factored: user.secret !== null,
+                    last_login: user.last_login, create_time: user.create_time
+                });
+            });
     });
 
     app.post('/changeEmail', isLoggedIn, just2FAd, isEmailPassUser, function(req, res) {

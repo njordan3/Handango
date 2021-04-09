@@ -8,7 +8,6 @@
                         <img class="img-profile img-circle img-responsive center-block" src="https://cambodiaict.net/wp-content/uploads/2019/12/computer-icons-user-profile-google-account-photos-icon-account.jpg" alt="">
                         <ul class="meta list list-unstyled">
                             <li class="name">{{FirstName}} {{LastName}}</li>
-                            
                         </ul>
                     </div>
             		<nav class="side-menu">
@@ -23,6 +22,13 @@
                 <div class="content-panel">
                     <h2 class="title">Profile</h2>
                     <form class="form-horizontal">
+                        <fieldset class="fieldset">
+                            <h3 class="fieldset-title">Account Details</h3>
+                            <p class="text-secondary"><strong>Created on</strong>{{" "+ CreateTime}}</p>
+                            <p class="text-secondary"><strong>Last Login</strong>{{" "+ LastLogin}}</p>
+                            <p class="text-secondary"><strong>Login type</strong>{{" "+(AccountType ? AccountType : "Email/Password")}}</p>
+                        </fieldset>
+                        <br>
                         <fieldset class="fieldset">
                             <h3 class="fieldset-title">Personal Info</h3>
                             <div class="form-group avatar">
@@ -63,11 +69,8 @@
 
                                 </div>
                             </div>
-                          
-                            
                         </fieldset>
                         <hr>
-                       
                     </form>
                 </div>
             </div>

@@ -13,7 +13,7 @@ import { complete } from '../lesson-lecture';
     </div>
     <div class="modal-body" style="text-align: center">
         <p><strong>Are you sure you are ready to practice what you've learned?</strong></p>
-        <p>You can always come back to review this lecture again, but returning here from the practice session will undo any progress made in the practice.</p>
+        <p>You can always come back to review this lecture again.</p>
     </div>
     <div class="modal-footer">
         <button type="button" ngbAutofocus class="btn btn-danger" (click)="submit()" #closeBtn>Continue to Practice</button>

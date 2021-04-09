@@ -112,7 +112,7 @@ function initLessonRoutes(app) {
     app.post('/is-lesson-unlocked', isLoggedIn, function(req, res) {
         let {num, type} = req.body;
         let msg = {loggedIn: true};
-        db.getUserLessons(req.session.passport.user.id, num)
+        db.getUserLesson(req.session.passport.user.id, num)
             .then(function(lesson) {
                 let lessonDetails = lesson.shift();
                 if (lesson != undefined && lesson.length > 0) {

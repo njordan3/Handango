@@ -15,8 +15,8 @@ import { Webcam } from 'src/assets/ts/web-cam';
 import { SelectQuestions } from 'src/assets/ts/select-questions';
 
 //get lesson info from URL
-let lesson_num: number = parseInt(window.location.pathname.split('/')[2].charAt(6));
-let part = window.location.pathname.split('/')[3];
+let lesson_num: number;
+let part: string;
 
 //////////////////////////////[SOCKET.IO]//////////////////////////////
 var socket = io('https://duohando.com:3000', {
@@ -99,6 +99,10 @@ export function pauseTimer() {
 var slideIndex = 1;
 var lessons: any[] = [];
 export function launch(data: any, time: number): void {
+
+    lesson_num = parseInt(window.location.pathname.split('/')[2].charAt(6));
+    part = window.location.pathname.split('/')[3];
+
     for (let i = 0; i < Object.keys(data).length; i++) {
         switch(data[i].type) {
             case "DragDrop":

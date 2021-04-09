@@ -41,9 +41,9 @@ export class Login2FAModal {
         if (isValid) {
             this.authService.doLogin2FACheck(model.code as number)
                 .then((resp) => {
-                    this.toastr.success(`Welcome ${resp.name}!`);
                     this.modalService.dismissAll();
                     this.router.navigate(['/dashboard'], { relativeTo: this.route });
+                    this.toastr.success(`Welcome ${resp.fname}!`);
                 })
                 .catch((err) => {
                     this.toastr.error(err);

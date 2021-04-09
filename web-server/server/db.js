@@ -9,7 +9,8 @@ module.exports = {
     findUser: findUser,
     Register: Register,
     comparePassword: comparePassword,
-    getUserLessons: getUserLessons,
+    getUserLesson: getUserLesson,
+    getUserLessonInfo: getUserLessonInfo,
     getRandomQuiz: getRandomQuiz,
     setPracticeAnswer: setPracticeAnswer,
     add2FA: add2FA,
@@ -35,7 +36,8 @@ function initDB() {
         host: process.env.DB_HOST,
         user: process.env.DB_USER,
         password: process.env.DB_PASS,
-        database: process.env.DB_NAME
+        database: process.env.DB_NAME,
+        dateStrings: 'date'
     });
 
     connection.connect(function(err) {
@@ -53,14 +55,29 @@ function connectToDB() {
     });
 }
 
-function getUserLessons(id, lesson_num) {
+function getUserLesson(id, lesson_num) {
     return new Promise((resolve, reject) => {
         connection.connect(function(err) {
             if (err) { return reject(err); }
             else {
-                connection.query('CALL getUserLessons(?,?)', [id, lesson_num], function(err, result) {
+                connection.query('CALL getUserLesson(?,?)', [id, lesson_num], function(err, result) {
                     if (err) { return reject(err.sqlMessage); }
-                    if (!result[0][0]) return reject("There was a problem getting user lessons...");
+                    if (!result[0][0]) return reject("There was a problem getting user lesson...");
+                    return resolve(result[0]);
+                });
+            }
+        });
+    }); 
+}
+
+function getUserLessonInfo(id) {
+    return new Promise((resolve, reject) => {
+        connection.connect(function(err) {
+            if (err) { return reject(err); }
+            else {
+                connection.query('CALL getUserLessonInfo(?)', [id], function(err, result) {
+                    if (err) { return reject(err.sqlMessage); }
+                    if (!result[0][0]) return reject("There was a problem getting user lesson info...");
                     return resolve(result[0]);
                 });
             }
@@ -225,7 +242,8 @@ function Login(row) {
             else {
                 connection.query('CALL Login(?,?)', [row.email, row.external_id], function(err, result) {
                     if (err) { return reject(err.sqlMessage); }
-                    return resolve(row);
+                    if (result instanceof Array) { return resolve(result[0][0]); }
+                    else { return reject(`Login failed...`); }
                 });
             }
         });

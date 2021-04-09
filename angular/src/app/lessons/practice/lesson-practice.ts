@@ -14,8 +14,8 @@ import { Webcam } from 'src/assets/ts/web-cam';
 import { SelectQuestions } from 'src/assets/ts/select-questions';
 
 //get lesson info from URL
-let lesson_num: number = parseInt(window.location.pathname.split('/')[2].charAt(6));
-let part: string = window.location.pathname.split('/')[3];
+let lesson_num: number;
+let part: string;
 let practice_id: number;
 
 var slideIndex: number = 1;
@@ -49,7 +49,11 @@ function setAnswer(msg: any) {
 }
 //////////////////////////////[Lesson Setup]//////////////////////////////
 var lessons: any[] = [];
-export function launch(data: any, slide: number): void {    
+export function launch(data: any, slide: number): void {   
+    
+    lesson_num = parseInt(window.location.pathname.split('/')[2].charAt(6));
+    part = window.location.pathname.split('/')[3];
+
     slideIndex = slide;
 
     for (let i = 0; i < Object.keys(data).length; i++) {

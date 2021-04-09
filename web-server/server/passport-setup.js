@@ -138,6 +138,7 @@ module.exports = function(passport) {
                 })
                 .then(function(row) { return db.Login(row); })
                 .then(function(row) { 
+                    console.log(row);
                     return done(null, {
                         id: row.id, email: row.email, fname: row.fname, lname: row.lname,
                         type: row.external_type, ext_id: row.external_id,
