@@ -58,7 +58,7 @@ function initSecurityRoutes(app, passport) {
                 if (err) { return res.json(err); }
                 //delete temporary user in session
                 delete req.session.temp;
-                return res.json({name: req.session.passport.user.name });
+                return res.json({fname: req.session.passport.user.fname });
             });
         } else {
             return res.json({error: "Incorrect code. Try again."});

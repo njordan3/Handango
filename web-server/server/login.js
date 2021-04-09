@@ -26,7 +26,7 @@ function initLoginRoutes(app, passport) {
                 } else {
                     req.logIn(user, function(err) {
                         if (err) { return res.json(err); }
-                        return res.json({name: req.session.passport.user.name });
+                        return res.json({fname: req.session.passport.user.fname });
                     });
                 }
             }
@@ -41,12 +41,18 @@ function initLoginRoutes(app, passport) {
         passport.authenticate('google', function(err, user, info) {
             if (!user) {
                 return res.redirect(`https://duohando.com/loginSignup?err=${encodeURIComponent(info.error)}`);
-                
             } else {
-                req.logIn(user, function(err) {
-                    if (err) return res.redirect(`https://duohando.com/loginSignup?err=${encodeURIComponent(err)}`);
-                    return res.redirect("https://duohando.com/dashboard");
-                });
+                if (user.secret !== null) {
+                    //dont login but save user info in session temporarily
+                    req.session.temp = user;
+                    req.session.save();
+                    return res.redirect(`https://duohando.com/loginSignup?twoFactored=true`);
+                } else {
+                    req.logIn(user, function(err) {
+                        if (err) return res.redirect(`https://duohando.com/loginSignup?err=${encodeURIComponent(err)}`);
+                        return res.redirect(`https://duohando.com/dashboard?fname=${req.session.passport.user.fname}`);
+                    });
+                }
             }
         })(req, res, next);
     });
@@ -57,10 +63,17 @@ function initLoginRoutes(app, passport) {
             if (!user) {
                 return res.redirect(`https://duohando.com/loginSignup?err=${encodeURIComponent(info.error)}`);
             } else {
-                req.logIn(user, function(err) {
-                    if (err) return res.redirect(`https://duohando.com/loginSignup?err=${encodeURIComponent(err)}`);
-                    return res.redirect("https://duohando.com/dashboard");
-                });
+                if (user.secret !== null) {
+                    //dont login but save user info in session temporarily
+                    req.session.temp = user;
+                    req.session.save();
+                    return res.redirect(`https://duohando.com/loginSignup?twoFactored=true`);
+                } else {
+                    req.logIn(user, function(err) {
+                        if (err) return res.redirect(`https://duohando.com/loginSignup?err=${encodeURIComponent(err)}`);
+                        return res.redirect(`https://duohando.com/dashboard?fname=${req.session.passport.user.fname}`);
+                    });
+                }
             }
         })(req, res, next);
     });

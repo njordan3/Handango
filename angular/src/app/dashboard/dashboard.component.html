@@ -6,44 +6,45 @@
                 </p>
             </div>
         </section>
-        <div class="container">
-            <div class="row">
-                <div class="col-sm">
-                    <div class="card" style="width: 18rem; height: 26.5rem;">
-                        <img src= "assets/Images/lesson1.gif" class="card-img-top" alt="lesson1">
-                        <div class="card-body">
-                            <h5 class="card-title" style="text-align: center;" >Lesson 1</h5>
-                            <p class="card-text">Welcome to lesson one where you will learn the basics of fingerspelling in the American Sign Language.</p>
-                            <br>
-                            <br>
-                            <a routerLink= '/dashboard/lesson1' class="btn btn-success">Start Lesson</a>
+        <ng-template [ngIf]="Lessons">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm" *ngFor="let lesson of Lessons">
+                        <div class="card mx-auto" style="width: 18rem; height: 28rem;">
+                            <img src= "assets/Images/lesson{{lesson.lesson_id}}.jpg" class="card-img-top" alt="lesson{{lesson.lesson_id}}">
+                            <div class="card-body">
+                                <h5 class="card-title" style="text-align: center;" >Lesson {{lesson.lesson_id}}</h5>
+                                <p class="card-text" style="text-align: center;">{{lesson.desc}}</p>
+                                <div class="card-footer">
+                                    <small><strong>Unlocked on:</strong>{{" "+lesson.unlock_date}}</small><br>
+                                    <ng-template [ngIf]="lesson.last_time != null">
+                                        <small><strong>Last Quiz grade:</strong>{{" "+lesson.last_grade+"% "}}
+                                            <strong [hidden]="lesson.quiz_passed == 0"><span style="color:green">Passed</span></strong>
+                                            <strong [hidden]="lesson.quiz_passed == 1"><span style="color:red">Failed</span></strong>
+                                        </small><br>
+                                        <small><strong>Last Quiz score:</strong>{{" "+lesson.last_score}}</small><br>
+                                        <small><strong>Last Quiz time:</strong>{{" "+lesson.last_time.min+":"+lesson.last_time.sec}}</small><br>
+                                    </ng-template>
+                                </div>
+                                <div class="row card-footer mx-auto" style="bottom: 0; position: absolute">
+                                    <button routerLink= '/dashboard/lesson{{lesson.lesson_id}}/lecture' class="btn col-sm" style="background-color: #04204e;" title="Lecture">
+                                        <span style="color: white">Lecture</span>
+                                    </button>
+                                    <button routerLink= '/dashboard/lesson{{lesson.lesson_id}}/practice' class="btn col-sm" style="background-color: #04204e;" title="Practice">
+                                        <span style="color: white">Practice</span>
+                                    </button>
+                                    <button routerLink= '/dashboard/lesson{{lesson.lesson_id}}/quiz' class="btn col-sm" style="background-color: #04204e;"
+                                        title="{{(lesson.practice_complete == 0) ? 'Finish this lessons quiz first' : 'Quiz'}}"
+                                        [disabled]="lesson.practice_complete == 0">
+                                        <span style="color: white">Quiz</span>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>    
-                <div class="col-sm">
-                    <div class="card" style="width: 18rem; height: 26.5rem;">
-                        <img src= "assets/Images/lesson2.jpg" class="card-img-top" alt="lesson1">
-                        <div class="card-body">
-                            <h5 class="card-title" style="text-align: center;" >Lesson 2</h5>
-                            <p class="card-text">Lesson two consists of learning the basics of counting. Make sure to complete lesson one before moving on to this lesson. </p>
-                            <br>
-                            <br>
-                            <a routerLink= '/dashboard/lesson2' class="btn btn-success">Start Lesson</a>
-                        </div>
-                    </div>
-                </div>    
-                <div class="col-sm">
-                    <div class="card" style="width: 18rem;">
-                        <img src= "assets/Images/lesson3.jpg" class="card-img-top" alt="lesson1">
-                        <div class="card-body">
-                            <h5 class="card-title" style="text-align: center;">Lesson 3</h5>
-                            <p class="card-text">If you've completed lessons one and two, then you are ready to move on to lesson 3. This lesson will guide you in engaging in a conversation that consist of questions </p>
-                            <a routerLink= '/dashboard/lesson3' class="btn btn-success">Start Lesson</a>
-                        </div>
-                    </div>
-                </div>    
+                </div>
             </div>
-        </div>
+        </ng-template>
         <div>
            <br>
         </div>

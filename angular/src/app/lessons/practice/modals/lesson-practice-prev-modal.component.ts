@@ -17,7 +17,7 @@ import { goBack, getAnswers } from '../lesson-practice';
             <div>
                 <p><strong>100% of your answers correct!</strong></p>
                 <p>You gave <span style="color:green">{{answers_correct}}</span> correct answers out of <span style="color:green">{{answers_count}}</span> possible.</p>
-                <p>You seem ready to move on to the quiz, but if you want to get more comfortable with the lesson you can go back to the lecture. You will have to eventually submit a practice if you want to unlock the quiz.</p>
+                <p>You seem ready to move on to the quiz, but if you want to get more comfortable with the lesson you can go back to the lecture. You will have to eventually submit your practice if you want to unlock the quiz.</p>
             </div>
         </ng-template>
 
@@ -25,7 +25,7 @@ import { goBack, getAnswers } from '../lesson-practice';
             <div>
                 <p><strong>Are you sure you want to go back to the lecture?</strong></p>
                 <p>You currently have <span style="color:blue">{{answers_correct}}</span> correct answers out of <span style="color:blue">{{answers_count}}</span> possible.</p>
-                <p>Feel free to get more comfortable with the lecture, but your current practice progress will be lost and you must eventually submit the practice if you want to unlock the quiz.</p>
+                <p>Feel free to get more comfortable with the lecture. You will have to eventually submit your practice if you want to unlock the quiz.</p>
             </div>
         </ng-template>
     </div>

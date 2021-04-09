@@ -33,7 +33,7 @@ export class LoginSignupComponent implements OnInit {
           if (resp.twoFactor) {
             this.modalService.open(Login2FAModal, { centered: true, animation: true, keyboard: false, backdrop: 'static' });            
           } else {
-            this.toastr.success(`Welcome ${resp.name}!`);
+            this.toastr.success(`Welcome ${resp.fname}!`);
             this.router.navigate(['/dashboard'], { relativeTo: this.route });
           }
         })
