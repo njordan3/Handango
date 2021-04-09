@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Send image</title>
+  </head>
+  <body>
+    <video class="webcam" autoplay></video>
+    <button class="start">Start</button>
+    <button class="stop">Stop</button>
+    <script src="/socket.io/socket.io.js"></script>
+<script>
+      var socket = io();
+      var video = document.querySelector(".webcam");
+
+      var sendInterval;
+      var isStreaming = false;
+
+      var startButton = document.querySelector(".start");
+      var stopButton = document.querySelector(".stop");
+      startButton.addEventListener("click", function() {
+        navigator.mediaDevices.getUserMedia({video: {width: 320, height: 240}})  //only get video
+          .then((stream) => {
+              video.srcObject = stream;
+              sendInterval = setInterval(function() {
+                  getFrame();
+              }, 1000/3 ); //3 fps
+                isStreaming = true;
+          });
+      });
+      stopButton.addEventListener("click", function() {
+        if (isStreaming) {
+            const stream = video.srcObject;
+            const tracks = stream.getTracks();
+
+            tracks.forEach(function(track) {
+                track.stop();
+            });
+
+            video.srcObject = null;
+            isStreaming = false;
+            clearInterval(sendInterval);
+        }
+      });
+
+      function getFrame() {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        canvas.toBlob(function(blob) {
+            socket.emit('asl-frame', blob); //use blob instead of base64 because there is less wasted space
+        }, 'image/jpeg', 1.0);
+      };
+
+
+</script>
+  </body>
+</html>

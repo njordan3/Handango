@@ -1,0 +1,16 @@
+#ignore all these folders
+classification/data
+transfer/data
+model/CollectedImages
+.vscode/
+build/
+c++/
+node_modules/
+tls/
+favicon/
+#ignore .txt files
+*.txt
+#ignore .gyp files
+*.gyp
+#ignore .env files
+*.env
