@@ -1,4 +1,5 @@
 const db = require('./db');
+const tf = require('@tensorflow/tfjs-node');
 
 const sharedSession = require("express-socket.io-session");
 let { isLoggedIn, just2FAd } = require('./middleware');
@@ -11,6 +12,37 @@ module.exports = {
 }
 
 function initSocketIO(session, io) {
+    //initialize ASL model
+    var model, mobilenet, cutoffLayer, truncatedModel, loaded = false;
+    tf.loadLayersModel(`file://server/tensorflow/transfer/model/model.json`)
+        .then((m) => {
+            model = m;
+            return tf.loadLayersModel('https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json');
+        })
+        .then((m) => {
+            mobilenet = m;
+            cutoffLayer = mobilenet.getLayer('conv_pw_13_relu');
+            truncatedModel = tf.model({ inputs: mobilenet.inputs, outputs: cutoffLayer.output });
+            loaded = true;
+            console.log("ASL Model Loaded");
+        })
+        .catch((e) => {
+            console.log(e);
+        })
+    
+
+    // Convert the image to a tensor for prediction
+    function readImage(imageBuffer) {
+        return tf.tidy(() => {
+            const tfimage = tf.node.decodeImage(imageBuffer);
+            return tfimage.resizeBilinear([224, 224])
+                .expandDims()
+                .toFloat()
+                .div(127)
+                .sub(1);
+        });
+    }
+
     //share session variables with Express
     io.use(sharedSession(session, {
         autoSave: true
@@ -59,12 +91,29 @@ function initSocketIO(session, io) {
                     });
                 
             });
+
             socket.on('asl-frame', function(data) {
-                //maybe use bitmap or other file formats instead of jpeg?
-                //maybe compress the data before sending and test the model confidence with and without compression?
-                //BLOB = BINARY LARGE OBJECT
-                console.log(data);
+                if (loaded) {
+                    const TARGET_CLASSES = ["A", "B", "C", "D", "E", "F", "Nothing"];
+                    const img = readImage(data);
+                    const activation = truncatedModel.predict(img);
+                    const prediction = model.predict(activation).dataSync();
+                    //console.log(prediction);
+                    let top = Array.from(prediction)
+                        .map(function (p, i) { // this is Array.map
+                            return {
+                                probability: p,
+                                className: TARGET_CLASSES[i] // we are selecting the value from the obj
+                            };
+                        }).sort(function (a, b) {
+                            return b.probability - a.probability;
+                        }).slice(0, 1);
+                    console.log(top)
+                    socket.emit('asl-prediction', top[0].className);
+                    //console.log(`${top.className}: ${top.probability.toFixed(6)}`);
+                }
             });
+
             socket.on('update-answer', function(data) {
                 db.setPracticeAnswer(data.practice_id, data.id, `{"answers": ${JSON.stringify(data.answers)}}`, data.type)
                     .then(function() {

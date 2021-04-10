@@ -4,22 +4,27 @@ export class Webcam {
     <div class="mySlides">
         <div class="webcam-container">
             <video class="webcam" autoplay></video>
-            <div class = "row">
-                <div class = "col">
+            <div class="row">
+                <div class="col">
                     <div>
-                        <button type="button" style="width: 130px;" class="btn btn-success start" class="start">Start Camera</button>
+                        <button type="button" style="" class="btn btn-success start">Start Camera</button>
                     </div>
                 </div>
-                <div class = "col">
+                <div class="col">
                     <div>
-                        <button style="width: 130px;" type= "button" class="btn btn-danger stop" class="stop">Stop Camera</button>
+                        <button style="" type= "button" class="btn btn-danger stop">Stop Camera</button>
                     </div>
-                </div
+                </div>
+                <div class="col snap" style="display: none">
+                    <div>
+                        <button style="background-color: #04204e;" type="button" class="btn"><span style="color: white">Snap</span></button>
+                    </div>
+                </div>
             </div>
         </div>
         <p class="wc-ASL-bank"></p>
+        <p class="wc-ASL-prediction"></p>
     </div>`;
-    private sendInterval: any;
     private video: any;
     private socket: any;
     private ASL: string;
@@ -53,9 +58,17 @@ export class Webcam {
             this.video = container.querySelector(".webcam");
             var startButton = container.querySelector(".start");
             var stopButton = container.querySelector(".stop");
+            var snapButton = container.querySelector(".snap");
 
             startButton?.addEventListener("click", function() { that.start(); })
             stopButton?.addEventListener("click", function() { that.stop(); });
+            snapButton?.addEventListener("click", function() { that.getFrame(); });
+
+            that.socket.on('asl-prediction', function(letter: string) {
+                console.log(document.getElementsByClassName('wc-ASL-prediction')[that.id-1], letter)
+                document.getElementsByClassName('wc-ASL-prediction')[that.id-1].innerHTML = `Prediction: ${letter}`;
+            });
+
             resolve();
         });
     }
@@ -64,15 +77,16 @@ export class Webcam {
     }
 
     private getFrame() {
-        let that = this;
-        const canvas = document.createElement('canvas');
-        canvas.width = this.video.videoWidth;
-        canvas.height = this.video.videoHeight;
-        canvas.getContext('2d')?.drawImage(this.video, 0, 0);
-        canvas.toBlob(function(blob) {
-            console.log("blob made");
-            that.socket.emit('asl-frame', blob); //use blob instead of base64 because there is less wasted space
-        }, 'image/jpeg', 1.0);
+        if (this.isStreaming) {
+            let that = this;
+            const canvas = document.createElement('canvas');
+            canvas.width = this.video.videoWidth;
+            canvas.height = this.video.videoHeight;
+            canvas.getContext('2d')?.drawImage(this.video, 0, 0);
+            canvas.toBlob(function(blob) {
+                that.socket.emit('asl-frame', blob); //use blob instead of base64 because there is less wasted space
+            }, 'image/jpeg', 1.0);
+        }
     }
 
     start() {
@@ -83,9 +97,7 @@ export class Webcam {
                 navigator.mediaDevices.getUserMedia({video: {width: 320, height: 240}})  //only get video
                     .then((stream) => { 
                         this.video.srcObject = stream;
-                        this.sendInterval = setInterval(function() {
-                            that.getFrame();
-                        }, 1000/3 ); //3 fps
+                        (document.getElementsByClassName("webcam-container")[this.id-1].querySelector(".snap") as HTMLElement).style.display = "block";
                         this.isStreaming = true;
                     });
             } else {
@@ -104,8 +116,8 @@ export class Webcam {
             });
         
             this.video.srcObject = null;
+            (document.getElementsByClassName("webcam-container")[this.id-1].querySelector(".snap") as HTMLElement).style.display = "none";
             this.isStreaming = false;
-            clearInterval(this.sendInterval);
             if (this.startTimer) this.startTimer();
         }
     }

@@ -99,6 +99,8 @@ export function launch(data: any, slide: number): void {
         }
     }
 
+    lessons.push(new Webcam("A", socket, null, 69));
+
     //setup each lessons' HTML template in the slideshow container
     for (let i = 0; i < lessons.length; i++) {
         document.getElementsByClassName('slideshow-container')[0].innerHTML += lessons[i].template;

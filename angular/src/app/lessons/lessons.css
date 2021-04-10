@@ -194,6 +194,11 @@
   font-size: 100px;
 }
 
+.wc-ASL-prediction {
+  margin-top: 100px;
+  text-align: center;
+}
+
 .sq-instruction {
   font-size: 30px;
 }
