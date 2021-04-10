@@ -28,20 +28,23 @@ export class Webcam {
     private video: any;
     private socket: any;
     private ASL: string;
-    private ans: string[]|null;
+    private ans: any|null;
     private ans_id: number|null;
     private id: number;
     private isStreaming: boolean;
     answer_correct: boolean = false;
+    private practice_id: number|null;
     pauseTimer: Function|null;
     startTimer: Function|null;
-    constructor(ASL: string, socket: any, ans: string[]|null = null, ans_id: number|null = null, pauseTimer: Function|null = null, startTimer: Function|null = null) {
+    constructor(ASL: string, socket: any, ans: any|null = null, ans_id: number|null = null, practice_id: number|null = null, 
+                pauseTimer: Function|null = null, startTimer: Function|null = null) {
         this.ASL = ASL;
         this.ans = ans;
         this.ans_id = ans_id;
         this.id = Webcam.count++;
         this.isStreaming = false;
         this.socket = socket;
+        this.practice_id = practice_id;
         this.pauseTimer = pauseTimer;
         this.startTimer = startTimer;
     }
@@ -62,29 +65,43 @@ export class Webcam {
 
             startButton?.addEventListener("click", function() { that.start(); })
             stopButton?.addEventListener("click", function() { that.stop(); });
-            snapButton?.addEventListener("click", function() { that.getFrame(); });
+            snapButton?.addEventListener("click", function() { that.sendFrame(); });
 
-            that.socket.on('asl-prediction', function(letter: string) {
-                console.log(document.getElementsByClassName('wc-ASL-prediction')[that.id-1], letter)
-                document.getElementsByClassName('wc-ASL-prediction')[that.id-1].innerHTML = `Prediction: ${letter}`;
+            this.plugAnswers(document.getElementsByClassName('wc-ASL-prediction')[that.id-1] as HTMLElement);
+
+            that.socket.on('asl-prediction', function(data: any) {
+                document.getElementsByClassName('wc-ASL-prediction')[that.id-1].innerHTML = `Prediction: ${data.letter}<br>Certainty: ${(data.certainty*100 as number).toFixed(2)}%`;
             });
 
             resolve();
         });
     }
+
+    private plugAnswers(predictionBank: HTMLElement) {
+        if (this.ans !== null) {
+            predictionBank.innerHTML = `Prediction: ${this.ans.letter}<br>Certainty: ${(this.ans.certainty*100 as number).toFixed(2)}%`;
+        }
+    }
+
     private hasGetUserMedia() {
         return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
     }
 
-    private getFrame() {
+    private sendFrame() {
         if (this.isStreaming) {
+            let lesson_num: number = parseInt(window.location.pathname.split('/')[2].charAt(6));
+            let types = ["WebCam", "WebCamNumbers", "WebCamQuestions"];
+
             let that = this;
             const canvas = document.createElement('canvas');
             canvas.width = this.video.videoWidth;
             canvas.height = this.video.videoHeight;
             canvas.getContext('2d')?.drawImage(this.video, 0, 0);
             canvas.toBlob(function(blob) {
-                that.socket.emit('asl-frame', blob); //use blob instead of base64 because there is less wasted space
+                //use blob instead of base64 because there is less wasted space
+                let data: sendData = {image: blob, type: null, id: null, practice_id: null};
+                if (that.practice_id) data.type = types[lesson_num-1], data.id = that.ans_id, data.practice_id = that.practice_id;
+                that.socket.emit('asl-frame', data);
             }, 'image/jpeg', 1.0);
         }
     }
@@ -121,4 +138,11 @@ export class Webcam {
             if (this.startTimer) this.startTimer();
         }
     }
+}
+
+interface sendData {
+    image: Blob|null,
+    type: string|null,
+    id: number|null,
+    practice_id: number|null
 }

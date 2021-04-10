@@ -73,8 +73,10 @@ export function launch(data: any, slide: number): void {
             case "MultipleChoice":
                 lessons.push(new MultipleChoice(data[i].phrases, data[i].answers, data[i].id, setAnswer));
                 break;
+            case "WebCamNumbers":
+            case "WebCamQuestions":
             case "WebCam":
-                lessons.push(new Webcam(data[i].phrase[0], socket, data[i].answers, data[i].id));
+                lessons.push(new Webcam(data[i].phrase[0], socket, data[i].answers, data[i].id, practice_id));
                 break;
             case "DragDropNumbers":
                 lessons.push(new DragDropNumbers(data[i].phrases, data[i].answers, data[i].id, setAnswer));
@@ -98,8 +100,6 @@ export function launch(data: any, slide: number): void {
                 console.log(`can't load practice type: ${data[i].type}`);
         }
     }
-
-    lessons.push(new Webcam("A", socket, null, 69));
 
     //setup each lessons' HTML template in the slideshow container
     for (let i = 0; i < lessons.length; i++) {

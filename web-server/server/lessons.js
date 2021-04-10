@@ -95,29 +95,37 @@ function initSocketIO(session, io) {
             socket.on('asl-frame', function(data) {
                 if (loaded) {
                     const TARGET_CLASSES = ["A", "B", "C", "D", "E", "F", "Nothing"];
-                    const img = readImage(data);
+                    const img = readImage(data.image);
                     const activation = truncatedModel.predict(img);
                     const prediction = model.predict(activation).dataSync();
-                    //console.log(prediction);
                     let top = Array.from(prediction)
-                        .map(function (p, i) { // this is Array.map
+                        .map(function (p, i) {
                             return {
                                 probability: p,
-                                className: TARGET_CLASSES[i] // we are selecting the value from the obj
+                                className: TARGET_CLASSES[i]
                             };
                         }).sort(function (a, b) {
                             return b.probability - a.probability;
                         }).slice(0, 1);
                     console.log(top)
-                    socket.emit('asl-prediction', top[0].className);
-                    //console.log(`${top.className}: ${top.probability.toFixed(6)}`);
+                    socket.emit('asl-prediction', {letter: top[0].className, certainty: top[0].probability});
+                    //save result in database
+                    if (data.type !== null && data.id !== null && data.practice_id !== null) {
+                        db.setPracticeAnswer(data.practice_id, data.id, `{"answers": ${JSON.stringify({letter: top[0].className, certainty: top[0].probability})}}`, data.type)
+                            .then(function() {
+                                //console.log("answer updated");
+                            })
+                            .catch(function(err) {
+                                console.log(err);
+                            });
+                    }
                 }
             });
 
             socket.on('update-answer', function(data) {
                 db.setPracticeAnswer(data.practice_id, data.id, `{"answers": ${JSON.stringify(data.answers)}}`, data.type)
                     .then(function() {
-                        console.log("answer updated");
+                        //console.log("answer updated");
                     })
                     .catch(function(err) {
                         console.log(err);
@@ -127,34 +135,6 @@ function initSocketIO(session, io) {
             console.log("Socket connection is not logged in");
         }
     });
-    /*
-    db.getUserLessons(402, 1)
-        .then(function(lesson) {    
-            let lessonDetails = lesson.shift();
-            if (lesson != undefined && lesson.length > 0) {
-                let lectureDetails = lessonDetails.PID.split('-');
-                let practiceDetails = lessonDetails.answers.split('-');
-                let quizDetails = lessonDetails.phrases;
-                let lessonData = getLessonData(lesson);
-            }
-            
-        })
-        .catch(function(err) {
-            console.log(err);
-        })
-    */
-    /*
-    db.getRandomQuiz(1)
-        .then(function(quiz) {
-            let questions = [];
-            for (let i = 0; i < quiz.length; i++) {
-                questions.push(quiz[i].phrases);
-            }
-        })
-        .catch(function(err) {
-            console.log(err);
-        });
-    */
 }
 
 function initLessonRoutes(app) {
