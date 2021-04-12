@@ -4,9 +4,9 @@
   "description": "senior sem project",
   "main": "index.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=development nodemon ./server/server.js"
+    "start": "cross-env NODE_ENV=development nodemon ./server.js"
   },
-  "author": "Nicholas Jordan and Alexisis Barcenas",
+  "author": "Nicholas Jordan, Alexisis Barcenas, and Raymundo Ayala",
   "license": "ISC",
   "dependencies": {
     "@tensorflow/tfjs-node": "^3.3.0",

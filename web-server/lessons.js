@@ -2,7 +2,7 @@ const db = require('./db');
 const tf = require('@tensorflow/tfjs-node');
 
 const sharedSession = require("express-socket.io-session");
-let { isLoggedIn, just2FAd } = require('./middleware');
+let { isLoggedIn } = require('./middleware');
 
 const quizTime = 10;    //minutes
 
@@ -14,7 +14,7 @@ module.exports = {
 function initSocketIO(session, io) {
     //initialize ASL model
     var model, mobilenet, cutoffLayer, truncatedModel, loaded = false;
-    tf.loadLayersModel(`file://server/tensorflow/transfer/model/model.json`)
+    tf.loadLayersModel(`file://tensorflow/transfer/model/model.json`)
         .then((m) => {
             model = m;
             return tf.loadLayersModel('https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json');

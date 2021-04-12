@@ -1,7 +1,3 @@
-//https://medium.com/@alexcambose/webcam-live-streaming-with-websockets-and-base64-64b1b4992db8
-//Websocket/socketio with NodeJS/Express
-//https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
-
 //server dependencies
 const express = require('express');
 //user authentication and database configuration
@@ -27,7 +23,7 @@ try {
 //initialize express app with middleware
 const app = express();
 let {initMiddleware} = require('./middleware');
-let session = initMiddleware(express, app, passport);
+let session = initMiddleware(app, passport);
 
 //load routes with our app and configured passport
 let {initLessonRoutes, initSocketIO} = require('./lessons');

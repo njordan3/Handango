@@ -98,7 +98,7 @@ function initDashboardRoutes(app, passport) {
             });
     });
 
-    app.get('/changeToGoogle', function(req, res, next) {
+    app.get('/changeToGoogle', isLoggedIn, just2FAd, isNotGoogleUser, function(req, res, next) {
         if (req.isAuthenticated()) {
             if (req.session.passport.user.secret === null) {
                 if (req.session.passport.user.type !== "Google") {
@@ -136,7 +136,7 @@ function initDashboardRoutes(app, passport) {
         })(req, res, next);
     });
 
-    app.get('/changeToFacebook', function(req, res, next) {
+    app.get('/changeToFacebook', isLoggedIn, just2FAd, isNotFacebookUser, function(req, res, next) {
         if (req.isAuthenticated()) {
             if (req.session.passport.user.secret === null) {
                 if (req.session.passport.user.type !== "Facebook") {
