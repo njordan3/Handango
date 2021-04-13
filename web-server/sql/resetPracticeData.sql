@@ -511,27 +511,7 @@ INSERT INTO webcam (id, phrase) VALUES
     (DEFAULT, '{"type": "WebCam", "phrase": ["C"]}'),
     (DEFAULT, '{"type": "WebCam", "phrase": ["D"]}'),
     (DEFAULT, '{"type": "WebCam", "phrase": ["E"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["F"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["G"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["H"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["I"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["J"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["K"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["L"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["M"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["N"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["O"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["P"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["Q"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["R"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["S"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["T"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["U"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["V"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["W"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["X"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["Y"]}'),
-    (DEFAULT, '{"type": "WebCam", "phrase": ["Z"]}');
+    (DEFAULT, '{"type": "WebCam", "phrase": ["F"]}');
     
 DELETE FROM webcamnumbers WHERE id > 0;
 ALTER TABLE webcamnumbers AUTO_INCREMENT=1;
