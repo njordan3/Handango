@@ -14,7 +14,7 @@ Includes all the features of the [web-servers](https://github.com/njordan3/Duoha
   * Lecture progress is saved live to the user's profile so that they can return to where they left off
 * Practice features:
   * Contains four different mini-games to help the learning process
-  * Includes a webcam component that implements server-side machine learning to identify a few ASL signs
+  * Includes a webcam component that still need to implement server-side machine learning to identify a few ASL signs
   * Practices are randomly compiled from a small dataset for each mini-game type when the lesson is unlocked
   * Practice progress and answers are saved live to the user's profile so they can return to where they left off with all their past answers in place
   * A practice must be completed for its quiz to be unlocked to the user
