@@ -29,3 +29,6 @@
 a:hover{
   cursor: pointer;
 }
+.col button:hover {
+  background-color: red;
+}

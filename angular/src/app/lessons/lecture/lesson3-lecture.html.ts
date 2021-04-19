@@ -47,12 +47,12 @@ export const html = `
         describing a handshape and generally, there is minimal association with the letter
         value.
     </p>
-    <button class="info-button" type="button" value="Who">Who?</button>
-    <button class="info-button" type="button" value="What">What?</button>
-    <button class="info-button" type="button" value="When">When?</button>
-    <button class="info-button" type="button" value="Where">Where?</button>
-    <button class="info-button" type="button" value="Why">Why?</button>
-    <button class="info-button" type="button" value="WhyVar">Why? Variation</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Who">Who?</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="What">What?</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="When">When?</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Where">Where?</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Why">Why?</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="WhyVar">Why? Variation</button>
 </div>
 
 <div class="mySlides">
@@ -69,9 +69,9 @@ export const html = `
     <p class="text-lg">
         Occasionally, a yes-no question is accompanied by a question mark.
     </p>
-    <button class="info-button" type="button" value="QuestionMark">Question Mark</button>
-    <button class="info-button" type="button" value="Yes">Yes</button>
-    <button class="info-button" type="button" value="No">No</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="QuestionMark">Question Mark</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Yes">Yes</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="No">No</button>
 </div>
 
 <div class="mySlides">
@@ -109,12 +109,15 @@ export const html = `
         practice signing these questions and responses the way they have been written in
         the chart.
     </p>
-    <table class="table">
-        <tr class="tablerow">
-            <th class="tablecol"><strong>English</strong></th>
-            <th class="tablecol"><strong>ASL</strong></th>
-            <th class="tablecol"><strong>Response</strong></th>
-        </tr>
+    <table class="table table-hover">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col"><strong>English</strong></th>
+            <th scope="col"><strong>ASL</strong></th>
+            <th scope="col"><strong>Response</strong></th>
+        </tr
+        </thead>
+        <tbody>
         <tr class="tablerow">
             <th class="tablecol">What is your name?</th>
             <th class="tablecol">Name your?</th>
@@ -145,25 +148,26 @@ export const html = `
             <th class="tablecol">Nice meet</th>
             <th class="tablecol">Nice-meet-you</th>
         </tr>
+        </tbody>
     </table>
     <p class="text-sm">
         To sign “nice to meet you,” combine “nice” and “meet” only. There is no need
         to sign “you”, this information is provided by the directionality of the sign
         “meet”.
     </p>
-    <button class="info-button" type="button" value="Interview">Interview</button>
-    <button class="info-button" type="button" value="Name">Name</button>
-    <button class="info-button" type="button" value="Me">I, Me</button>
-    <button class="info-button" type="button" value="Mine">Mine</button>
-    <button class="info-button" type="button" value="Your">Your</button>
-    <button class="info-button" type="button" value="Address">Live/Address</button>
-    <button class="info-button" type="button" value="House">House</button>
-    <button class="info-button" type="button" value="Town">City, Town, Community</button>
-    <button class="info-button" type="button" value="Work">Work</button>
-    <button class="info-button" type="button" value="Learn">Learn</button>
-    <button class="info-button" type="button" value="Deaf">Deaf</button>
-    <button class="info-button" type="button" value="Meet">Meet</button>
-    <button class="info-button" type="button" value="Nice">Nice</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Interview">Interview</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Name">Name</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Me">I, Me</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Mine">Mine</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Your">Your</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Address">Live/Address</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="House">House</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Town">City, Town, Community</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Work">Work</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Learn">Learn</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Deaf">Deaf</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Meet">Meet</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Nice">Nice</button>
 </div>
 
 <div class="mySlides">

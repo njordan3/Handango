@@ -38,18 +38,18 @@ export const html = `
         two hands to count this high. In sign language, you can count to ten (and much
         higher) using just one hand!
     </p>
-    <button class="info-button" type="button" value="Number">Number</button>
-    <button class="info-button" type="button" value="0">0</button>
-    <button class="info-button" type="button" value="1">1</button>
-    <button class="info-button" type="button" value="2">2</button>
-    <button class="info-button" type="button" value="3">3</button>
-    <button class="info-button" type="button" value="4">4</button>
-    <button class="info-button" type="button" value="5">5</button>
-    <button class="info-button" type="button" value="6">6</button>
-    <button class="info-button" type="button" value="7">7</button>
-    <button class="info-button" type="button" value="8">8</button>
-    <button class="info-button" type="button" value="9">9</button>
-    <button class="info-button" type="button" value="10">10</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Number" class="btn btn-outline-dark">Number</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="0">0</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="1">1</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="2">2</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="3">3</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="4">4</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="5">5</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="6">6</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="7">7</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="8">8</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="9">9</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="10">10</button>
     <p class="text-md">
         Notice that the counting process changes for six through nine.
         It’s easy; you only need to touch a specific finger to your thumb.
@@ -91,11 +91,11 @@ export const html = `
         through “5” and set them in your mind. The reason; numbers “11” to “15” use
         the same handshapes as numbers “1” through “5”.
     </p>
-    <button class="info-button" type="button" value="11">11</button>
-    <button class="info-button" type="button" value="12">12</button>
-    <button class="info-button" type="button" value="13">13</button>
-    <button class="info-button" type="button" value="14">14</button>
-    <button class="info-button" type="button" value="15">15</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="11">11</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="12">12</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="13">13</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="14">14</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="15">15</button>
     <p class="text-lg">
         Moving right along, let’s take on numbers “16” through “19,” which are
         referred to as the “swing-outs”. The good news is that the finger positions for
@@ -106,11 +106,11 @@ export const html = `
         “17” through “19” are formed in the same manner, by first touching your thumb
         to the appropriate fingers then swinging out. The sign for “20” is a stand-alone sign.
     </p>
-    <button class="info-button" type="button" value="16">16</button>
-    <button class="info-button" type="button" value="17">17</button>
-    <button class="info-button" type="button" value="18">18</button>
-    <button class="info-button" type="button" value="19">19</button>
-    <button class="info-button" type="button" value="20">20</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="16">16</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="17">17</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="18">18</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="19">19</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="20">20</button>
 </div>
 
 <div class="mySlides">
@@ -121,13 +121,13 @@ export const html = `
         the basic number first, such as “3”, “4”, or “5”. You will then sign a “0” (zero).
         A memory aid for these numbers is an easy formula: The number then changes to zero.
     </p>
-    <button class="info-button" type="button" value="30">30</button>
-    <button class="info-button" type="button" value="40">40</button>
-    <button class="info-button" type="button" value="50">50</button>
-    <button class="info-button" type="button" value="60">60</button>
-    <button class="info-button" type="button" value="70">70</button>
-    <button class="info-button" type="button" value="80">80</button>
-    <button class="info-button" type="button" value="90">90</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="30">30</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="40">40</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="50">50</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="60">60</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="70">70</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="80">80</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="90">90</button>
 </div>
 
 <div class="mySlides">
@@ -150,8 +150,8 @@ export const html = `
         It is the same pattern that you use for forming numbers in the hundreds. A
         “million” is signed by tapping the letter “M” twice in the palm.
     </p>
-    <button class="info-button" type="button" value="Hundred">Hundred</button>
-    <button class="info-button" type="button" value="Thousand">Thousand</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Hundred">Hundred</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Thousand">Thousand</button>
     <p class="text-md">
         Here is an example of the two different ways you could sign the number “1,900”:
     </p>
@@ -169,7 +169,7 @@ export const html = `
         denominator. In this example, the visual of a “1” above a “2” demonstrates a
         numeric fraction. Use this same pattern and order of signs for all fractions.
     </p>
-    <button class="info-button" type="button" value="OneHalf">One-Half</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="OneHalf">One-Half</button>
 </div>
 
 <div class="mySlides">

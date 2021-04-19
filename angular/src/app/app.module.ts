@@ -26,6 +26,7 @@ import { TwoFactorModal } from './two-factor-auth/2FA-modal.component';
 import { AboutComponent } from './about/about.component';
 
 import { NavBarComponent } from './nav-bar/nav-bar.component';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 
 @NgModule({
   declarations: [
@@ -41,6 +42,7 @@ import { NavBarComponent } from './nav-bar/nav-bar.component';
     ConfirmComponent,
     AboutComponent,
     NavBarComponent,
+    PageNotFoundComponent,
   ],
   imports: [
     BrowserModule,

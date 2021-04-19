@@ -10,7 +10,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-sm" *ngFor="let lesson of Lessons">
-                        <div class="card mx-auto" style="width: 18rem; height: 28rem;">
+                        <div class="card mx-auto" style="width: 21rem; height: 35rem;">
                             <img src= "assets/Images/lesson{{lesson.lesson_id}}.jpg" class="card-img-top" alt="lesson{{lesson.lesson_id}}">
                             <div class="card-body">
                                 <h5 class="card-title" style="text-align: center;" >Lesson {{lesson.lesson_id}}</h5>
@@ -26,18 +26,26 @@
                                         <small><strong>Last Quiz time:</strong>{{" "+lesson.last_time.min+":"+lesson.last_time.sec}}</small><br>
                                     </ng-template>
                                 </div>
-                                <div class="row card-footer mx-auto" style="bottom: 0; position: absolute">
-                                    <button routerLink= '/dashboard/lesson{{lesson.lesson_id}}/lecture' class="btn col-sm" style="background-color: #04204e;" title="Lecture">
+                                <div class="containter">
+                                <div class="row card-footer mx-auto cols-auto" style="bottom: 0; position: absolute">
+                                    <div class = "col">
+                                    <button routerLink= '/dashboard/lesson{{lesson.lesson_id}}/lecture' class="btn col-sm" style="background-color: #04204e;" title="Lecture" onmouseover="this.style.backgroundColor = 'rgb(4, 32, 78, 0.8)'" onmouseout = "this.style.backgroundColor = 'rgb(4, 32, 78)'">
                                         <span style="color: white">Lecture</span>
                                     </button>
-                                    <button routerLink= '/dashboard/lesson{{lesson.lesson_id}}/practice' class="btn col-sm" style="background-color: #04204e;" title="Practice">
+                                    </div>
+                                    <div class = "col">
+                                    <button  routerLink= '/dashboard/lesson{{lesson.lesson_id}}/practice' class="btn col-sm" style="background-color: #04204e;" title="Practice" onmouseover="this.style.backgroundColor = 'rgb(4, 32, 78, 0.8)'" onmouseout = "this.style.backgroundColor = 'rgb(4, 32, 78)'">
                                         <span style="color: white">Practice</span>
                                     </button>
-                                    <button routerLink= '/dashboard/lesson{{lesson.lesson_id}}/quiz' class="btn col-sm" style="background-color: #04204e;"
+                                    </div>
+                                    <div class = "col"  style="width: 50px; padding-top: 1px;">
+                                    <button routerLink= '/dashboard/lesson{{lesson.lesson_id}}/quiz' class="btn col-sm" style="background-color: #04204e;" onmouseover="this.style.backgroundColor = 'rgb(4, 32, 78, 0.8)'" onmouseout = "this.style.backgroundColor = 'rgb(4, 32, 78)'"
                                         title="{{(lesson.practice_complete == 0) ? 'Finish this lessons quiz first' : 'Quiz'}}"
                                         [disabled]="lesson.practice_complete == 0">
                                         <span style="color: white">Quiz</span>
                                     </button>
+                                    </div>
+                                </div>
                                 </div>
                             </div>
                         </div>

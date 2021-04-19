@@ -97,32 +97,32 @@ export const html = `
     <p class="text-lg" style="text-align: center">
         Select a letter for instructions and help.
     </p>
-    <button class="info-button" type="button" value="A">A</button>
-    <button class="info-button" type="button" value="B">B</button>
-    <button class="info-button" type="button" value="C">C</button>
-    <button class="info-button" type="button" value="D">D</button>
-    <button class="info-button" type="button" value="E">E</button>
-    <button class="info-button" type="button" value="F">F</button>
-    <button class="info-button" type="button" value="G">G</button>
-    <button class="info-button" type="button" value="H">H</button>
-    <button class="info-button" type="button" value="I">I</button>
-    <button class="info-button" type="button" value="J">J</button>
-    <button class="info-button" type="button" value="K">K</button>
-    <button class="info-button" type="button" value="L">L</button>
-    <button class="info-button" type="button" value="M">M</button>
-    <button class="info-button" type="button" value="N">N</button>
-    <button class="info-button" type="button" value="O">O</button>
-    <button class="info-button" type="button" value="P">P</button>
-    <button class="info-button" type="button" value="Q">Q</button>
-    <button class="info-button" type="button" value="R">R</button>
-    <button class="info-button" type="button" value="S">S</button>
-    <button class="info-button" type="button" value="T">T</button>
-    <button class="info-button" type="button" value="U">U</button>
-    <button class="info-button" type="button" value="V">V</button>
-    <button class="info-button" type="button" value="W">W</button>
-    <button class="info-button" type="button" value="X">X</button>
-    <button class="info-button" type="button" value="Y">Y</button>
-    <button class="info-button" type="button" value="Z">Z</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="A">A</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="B">B</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="C">C</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="D">D</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="E">E</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="F">F</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="G">G</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="H">H</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="I">I</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="J">J</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="K">K</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="L">L</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="M">M</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="N">N</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="O">O</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="P">P</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Q">Q</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="R">R</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="S">S</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="T">T</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="U">U</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="V">V</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="W">W</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="X">X</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Y">Y</button>
+    <button class="info-button btn btn-outline-dark" type="button" value="Z">Z</button>
 </div>
 
 <div class="mySlides">

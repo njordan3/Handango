@@ -34,13 +34,13 @@
 #prev-slide, #next-slide {
   cursor: pointer;
   position: absolute;
-  top: 50%;
+  top: 20%;
   width: auto;
-  margin-top: -22px;
+  margin-top: -15px;
   padding: 16px;
   color: black;
   font-weight: bold;
-  font-size: 18px;
+  font-size: 30px;
   border-radius: 0 3px 3px 0;
   user-select: none;
 }
