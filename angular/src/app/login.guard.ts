@@ -29,10 +29,11 @@ export class LoginGuard implements CanActivate {
         this.authService.getLogin()
           .then((loggedIn) => {
             if (loggedIn) {
-              this.router.navigate(['/dashboard'], { relativeTo: this.route });
-              return resolve(false);
+              this.router.navigate(['/dashboard'], { relativeTo: this.route }).then(() => {this.authService.doUrlChange();});
+              resolve(false);
             } else {
-              return resolve(true);
+              resolve(true);
+              this.authService.doUrlChange();
             }
           });
       });

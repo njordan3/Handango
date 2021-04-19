@@ -2,13 +2,21 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../environments/environment';
 import {ToastrService} from 'ngx-toastr';
+import { Output, EventEmitter } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
+  @Output() urlChange: EventEmitter<any> = new EventEmitter();
+
   constructor(private http : HttpClient, private toastr : ToastrService) { }
+
+  //changes the navbar based on the current url
+  doUrlChange() {
+    this.urlChange.emit();
+  }
 
   doFacebook() {
     window.location.href = environment.domainUrl+'/facebook';

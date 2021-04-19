@@ -21,11 +21,11 @@ const routes: Routes = [
   {path: "forgetEmail", component: ForgetEmailComponent},
   {path: "verify", canActivate: [VerifyGuard]},
   {path: "confirm", component: ConfirmComponent},
-  {path: "**", component: PageNotFoundComponent},
   {path: "dashboard",
     canLoad: [DashboardGuard],
     loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule) //lazy load dashboard on login
   },
+  {path: "**", component: PageNotFoundComponent},
 ];
 
 @NgModule({

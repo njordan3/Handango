@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ViewportScroller } from '@angular/common';
+import { AuthService } from '../auth.service';
+
 
 @Component({
   selector: 'app-home',
@@ -8,11 +9,17 @@ import { ViewportScroller } from '@angular/common';
 })
 export class HomeComponent implements OnInit {
 
-  constructor() {
-
-   }
+  constructor(private authService: AuthService) {
+    let that = this;
+    this.authService.getLogin().then(function(loggedIn) {
+      that.authService.doUrlChange();
+    });
+  }
 
   ngOnInit(): void {
   }
  
+  toLearn(): void {
+
+  }
 }

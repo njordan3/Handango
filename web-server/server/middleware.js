@@ -1,10 +1,7 @@
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
-const favicon = require('serve-favicon');
 const session = require('express-session')
-const path = require('path');
-const flash = require('connect-flash');
 const cors = require('cors');
 
 module.exports = {
@@ -48,8 +45,6 @@ function initMiddleware(express, app, passport) {
         app.use(passport.initialize());
         app.use(passport.session());
 
-        //serves favicon
-        app.use(favicon(path.join(__dirname, '../favicon/favicon-32x32.png')));
         return ses;
 }
 
@@ -62,21 +57,6 @@ function isLoggedIn(req, res, next) {
     res.json({loggedIn: false, message: "You are not authorized for this page..."});
 }
 
-/*
-    How to use this maybe:
-        Angular makes request with this middleware:
-        if not just2FAd, then open the 2FA modal
-            when correct code is submitted, set just2FAd to true and return json
-            dismiss modal and have the user click submit on the original form again
-                OR
-            dismiss modal and use:
-                this.modalService.activeInstances.subscribe((closed) => {
-                    console.log("here");
-                })
-            which is called when the modal gets closed and recall the doWhatever function in the component (do not call auth.service function directly)
-        if just2FAd or not 2FAd at all
-            continue with the request by calling next();
-*/
 function just2FAd(req, res, next) {
     if (req.session.passport.user.secret === null || req.body.just2FAd) {
         return next();
