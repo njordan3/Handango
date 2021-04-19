@@ -20,6 +20,6 @@ export class HomeComponent implements OnInit {
   }
  
   toLearn(): void {
-
+    document.getElementById("learn")?.scrollIntoView({behavior: "smooth"});
   }
 }
