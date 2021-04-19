@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../auth.service';
+
 
 @Component({
   selector: 'app-home',
@@ -7,9 +9,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomeComponent implements OnInit {
 
-  constructor() { }
+  constructor(private authService: AuthService) {
+    let that = this;
+    this.authService.getLogin().then(function(loggedIn) {
+      that.authService.doUrlChange();
+    });
+  }
 
   ngOnInit(): void {
   }
-
+ 
+  toLearn(): void {
+    document.getElementById("learn")?.scrollIntoView({behavior: "smooth"});
+  }
 }

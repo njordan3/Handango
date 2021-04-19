@@ -58,22 +58,24 @@
           </div>
 
           <div class="text-center mb-3">
-            or login with
+            or login with:
           </div>
 
-          <div class="row mb-3" class="buttonsRow">
-            <div class="col-4">
-              <button type="button" (click)="doFacebook()" class="btn btn-block btn-social btn-facebook">
-                <i class="fab fa-facebook-f"></i> Facebook
-              </button>
+          <div class="container">
+              <div class="row">
+                <div class="col">
+                  <button type="button" (click)="doFacebook()" class="btn btn-block btn-social btn-facebook">
+                    <i class="fab fa-facebook-f"></i> Facebook
+                  </button>
+                </div>
+    
+                <div class="col">
+                  <button type="button" (click)="doGoogle()" class="btn btn-block btn-social btn-google">
+                      <i class="fab fa-google"></i> Google
+                  </button>
+                </div>
+              </div>
             </div>
-
-            <div class="col-4">
-              <button type="button" (click)="doGoogle()" class="btn btn-block btn-social btn-google">
-                  <i class="fab fa-google"></i> Google
-              </button>
-            </div>
-          </div>
 
           <hr class="my-4">
 

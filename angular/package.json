@@ -8,7 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "launch": "ng serve --host 192.168.1.3 --public-host duohando.com --port 443 --ssl true --ssl-cert ../web-server/server/tls/cert.pem --ssl-key ../web-server/server/tls/privkey.pem"
+    "launch": "ng serve --host 192.168.1.3 --public-host duohando.com --port 443 --ssl true --ssl-cert ../web-server/tls/cert.pem --ssl-key ../web-server/tls/privkey.pem"
   },
   "private": true,
   "dependencies": {

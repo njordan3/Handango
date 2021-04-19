@@ -18,14 +18,16 @@ export class DashboardGuard implements CanLoad {
             if (loggedIn) {
               let welcomeName = this.router.getCurrentNavigation()?.extractedUrl.queryParams.fname; 
               if (welcomeName) {
-                this.router.navigate(['/dashboard'], { relativeTo: this.route });
+                this.router.navigate(['/dashboard'], { relativeTo: this.route }).then(() => {this.authService.doUrlChange();});
                 this.toastr.success(`Welcome ${welcomeName}!`);
               } else {
                 resolve(true);
+                this.authService.doUrlChange();
               }
             } else {
               this.toastr.error("Login to reach your dashboard.");
               resolve(false);
+              this.authService.doUrlChange();
             }
           })
       });

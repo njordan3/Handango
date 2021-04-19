@@ -16,3 +16,37 @@
     padding-left: 80px !important;
     padding-top: 700px !important;
 }
+.appDescrip .container h1 {
+    text-align: center;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: whitesmoke;
+    color: #333;
+    padding-bottom: 100px;
+}
+.appDescrip .container h1:after {
+    content: '';
+    background: whitesmoke;
+    background: #333;
+    display: block;
+    height: 3px;
+    width: 400px;
+    margin: 10px auto;
+
+}
+.appDescrip .container h2{
+    text-align: center;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #333;
+    padding-bottom: 10px;
+
+}
+.w-100 {
+    padding-top: 50px;
+}
+
+.appDescrip .container img {
+    height: 500px;
+    width: 90%;
+}
