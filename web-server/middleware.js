@@ -65,7 +65,6 @@ function just2FAd(req, res, next) {
 }
 
 function isExternalUser(req, res, next) {
-    console.log(req.session.passport.user.type, req.session.passport.user.id);
     if ((req.session.passport.user.type === "Facebook" || req.session.passport.user.type === "Google") && req.session.passport.user.id !== null) {
         return next();
     }

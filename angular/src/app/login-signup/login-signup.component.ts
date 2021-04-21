@@ -34,7 +34,7 @@ export class LoginSignupComponent implements OnInit {
             this.modalService.open(Login2FAModal, { centered: true, animation: true, keyboard: false, backdrop: 'static' });            
           } else {
             this.toastr.success(`Welcome ${resp.fname}!`);
-            this.router.navigate(['/dashboard'], { relativeTo: this.route });
+            this.router.navigate(['/dashboard'], { relativeTo: this.route }).then(() => {this.authService.doUrlChange();});
           }
         })
         .catch((err) => {

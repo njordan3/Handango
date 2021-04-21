@@ -15,6 +15,7 @@ import { DashboardService } from '../dashboard/dashboard.service';
 export class UserSettingsComponent implements OnInit {
 
   user: User = {
+    username: '',
     email: '',
     password: '',
     repeatPassword: '',
@@ -130,7 +131,10 @@ export class UserSettingsComponent implements OnInit {
       if (isValid) {
         this.authService.doChangeToEmail(model, isValid)
           .then((resp) => {
-            this.toastr.success(resp);
+            this.authService.logout()
+            .then(() => {
+              this.toastr.success(resp?.message);
+            });
           })
           .catch((err) => {
             this.toastr.error(err);
@@ -145,6 +149,7 @@ export class UserSettingsComponent implements OnInit {
 }
 
 interface User {
+  username: string;
   email: string;
   password: string;
   repeatPassword: string;

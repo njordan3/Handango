@@ -30,7 +30,7 @@
                                     <div class="col-md-10 col-sm-9 col-xs-12">
                                         <input name="password" class="form-control" placeholder="Current Password" type="password"
                                         pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[-+_!@#$%^&*.,?]).{8,}"
-                                        [ngModel]="user.password" required #password="ngModel">
+                                        [ngModel]="user.password" required validateEqual="newPassword" reverse="true" #password="ngModel">
                                     </div>
                                 </div>
                                 <!--Validation error messages-->
@@ -50,7 +50,7 @@
                                     <div class="col-md-10 col-sm-9 col-xs-12">
                                         <input name="newPassword" class="form-control" placeholder="New Password" type="password"
                                         pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[-+_!@#$%^&*.,?]).{8,}"
-                                        [ngModel]="user.newPassword" required validateEqual="repeatPassword" reverse="true" #newPassword="ngModel">
+                                        [ngModel]="user.newPassword" required validateEqual="password" reverse="false" #newPassword="ngModel">
                                     </div>
                                 </div>
                                 <!--Validation error messages-->
