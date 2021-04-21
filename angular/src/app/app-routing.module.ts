@@ -11,6 +11,7 @@ import { LoginGuard } from './login.guard';
 import { VerifyGuard } from './verify.guard';
 import { DashboardGuard } from './dashboard.guard';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import { AboutComponent } from './about/about.component';
 
 const routes: Routes = [
   {path: "", pathMatch: "full", redirectTo: "/home"},
@@ -21,6 +22,7 @@ const routes: Routes = [
   {path: "forgetEmail", component: ForgetEmailComponent},
   {path: "verify", canActivate: [VerifyGuard]},
   {path: "confirm", component: ConfirmComponent},
+  {path: "aboutPage", component: AboutComponent},
   {path: "dashboard",
     canLoad: [DashboardGuard],
     loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule) //lazy load dashboard on login
