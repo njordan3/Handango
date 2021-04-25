@@ -1,2 +1,2 @@
-# Duohando
+# Handango
 Senior Seminar Project
