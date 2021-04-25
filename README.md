@@ -1,4 +1,4 @@
-# Duohando
+# Handango
 ### Master branch
 Includes all the features implemented in the other branches of this repository:
 ### User profile features
