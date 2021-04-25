@@ -38,11 +38,15 @@ export class UserProfileComponent implements OnInit {
         that.CreateTime = date;
 
         that.dashboardService.sharedLastLogin?.subscribe(lastLogin => that.LastLogin = lastLogin);
-        date = that.LastLogin.split(' ')[0];
-        time = that.LastLogin.split(' ')[1];
-        pm = parseInt(time.split(':')[0]) > 11;
-        date = `${date.split('-')[1]}-${date.split('-')[2]}-${date.split('-')[0]} at ${parseInt(time.split(':')[0]) == 12 ? 12 : parseInt(time.split(':')[0])%12}:${time.split(':')[1]}${pm ? 'pm' : 'am'}`;
-        that.LastLogin = date;
+        if (that.LastLogin === null) {
+          that.LastLogin = "Never";
+        } else {
+          date = that.LastLogin.split(' ')[0];
+          time = that.LastLogin.split(' ')[1];
+          pm = parseInt(time.split(':')[0]) > 11;
+          date = `${date.split('-')[1]}-${date.split('-')[2]}-${date.split('-')[0]} at ${parseInt(time.split(':')[0]) == 12 ? 12 : parseInt(time.split(':')[0])%12}:${time.split(':')[1]}${pm ? 'pm' : 'am'}`;
+          that.LastLogin = date;
+        }
 
         that.dashboardService.sharedAccountType?.subscribe(accountType => that.AccountType = accountType);
       });

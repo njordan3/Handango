@@ -26,24 +26,26 @@ export class AuthService {
     window.location.href = environment.domainUrl+'/google';
   }
 
-  doRegister(username: string, fname: string, lname: string, email: string, password: string) {
-    this.http.post(environment.domainUrl + '/register', {
-      username: username,
-      firstname: fname,
-      lastname: lname,
-      email: email,
-      password: password
-    }, {
-      withCredentials: true
-    }).subscribe((resp: any) => {
-      console.log(resp);
-      if (resp.error) {
-        this.toastr.error(resp.error);
-      } else {
-        this.toastr.success(`Your new account has been created!`);
-      }
-    }, (errorResp) => {
-      this.toastr.error("Something went wrong trying to register...");
+  doRegister(username: string, fname: string, lname: string, email: string, password: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      this.http.post(environment.domainUrl + '/register', {
+        username: username,
+        firstname: fname,
+        lastname: lname,
+        email: email,
+        password: password
+      }, {
+        withCredentials: true
+      }).subscribe((resp: any) => {
+        console.log(resp);
+        if (resp.error) {
+          return reject(resp.error);
+        } else {
+          return resolve(`Your new account has been created! But first you need to verify your email...`);
+        }
+      }, (errorResp) => {
+        return reject("Something went wrong trying to register...");
+      });
     });
   }
 

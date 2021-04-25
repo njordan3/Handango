@@ -46,6 +46,12 @@ export class SecuritySettingsComponent implements OnInit {
 
   enable2FA(): void {
     this.modalService.open(Activate2FAModal, { centered: true, animation: true, keyboard: false, backdrop: 'static', size: "lg" });
+      this.modalService.activeInstances.subscribe((closed) => {
+        this.authService.logout()
+          .then(() => {
+            this.toastr.success(`Two Factor has successfully been added to your account! You are being logged out...`);
+          });
+    })
   }
 
   doChangePassword(model: User, isValid: boolean|null) {

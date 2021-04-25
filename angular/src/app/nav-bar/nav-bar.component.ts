@@ -28,4 +28,8 @@ export class NavBarComponent implements OnInit {
       });
   }
 
+  goToDashboard() {
+    window.location.href = "https://duohando.com/dashboard";
+  }
+
 }

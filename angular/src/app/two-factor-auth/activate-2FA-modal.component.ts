@@ -76,7 +76,6 @@ export class Activate2FAModal implements OnInit {
         if (isValid) {
             this.authService.doActivate2FACheck(model.code as number)
                 .then((resp) => {
-                    this.toastr.success(`Two Factor has successfully been added to your account!`);
                     this.modalService.dismissAll();
                 })
                 .catch((err) => {

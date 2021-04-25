@@ -42,7 +42,7 @@ export class Login2FAModal {
             this.authService.doLogin2FACheck(model.code as number)
                 .then((resp) => {
                     this.modalService.dismissAll();
-                    this.router.navigate(['/dashboard'], { relativeTo: this.route });
+                    this.router.navigate(['/dashboard'], { relativeTo: this.route }).then(() => {this.authService.doUrlChange();});
                     this.toastr.success(`Welcome ${resp.fname}!`);
                 })
                 .catch((err) => {

@@ -1,10 +1,11 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { launch } from './lesson-practice';
 import { ActivatedRoute } from '@angular/router';
 import { callStop } from './lesson-practice';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LessonPracticeNextModal } from './modals/lesson-practice-next-modal.component';
 import { LessonPracticePrevModal } from './modals/lesson-practice-prev-modal.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'Lesson-practice',
@@ -12,16 +13,20 @@ import { LessonPracticePrevModal } from './modals/lesson-practice-prev-modal.com
   styleUrls: ['../lessons.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class LessonPracticeComponent implements OnInit {
+export class LessonPracticeComponent implements OnInit, OnDestroy {
   type: string = "";
   lesson_num: number = 1;
+
+  private subscription: Subscription | null = null;
+
   constructor(private activatedRoute: ActivatedRoute, private modalService: NgbModal) {
     this.type = "Practice";
   }
 
   ngOnInit(): void {
     //grab route data set in lesson.guard
-    this.activatedRoute.data.subscribe(data => {
+    this.subscription = this.activatedRoute.data.subscribe(data => {
+      console.log(data)
       this.lesson_num = data.lesson_num;
       launch(data.lesson, data.slide); //build all the lessons after the HTML template has loaded
 
@@ -49,5 +54,9 @@ export class LessonPracticeComponent implements OnInit {
           }
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 }
