@@ -1,4 +1,4 @@
-# Duohando
+# Handango
 ### Web-Servers Branch (pre Angular merge)
 Includes the full implementation of backend user profiles with the following features:
 * Three different login types
