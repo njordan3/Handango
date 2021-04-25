@@ -1,4 +1,4 @@
-# Duohando
+# Handango
 ### Angular-Express Merger branch
 Includes all the features of the [web-servers](https://github.com/njordan3/Duohando/tree/web-servers) branch, but with fleshed out lessons and a beautiful user interface to back it up. Lesson features include:
 * Three full lessons with the following topics:
